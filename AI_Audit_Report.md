@@ -61,3 +61,14 @@ Các lượt làm bài mới được ghi append-only trong [conversation_log.md
 - **Output thực tế:** TC-A04-001–005 được báo Fail; TC-A04-006–009 Pass. Ảnh `TC-A04-001.png`, `TC-A04-002.png`, `TC-A04-003.png`, `TC-A04-005.png` đến `TC-A04-009.png` đã chuyển vào [evidence/A04](test-cases/evidence/A04/). Không có file `TC-A04-004.png` trong workspace nên card ghi thiếu evidence, không tạo ảnh giả.
 - **Bug drafts:** [BUG-A04-002](bug-reports/bugs.md) cho UI từ chối phone hợp lệ L=10/11; [BUG-A04-003](bug-reports/bugs.md) cho UI lưu phone không bắt đầu bằng 0. TC-A04-002/004 vẫn được giữ trạng thái Fail theo báo cáo của sinh viên, nhưng hành vi quan sát phù hợp expected invalid class theo FR-04; cần sinh viên xác nhận lại phân loại.
 - **Cleanup:** Xoá `backend.stderr.log` rỗng và `backend.stdout.log` khỏi evidence/A04; giữ collection, summary, CLI log và ảnh thực tế.
+
+## B08 — Domain design và đánh giá BVA
+
+- **Prompt nguyên văn:** “Thực hiện cho feature B08, trigger các skills liên quan.”
+- **Ngày/công cụ:** 2026-10-18, Asia/Bangkok; Codex; model/version không xác nhận. Dùng work-flow và domain-testing.
+- **Nguồn:** FR-08 và SEC-02 trong README SUT, API Cart & Orders, đề HW02. Đọc code chỉ để chọn bước thực thi; chưa chạy SUT.
+- **Output ban đầu:** [analysis/B08_Checkout.md](analysis/B08_Checkout.md), [test-cases/B08_Checkout.md](test-cases/B08_Checkout.md). Bản bất biến qua Git: `f2bad5b` (yêu cầu/scope), `c44688e` (Domain, đánh giá BVA, 10 card).
+- **Kết quả thiết kế:** 6 lớp; 10 TC duy nhất: 8 Domain, 2 Functional, 0 BVA; 10 Not Run. Dùng T=Σ(pᵢ×qᵢ) làm oracle; sửa total client chỉ được reject hoặc tạo đơn đúng T.
+- **Review AI:** ID/matrix/summary/card, 13 trường/card và link đã kiểm tra. BVA chưa có min/max/precision được đặc tả; T−1/T/T+1 chỉ là relational Domain probes, không tự thêm threshold từ coupon/code. Ghi rõ giới hạn với rubric HW.
+- **Verdict sinh viên:** Chưa review/chưa gán VALID hoặc INVALID. Không có bug B08 được tái hiện hoặc evidence execution.
+- **Gap:** chưa đối chiếu bài giảng; chưa thể kiểm chứng chất lượng test bằng runtime. Chưa có trường hợp sinh viên phát hiện AI bỏ sót test/bug B08 để ghi là gap thực tế. Xem [conversation log](audit/conversation_log.md) để biết chi tiết lượt này.

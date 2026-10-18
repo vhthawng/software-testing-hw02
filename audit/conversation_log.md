@@ -204,3 +204,22 @@ Historical entries before this log: [conversation_before_current.md](conversatio
 **Assistant response summary:** A04 đã commit; B08 được đặt làm feature kế tiếp với phạm vi FR-08: đăng nhập, backend tự tính tổng từ giỏ, không tin `total_amount` client, xóa giỏ sau checkout thành công.  
 **Verdict:** COMPLETE for requested commit/preparation; B08 chưa bắt đầu thiết kế.  
 **Student review:** Xác nhận hash commit và phạm vi B08 trước khi gọi domain-testing cho feature tiếp theo.
+
+## Entry 010 — Thiết kế B08 Checkout bằng skills
+
+**Date/time:** 2026-10-18, Asia/Bangkok; exact time unavailable.
+**Tool/model:** Codex; model/version not confirmed.
+**Skills:** work-flow, domain-testing.
+
+**Prompt (user, verbatim):**
+
+> Thực hiện cho feature B08, trigger các skills liên quan.
+
+**Assistant output record:** Đọc domain-testing (template, boundary-rules, domain-types), work-flow, đề HW02, README SUT và API spec. Đọc Checkout.jsx, CartContext.jsx và route cart/checkout/orders chỉ để chuẩn bị cách chạy. Tạo analysis/B08_Checkout.md với input/context, O1–O4 postconditions, 6 lớp, 10-row matrix và truy vết. Tạo test-cases/B08_Checkout.md với 10 card độc lập, gồm 5 Web/5 API, 8 Domain/2 Functional. Chuẩn bị fixture F1=100000×2=200000 và F2=100000×2+50000×3=350000; không khẳng định chúng là seed có sẵn. Fixture Web/API tách riêng; dùng tài khoản riêng nếu không có endpoint xóa giỏ được công bố. Không tạo field code-only, không tạo output class giả, không thêm validation địa chỉ/giỏ trống từ giả định. BVA được đánh giá nhưng không gán test BVA vì FR-08 không nêu min/max hoặc precision; lấy mẫu T−1/T/T+1 là Domain quan hệ. Chưa chạy SUT, 10 Not Run, không tạo evidence/bug giả.
+
+**Immutable outputs:** Git `f2bad5b` (requirements/scope); `c44688e` (Domain, BVA applicability, 10 test cards). File history tại các commit này giữ bản AI ban đầu để so sánh review sau.
+**Artifacts:** [analysis](../analysis/B08_Checkout.md), [test cases](../test-cases/B08_Checkout.md), [progress](../WORK_PROGRESS.md), [AI Audit](../AI_Audit_Report.md).
+**Verification:** 10 IDs khớp matrix/summary/cards; 10 Not Run; 13 trường/card; link local hợp lệ. Đây là kiểm tra artifact, không phải execution.
+**Assistant response summary:** Đã tạo bộ thiết kế B08 để review/thực thi; nêu rõ giới hạn áp dụng BVA và việc còn thiếu so với rubric.
+**Verdict:** INCOMPLETE — raw tool transcript chưa export; bản ghi giữ prompt nguyên văn và output thực tế qua file/Git. Thiết kế đã có, chưa được sinh viên review, chưa thực thi và chưa xác nhận phần BVA theo bài giảng.
+**Student review:** Review fixture/expected, cách phân vùng quan hệ tiền và phần BVA; cung cấp actual/evidence sau khi thực thi. Không đòi xác nhận như điều kiện để tạo tài liệu đã được giao.
