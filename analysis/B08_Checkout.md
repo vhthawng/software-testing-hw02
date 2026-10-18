@@ -5,7 +5,7 @@
 | **Tính năng / nền tảng** | FR-08 Checkout Web; API bổ sung cho JWT và tính toàn vẹn tổng tiền |
 | **Người thiết kế / ngày** | Codex hỗ trợ MSSV 23120355; tên sinh viên chưa cung cấp; 2026-10-18, Asia/Bangkok |
 | **Test case chi tiết** | [B08_Checkout.md](../test-cases/B08_Checkout.md) |
-| **Trạng thái** | Draft; 6 API đã chạy: 2 Pass, 4 Fail; 6 Web Not Run; review tổng thể pending |
+| **Trạng thái** | Draft; 4 Pass, 7 Fail, 1 Blocked, 0 Not Run; Web do người dùng báo cáo, API có CLI evidence; review cuối pending |
 
 ## 1. Phạm vi và nguồn
 
@@ -119,7 +119,7 @@ F1/F2, địa chỉ và U được định nghĩa ở mục 2. Chữ đậm là 
 | Requirement / Class | TC IDs | Trạng thái | Lý do |
 |:---|:---|:---|:---|
 | R1 | 002, 003, 006, 007 | Đã thiết kế | Web guest và API JWT riêng |
-| R2 | 001, 002, 004, 005 | Đã thiết kế | Phép tính, read-only và thay đổi fixture |
+| R2 | 001, 002, 004, 005 | Đã thiết kế | TC005 có test nhưng execution bị chặn; đường thêm sản phẩm có tổng cập nhật đúng theo người dùng |
 | R3 | 001, 002 | Đã thiết kế | Một và nhiều sản phẩm |
 | R4 | 002, 008, 009, 010 | Đã thiết kế | Đúng, thấp và cao hơn T |
 | R5 | 002, 008 | Đã thiết kế | Giỏ Web và giỏ API sau thành công |
@@ -146,9 +146,10 @@ TC IDs dạng số trong bảng này có prefix TC-B08-. Truy vết là độ ph
 | Cả Domain/BVA | 2 |
 | Chỉ kỹ thuật bổ sung | 2 |
 | Hợp lệ / Không hợp lệ / Thao tác bị cấm | 4 / 7 / 1 |
-| Đã thực thi / Pass / Fail / Not Run | 6 / 2 / 4 / 6 |
+| Đã hoàn thành (Pass + Fail) / Pass / Fail | 11 / 4 / 7 |
+| Blocked / Not Run | 1 / 0 |
 
-N=8+0+2+2=12. Không định lượng mức giảm tổ hợp: miền tiền/giỏ không có tập giá trị hữu hạn được đặc tả. Mismatch phải reject theo D2. Đã có runtime evidence cho 6 API: [summary](../test-cases/evidence/B08/b08_api_execution_summary.md). Ba bug nháp: BUG-B08-001/002/003; 6 test Web chưa chạy.
+N=8+0+2+2=12. Không định lượng mức giảm tổ hợp: miền tiền/giỏ không có tập giá trị hữu hạn được đặc tả. Mismatch phải reject theo D2. Đã có runtime evidence cho 6 API: [summary](../test-cases/evidence/B08/b08_api_execution_summary.md). Web được cập nhật theo báo cáo người dùng: TC001/003 Pass, TC002/004/011 Fail, TC005 Blocked do không đổi số lượng trong giỏ được. Có 5 bug B08 nháp (001–005). Tổng 4 Pass, 7 Fail, 1 Blocked; 12 test đã được thử, 11 hoàn thành Pass/Fail.
 
 ## 8. Giới hạn và kỹ thuật bổ sung
 
@@ -163,3 +164,5 @@ Cần bổ sung concurrency/idempotency, checkout nhiều lần, thay đổi gi�
 | v0.3 | 2026-10-18 | Áp dụng D1/D2; thêm TC011/012, B1; giữ G2 mở | Người dùng chốt policy G1/G3 | 008–012 | Policy đã xác nhận; test chưa thực thi |
 
 | v0.4 | 2026-10-18 | Chạy 6 API bằng Postman CLI: 2 Pass, 4 Fail; thu log/JSON và bug drafts | Runtime evidence trên backend nguyên mã, database tạm riêng | 006–010, 012 | Kết quả thật; sinh viên cần review |
+
+| v0.5 | 2026-10-18 | Nhập kết quả Web: 2 Pass, 3 Fail, 1 Blocked; thêm bug Web và ảnh có thật | Báo cáo của người dùng; giữ riêng quan sát đường thêm sản phẩm của TC005 | 001–005, 011 | Chưa gán TC005 Pass/Fail vì bước đổi số lượng không thực hiện được |

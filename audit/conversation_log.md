@@ -304,3 +304,42 @@ Historical entries before this log: [conversation_before_current.md](conversatio
 **Assistant response summary:** 6 API đã thực thi: 2 Pass, 4 Fail; 6 Web vẫn Not Run. Evidence gồm collection/log/JSON/summary. Ba bug nháp chưa đăng Issue và chưa có screenshot. Backend tạm nguyên mã dùng database độc lập, không reset dữ liệu gốc.
 **Verdict:** Execution hoàn tất cho sáu API đã giao; có kết quả Fail cần review, chưa tuyên bố hoàn tất toàn bộ B08. Raw tool transcript chưa export, CLI evidence thật được giữ trong log.
 **Student review:** Kiểm actual và ba bug nháp; chạy các test Web còn lại và thu evidence UI; G2 precision/rounding vẫn chưa chốt.
+
+## Entry 016 — Nhập kết quả Web B08 do người dùng cung cấp
+
+**Date/time:** 2026-10-18, Asia/Bangkok; exact time unavailable.
+**Tool/model:** Codex; model/version not confirmed.
+**Skills:** domain-testing (oracle và phân loại kết quả), work-flow (audit/progress/bug drafts).
+
+**Prompt (user, verbatim):**
+
+> TC-B08-001 - PASS
+> Hiển thị đúng sản phẩm, số lượng 2 và tổng tiền 200000 ₫.
+>
+> TC-B08-002 - FAIL
+> Thanh toán thành công; đơn mới lưu tổng tiền 350000 ₫; giỏ hàng còn sản phẩm
+>
+> TC-B08-003 - PASS
+> Hiển thị dialog thông báo "Bạn cần đăng nhập để thanh toán!"
+> Không thanh toán thành công. Chuyển sang đăng nhập
+>
+> TC-B08-004 - FAIL
+> Sửa được tổng tiền từ UI
+>
+> TC-B08-005 -
+> Ở giỏ hàng thì không điều chỉnh số lượng sản phẩmm được
+> Khi ra ngoài trang chính để thêm sản phẩm tương tự, thì trong giỏ hàng hiển thị (ví dụ) SPA - x2 và SPA - x1, chứ không phải SPA - x3
+> Giá tiền khi tiến vào checkout vẫn được cập nhật
+>
+> TC-B08-011 - FAIL
+> Cho phép thanh toán với 0đ -> hiển thị thanh toán thành công
+> Trong lịch sử đơn có đơn 0đ với 0 đơn hangf
+>
+> đây là state của các test còn lại.
+
+**Assistant output record:** Cập nhật Web TC001/003 Pass, TC002/004/011 Fail đúng báo cáo. Người dùng chưa gán status cho TC005; AI ghi Blocked cho test gốc vì không thực hiện được bước đổi số lượng ngay trong giỏ, giữ quan sát thêm lại sản phẩm thành hai dòng và tổng checkout cập nhật trong Actual Result. Không tự gán giá trị 300000 cho quan sát đường khác khi người dùng chưa nêu con số. Vấn đề điều khiển/gộp số lượng thuộc FR-07; chưa tạo bug B08 cho phần này. Link ba ảnh có thật TC003/004/011; ghi rõ chưa có ảnh TC001/002/005. Giữ 6 API results trước đó. Thêm bug Web không xóa giỏ BUG-B08-004, sửa tổng UI BUG-B08-005; bổ sung Web giỏ trống vào BUG-B08-003. Không suy ra các triệu chứng Web/API có cùng nguyên nhân. Cập nhật analysis/progress/AI audit: 4 Pass, 7 Fail, 1 Blocked, 0 Not Run; completed=Pass+Fail=11, attempted=12. Không thực thi UI hoặc sửa SUT trong lượt này.
+
+**Artifacts:** [B08 test cases](../test-cases/B08_Checkout.md), [analysis](../analysis/B08_Checkout.md), [bug drafts](../bug-reports/bugs.md), [progress](../WORK_PROGRESS.md), [AI Audit](../AI_Audit_Report.md); ảnh [TC003](../test-cases/evidence/B08/TC-B08-003.png), [TC004](../test-cases/evidence/B08/TC-B08-004.png), [TC011](../test-cases/evidence/B08/TC-B08-011.png).
+**Assistant response summary:** Đã cập nhật kết quả Web; TC005 Blocked cho đường gốc, tổng tiền đúng qua đường thêm sản phẩm được ghi riêng. Tổng 4 Pass/7 Fail/1 Blocked; 5 bug B08 nháp.
+**Verdict:** Cập nhật theo báo cáo người dùng; chưa tuyên bố mọi test hoàn thành vì TC005 Blocked; chưa có Issue/screenshot cho mọi bug. Raw tool transcript chưa export.
+**Student review:** Review cách phân loại TC005; nếu muốn kiểm tra đường thêm sản phẩm thay thế, cần mô tả lại case/re-run có dữ liệu cụ thể, không biến quan sát hiện tại thành Pass của steps chưa chạy được.

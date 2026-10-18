@@ -98,3 +98,13 @@ Người dùng phản hồi test case khó hiểu vì quá nhiều mã R1/F1 và
 - **Artifacts:** [summary](test-cases/evidence/B08/b08_api_execution_summary.md), [CLI log](test-cases/evidence/B08/postman-cli.log), [response/snapshot JSON](test-cases/evidence/B08/b08_api_results.json), [collection](test-cases/evidence/B08/b08_api_postman_collection.json); cập nhật [test cases](test-cases/B08_Checkout.md), analysis và progress.
 - **Bug drafts:** BUG-B08-001 giỏ không xóa; BUG-B08-002 client total được tin và lưu sai; BUG-B08-003 giỏ trống tạo đơn. Xem [bugs.md](bug-reports/bugs.md). Chưa có screenshot/GitHub Issue; không tự đăng ngoài workspace.
 - **Verdict:** execution có evidence; sinh viên chưa review kết quả cuối. TC012 đánh theo quyết định bổ sung được xác nhận, phân biệt với FR-08 gốc. Chưa chạy Web, chưa suy ra kết quả UI.
+
+## B08 — Người dùng cung cấp kết quả Web
+
+- **Ngày:** 2026-10-18, Asia/Bangkok; Codex cập nhật tài liệu, không tự chạy UI.
+- **Kết quả do người dùng báo cáo:** TC001 Pass; TC002 Fail (đơn đúng 350000 nhưng giỏ còn hàng); TC003 Pass (dialog yêu cầu đăng nhập rồi chuyển sang đăng nhập); TC004 Fail (sửa được tổng từ UI); TC011 Fail (giỏ trống tạo đơn 0 ₫).
+- **TC005:** người dùng không ghi trạng thái. Bước đổi số lượng trực tiếp trong giỏ không làm được nên AI ghi Blocked cho test gốc. Người dùng thêm lại sản phẩm từ trang chính, thấy hai dòng ×2/×1 và tổng checkout vẫn cập nhật; giữ quan sát này trong Actual, không đổi steps sau chạy hoặc tự gán Pass/Fail. Vướng mắc điều khiển/gộp giỏ thuộc FR-07; chưa thêm thành bug B08.
+- **Tổng hợp:** 4 Pass, 7 Fail, 1 Blocked, 0 Not Run; 12 test đã được thử, 11 hoàn thành Pass/Fail. 6 API vẫn giữ kết quả CLI trước đó.
+- **Evidence Web có thật:** ảnh TC003, TC004, TC011 trong test-cases/evidence/B08/. TC001/002/005 chỉ có báo cáo người dùng, chưa có ảnh tương ứng.
+- **Bug drafts:** thêm BUG-B08-004 (Web không xóa giỏ), BUG-B08-005 (sửa tổng UI); bổ sung đường Web vào BUG-B08-003 (giỏ trống). Giữ riêng lỗi Web/API không xóa giỏ vì chưa có kết luận nguyên nhân chung. Tổng 5 bug B08 nháp; chưa đăng Issue.
+- **AI review:** thiết kế TC005 dựa vào khả năng chỉnh số lượng theo FR-07 nhưng runtime không hỗ trợ, khiến đường chạy bị chặn. Cần phân biệt quan sát tổng đúng qua đường khác với việc đã hoàn thành các bước test ban đầu. Kết luận/ảnh do người dùng cung cấp chưa đồng nghĩa AI đã tự kiểm chứng UI.

@@ -1,4 +1,4 @@
-﻿# Bug reports
+# Bug reports
 
 ## Classification note
 
@@ -86,13 +86,13 @@ The execution report marks TC-A04-002 (L=9) and TC-A04-004 (L=12) as **Fail**. T
 | Screenshot / Issue | Chưa có screenshot, chưa đăng GitHub Issue |
 | Cleanup | Tài khoản/đơn nằm trong database tạm; dừng backend thử nghiệm sau khi lưu evidence |
 
-## BUG-B08-003 — API tạo đơn cho giỏ trống
+## BUG-B08-003 — Thanh toán giỏ trống vẫn tạo đơn (API và Web)
 
 | Trường | Nội dung |
 |:---|:---|
 | Trạng thái | Đã tái hiện bằng Postman CLI; bug Markdown nháp, chưa đăng GitHub Issue |
 | Requirement | Quyết định bổ sung giỏ trống do người dùng xác nhận: phải từ chối, báo lỗi, không tạo đơn; FR-08 gốc chưa quy định riêng trường hợp này |
-| Test case | TC-B08-012 trong [B08 test cases](../test-cases/B08_Checkout.md) |
+| Test case | TC-B08-011 (Web) và TC-B08-012 (API) trong [B08 test cases](../test-cases/B08_Checkout.md) |
 | Môi trường | 2026-10-18; Postman CLI 1.75.0; localhost:3000; backend nguyên mã, database riêng |
 | Preconditions / Data | User mới có JWT hợp lệ; GET /api/cart trả []; orders trước test rỗng. Total gửi 0 khớp tổng giỏ trống, chỉ vi phạm điều kiện giỏ không trống |
 | Steps | 1. Xác minh giỏ trống.<br>2. POST /api/checkout với JWT hợp lệ và body {"total_amount":0,"shipping_address":"123 Le Loi, TP.HCM"}.<br>3. GET /api/orders/my-orders. |
@@ -100,5 +100,42 @@ The execution report marks TC-A04-002 (L=9) and TC-A04-004 (L=12) as **Fail**. T
 | Actual | HTTP 200 với Checkout successful, tạo đơn ID 4 có total_amount=0 |
 | Ảnh hưởng | Phát sinh đơn không có sản phẩm và tổng tiền 0 trái policy đã chốt |
 | Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [JSON snapshot](../test-cases/evidence/B08/b08_api_results.json), [summary](../test-cases/evidence/B08/b08_api_execution_summary.md) |
-| Screenshot / Issue | Chưa có screenshot, chưa đăng GitHub Issue |
+| Screenshot / Issue | Có ảnh Web [TC-B08-011.png](../test-cases/evidence/B08/TC-B08-011.png); chưa có screenshot API, chưa đăng GitHub Issue |
 | Cleanup | Đơn thử nằm trong database tạm; dừng backend thử nghiệm sau khi lưu evidence |
+
+**Bổ sung Web cho BUG-B08-003 (người dùng thực thi, 2026-10-18):** giỏ không có sản phẩm, xác nhận thanh toán vẫn hiển thị thành công; lịch sử có đơn 0 ₫ không có sản phẩm. Expected: chặn, báo lỗi và không tạo đơn theo policy đã chốt. Evidence: [TC-B08-011.png](../test-cases/evidence/B08/TC-B08-011.png). Đây là bổ sung đường tái hiện Web cho cùng yêu cầu; chưa suy ra hai nền tảng có chung nguyên nhân.
+
+## BUG-B08-004 — Giỏ Web còn sản phẩm sau thanh toán thành công
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Người dùng đã tái hiện Web; bug Markdown nháp, chưa đăng GitHub Issue |
+| Requirement | FR-08: sau thanh toán thành công, giỏ hàng được xóa |
+| Test case | TC-B08-002 trong [B08 test cases](../test-cases/B08_Checkout.md) |
+| Môi trường | Web EShop; kết quả người dùng cung cấp 2026-10-18; chưa có build/browser cụ thể |
+| Preconditions / Data | Đã đăng nhập; sản phẩm 100000 ₫ × 2 và sản phẩm khác 50000 ₫ × 3; tổng 350000 ₫ |
+| Steps | 1. Mở checkout và xác nhận thanh toán.<br>2. Kiểm đơn mới lưu 350000 ₫.<br>3. Quay lại giỏ trong cùng phiên. |
+| Expected | Đơn đúng 350000 ₫; giỏ không còn sản phẩm sau thành công |
+| Actual | Thanh toán thành công, đơn mới đúng 350000 ₫; giỏ vẫn còn sản phẩm theo báo cáo người dùng |
+| Evidence | Báo cáo thực thi trong [conversation log](../audit/conversation_log.md), Entry 016; chưa có ảnh TC-B08-002 trong workspace |
+| Ảnh hưởng | Giỏ Web giữ lại hàng đã thanh toán, có thể khiến người dùng đặt lặp |
+| Liên quan | BUG-B08-001 là đường API cùng triệu chứng; giữ riêng vì chưa xác nhận nguyên nhân chung |
+| Screenshot / Issue | Chưa có screenshot, chưa đăng GitHub Issue |
+
+## BUG-B08-005 — Web cho sửa trực tiếp tổng tiền thanh toán
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Người dùng đã tái hiện Web; bug Markdown nháp, chưa đăng GitHub Issue |
+| Requirement | FR-08: tổng tiền được tính tự động và không cho sửa trực tiếp |
+| Test case | TC-B08-004 trong [B08 test cases](../test-cases/B08_Checkout.md) |
+| Môi trường | Web EShop; kết quả người dùng cung cấp 2026-10-18; chưa có build/browser cụ thể |
+| Preconditions / Data | Đã đăng nhập; giỏ có sản phẩm 100000 ₫ × 2, tổng 200000 ₫ |
+| Steps | 1. Mở trang thanh toán.<br>2. Thử nhập hoặc sửa trực tiếp vùng tổng tiền bằng thao tác UI thông thường. |
+| Expected | Không sửa trực tiếp được tổng tiền |
+| Actual | Người dùng sửa được tổng tiền từ giao diện; chưa ghi giá trị sau sửa cụ thể vì báo cáo chưa nêu |
+| Evidence | [TC-B08-004.png](../test-cases/evidence/B08/TC-B08-004.png) |
+| Ảnh hưởng | Tổng tiền trên giao diện bị người dùng thay đổi trái FR-08; backend còn có BUG-B08-002 riêng |
+| Screenshot / Issue | Có ảnh Web local; chưa đăng GitHub Issue |
+
+**Quan sát phụ thuộc của TC-B08-005:** người dùng không đổi số lượng ngay trong giỏ được; thêm lại cùng sản phẩm từ trang chính tạo hai dòng ×2 và ×1, checkout vẫn cập nhật tổng. Điều khiển số lượng và gộp sản phẩm thuộc FR-07; ghi nhận để theo dõi, chưa đếm thành bug B08 hoặc gán Fail cho phép tính tổng B08. Test theo bước gốc hiện Blocked.

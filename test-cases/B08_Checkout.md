@@ -1,6 +1,6 @@
 # Test Cases: B08 — Thanh toán
 
-- **Trạng thái:** 12 test: 6 đã chạy bằng Postman CLI (2 Pass, 4 Fail); 6 test Web chưa chạy (Not Run).
+- **Trạng thái:** 12 test: 4 Pass, 7 Fail, 1 Blocked; 0 Not Run. Kết quả Web do người dùng cung cấp, API do Postman CLI thực thi.
 - **Yêu cầu gốc:** [FR-08 và SEC-02](../eshop-sut/README.md). [Cách gọi API](../eshop-sut/api_specification.md).
 - **Phân tích và truy vết:** [analysis/B08_Checkout.md](../analysis/B08_Checkout.md).
 - **Ngày cập nhật:** 2026-10-18, Asia/Bangkok.
@@ -32,23 +32,25 @@ Hai quy tắc bổ sung đã được bạn xác nhận: **giỏ trống phải 
 
 **Lần chạy API 2026-10-18:** backend nguyên mã trong database tạm riêng. Chi tiết và response: [execution summary](evidence/B08/b08_api_execution_summary.md). Không phải bằng chứng thực thi UI Web.
 
+**Kết quả Web 2026-10-18:** cập nhật theo báo cáo thực thi của bạn. Ảnh hiện có: TC003, TC004, TC011. TC005 ghi Blocked cho bước đổi số lượng trong giỏ; quan sát tổng tiền đúng qua cách thêm sản phẩm được giữ riêng trong Actual Result.
+
 ## 1. Tổng hợp
 
-12 test: 8 chỉ Domain Testing, 2 thuộc cả Domain Testing và BVA, 2 kiểm tra chức năng. Kết quả hiện tại: 2 Pass, 4 Fail, 6 Not Run.
+12 test: 8 chỉ Domain Testing, 2 thuộc cả Domain Testing và BVA, 2 kiểm tra chức năng. Kết quả hiện tại: 4 Pass, 7 Fail, 1 Blocked, 0 Not Run. Đã hoàn thành 11 test (Pass + Fail); TC005 đã thử nhưng bị chặn tại bước đổi số lượng trong giỏ.
 
 | TC ID | Nội dung kiểm tra | Dữ liệu chính | Kết quả mong đợi | Trạng thái |
 |:---|:---|:---|:---|:---|
-| TC-B08-001 | Web hiển thị đúng sản phẩm và tổng tiền | Một sản phẩm × 2; tổng đúng 200000 ₫. | Hiển thị đúng sản phẩm và 200000 ₫ | Not Run |
-| TC-B08-002 | Web thanh toán nhiều sản phẩm và xóa giỏ | Sản phẩm thứ nhất: 100000 ₫ × 2. Sản phẩm thứ hai: 50000 ₫ × 3. Tổng đúng 350000 ₫. | Đơn 350000 ₫, giỏ rỗng sau thành công | Not Run |
-| TC-B08-003 | Web chặn thanh toán khi chưa đăng nhập | Không có phiên đăng nhập hoặc token trong cửa sổ thử nghiệm. | Không thanh toán được khi chưa đăng nhập | Not Run |
-| TC-B08-004 | Web không cho sửa trực tiếp tổng tiền | Tổng đúng 200000 ₫; thử sửa thành 1 bằng thao tác nhập thông thường. | Không sửa trực tiếp được tổng tiền | Not Run |
-| TC-B08-005 | Web tính lại tổng khi thay đổi số lượng | Đổi số lượng từ 2 thành 3; tổng mới phải là 300000 ₫. | Tổng đổi thành 300000 ₫ | Not Run |
+| TC-B08-001 | Web hiển thị đúng sản phẩm và tổng tiền | Một sản phẩm × 2; tổng đúng 200000 ₫. | Hiển thị đúng sản phẩm và 200000 ₫ | Pass |
+| TC-B08-002 | Web thanh toán nhiều sản phẩm và xóa giỏ | Sản phẩm thứ nhất: 100000 ₫ × 2. Sản phẩm thứ hai: 50000 ₫ × 3. Tổng đúng 350000 ₫. | Đơn 350000 ₫, giỏ rỗng sau thành công | Fail |
+| TC-B08-003 | Web chặn thanh toán khi chưa đăng nhập | Không có phiên đăng nhập hoặc token trong cửa sổ thử nghiệm. | Không thanh toán được khi chưa đăng nhập | Pass |
+| TC-B08-004 | Web không cho sửa trực tiếp tổng tiền | Tổng đúng 200000 ₫; thử sửa thành 1 bằng thao tác nhập thông thường. | Không sửa trực tiếp được tổng tiền | Fail |
+| TC-B08-005 | Web tính lại tổng khi thay đổi số lượng | Đổi số lượng từ 2 thành 3; tổng mới phải là 300000 ₫. | Tổng đổi thành 300000 ₫ | Blocked |
 | TC-B08-006 | API từ chối thanh toán khi thiếu token | POST /api/checkout; không gửi header Authorization; body như bên dưới với total_amount=200000. | Từ chối, không tạo đơn | Pass |
 | TC-B08-007 | API từ chối thanh toán khi token sai | POST /api/checkout; Authorization: Bearer invalid.b08.token; body với total_amount=200000. | Từ chối, không tạo đơn | Pass |
 | TC-B08-008 | API thanh toán giỏ có một dòng sản phẩm | POST /api/checkout; token hợp lệ; body với total_amount=200000. Một dòng sản phẩm có số lượng 2 vẫn được tính là một dòng giỏ. | Đơn 200000 ₫, giỏ API rỗng | Fail |
 | TC-B08-009 | API từ chối tổng tiền gửi lên thấp hơn tổng giỏ | POST /api/checkout; token hợp lệ; body với total_amount=199999. | Từ chối, báo lỗi, không tạo đơn | Fail |
 | TC-B08-010 | API từ chối tổng tiền gửi lên cao hơn tổng giỏ | POST /api/checkout; token hợp lệ; body với total_amount=200001. | Từ chối, báo lỗi, không tạo đơn | Fail |
-| TC-B08-011 | Web chặn thanh toán giỏ trống | Giỏ không có sản phẩm; tổng bằng 0. | Chặn, báo giỏ trống, không tạo đơn | Not Run |
+| TC-B08-011 | Web chặn thanh toán giỏ trống | Giỏ không có sản phẩm; tổng bằng 0. | Chặn, báo giỏ trống, không tạo đơn | Fail |
 | TC-B08-012 | API từ chối thanh toán giỏ trống | POST /api/checkout; token hợp lệ; body với total_amount=0. Tổng gửi lên khớp giỏ trống để chỉ kiểm tra lỗi giỏ trống. | Từ chối, báo lỗi, không tạo đơn | Fail |
 
 ## 2. Chi tiết
@@ -65,9 +67,9 @@ Hai quy tắc bổ sung đã được bạn xác nhận: **giỏ trống phải 
 | Test data | Một sản phẩm × 2; tổng đúng 200000 ₫. |
 | Steps | 1. Mở trang thanh toán.<br>2. Kiểm tra tên sản phẩm, số lượng và tổng tiền. |
 | Expected Result | Hiển thị đúng sản phẩm, số lượng 2 và tổng tiền 200000 ₫. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
+| Actual Result | Theo người dùng thực thi Web: hiển thị đúng sản phẩm, số lượng 2 và tổng tiền 200000 ₫. |
+| Status | Pass |
+| Evidence | — (kết quả do người dùng báo cáo; chưa có ảnh TC-B08-001 trong workspace) |
 | Bug ID / Issue URL | — |
 | Cleanup | Ghi mã đơn thử nghiệm nếu có; dọn giỏ thử bằng thao tác được hỗ trợ. Nếu không dọn được thì dùng tài khoản thử nghiệm khác cho lần chạy sau. |
 
@@ -83,10 +85,10 @@ Hai quy tắc bổ sung đã được bạn xác nhận: **giỏ trống phải 
 | Test data | Sản phẩm thứ nhất: 100000 ₫ × 2. Sản phẩm thứ hai: 50000 ₫ × 3. Tổng đúng 350000 ₫. |
 | Steps | 1. Mở trang thanh toán, kiểm tra đủ hai sản phẩm và số lượng.<br>2. Kiểm tra tổng tiền bằng 350000 ₫.<br>3. Nhấn Xác Nhận Thanh Toán một lần.<br>4. Đọc danh sách đơn hàng và xác định đơn vừa tạo bằng mã đơn mới.<br>5. Quay lại giỏ trong cùng phiên trình duyệt. |
 | Expected Result | Thanh toán thành công; đơn mới lưu tổng tiền 350000 ₫; giỏ hàng không còn sản phẩm. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Theo người dùng thực thi Web: thanh toán thành công, đơn mới lưu 350000 ₫, nhưng giỏ vẫn còn sản phẩm. |
+| Status | Fail |
+| Evidence | — (kết quả do người dùng báo cáo; chưa có ảnh TC-B08-002 trong workspace) |
+| Bug ID / Issue URL | [BUG-B08-004](../bug-reports/bugs.md) |
 | Cleanup | Ghi mã đơn thử nghiệm nếu có; dọn giỏ thử bằng thao tác được hỗ trợ. Nếu không dọn được thì dùng tài khoản thử nghiệm khác cho lần chạy sau. |
 
 ### TC-B08-003 — Web chặn thanh toán khi chưa đăng nhập
@@ -101,9 +103,9 @@ Hai quy tắc bổ sung đã được bạn xác nhận: **giỏ trống phải 
 | Test data | Không có phiên đăng nhập hoặc token trong cửa sổ thử nghiệm. |
 | Steps | 1. Thử mở trang thanh toán từ giỏ hàng và bằng URL /checkout.<br>2. Nếu trang cho phép, nhấn xác nhận thanh toán.<br>3. Ghi lại điểm bị chặn và thông báo. |
 | Expected Result | Không thanh toán thành công. Chuyển sang đăng nhập, chặn trang hoặc từ chối xác nhận đều phù hợp; không bắt buộc một URL hay câu thông báo cụ thể. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
+| Actual Result | Theo người dùng thực thi Web: hiển thị dialog "Bạn cần đăng nhập để thanh toán!", không thanh toán thành công và chuyển sang đăng nhập. |
+| Status | Pass |
+| Evidence | [TC-B08-003.png](evidence/B08/TC-B08-003.png) |
 | Bug ID / Issue URL | — |
 | Cleanup | Ghi mã đơn thử nghiệm nếu có; dọn giỏ thử bằng thao tác được hỗ trợ. Nếu không dọn được thì dùng tài khoản thử nghiệm khác cho lần chạy sau. |
 
@@ -119,10 +121,10 @@ Hai quy tắc bổ sung đã được bạn xác nhận: **giỏ trống phải 
 | Test data | Tổng đúng 200000 ₫; thử sửa thành 1 bằng thao tác nhập thông thường. |
 | Steps | 1. Mở trang thanh toán.<br>2. Thử chọn vùng tổng tiền bằng chuột và phím Tab.<br>3. Nếu có ô nhập, thử gõ hoặc dán số 1; thử nút tăng/giảm nếu có.<br>4. Quan sát giá trị; chưa xác nhận thanh toán. |
 | Expected Result | Không sửa được tổng tiền bằng thao tác UI thông thường; tổng vẫn là 200000 ₫. Nếu sửa được thì test Fail, kể cả backend có thể tính lại. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Theo người dùng thực thi Web: sửa được tổng tiền trực tiếp trên giao diện thanh toán. |
+| Status | Fail |
+| Evidence | [TC-B08-004.png](evidence/B08/TC-B08-004.png) |
+| Bug ID / Issue URL | [BUG-B08-005](../bug-reports/bugs.md) |
 | Cleanup | Ghi mã đơn thử nghiệm nếu có; dọn giỏ thử bằng thao tác được hỗ trợ. Nếu không dọn được thì dùng tài khoản thử nghiệm khác cho lần chạy sau. |
 
 ### TC-B08-005 — Web tính lại tổng khi thay đổi số lượng
@@ -137,10 +139,10 @@ Hai quy tắc bổ sung đã được bạn xác nhận: **giỏ trống phải 
 | Test data | Đổi số lượng từ 2 thành 3; tổng mới phải là 300000 ₫. |
 | Steps | 1. Mở trang thanh toán, ghi nhận tổng 200000 ₫.<br>2. Quay lại giỏ và đổi số lượng sản phẩm thành 3.<br>3. Mở lại trang thanh toán.<br>4. Kiểm tra số lượng và tổng tiền. |
 | Expected Result | Hiển thị số lượng 3 và tổng tiền 100000 × 3 = 300000 ₫. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Không thực hiện được bước đổi số lượng trực tiếp trong giỏ vì UI không hỗ trợ. Người dùng thử đường khác: quay về trang chính thêm cùng sản phẩm; giỏ hiển thị hai dòng (ví dụ sản phẩm A × 2 và A × 1), tổng tiền khi mở checkout vẫn cập nhật. Đây là quan sát bổ sung về đường thêm sản phẩm, chưa đủ để gán Pass/Fail cho đúng các bước test hiện tại; không khẳng định giá trị mới 300000 ₫ khi báo cáo chưa nêu số cụ thể. |
+| Status | Blocked |
+| Evidence | — (quan sát do người dùng báo cáo; chưa có ảnh TC-B08-005 trong workspace) |
+| Bug ID / Issue URL | — (vướng chức năng giỏ hàng FR-07; chưa gán lỗi tính tổng của B08) |
 | Cleanup | Ghi mã đơn thử nghiệm nếu có; dọn giỏ thử bằng thao tác được hỗ trợ. Nếu không dọn được thì dùng tài khoản thử nghiệm khác cho lần chạy sau. |
 
 ### TC-B08-006 — API từ chối thanh toán khi thiếu token
@@ -245,10 +247,10 @@ Hai quy tắc bổ sung đã được bạn xác nhận: **giỏ trống phải 
 | Test data | Giỏ không có sản phẩm; tổng bằng 0. |
 | Steps | 1. Thử mở trang thanh toán từ giỏ và bằng URL /checkout.<br>2. Nếu UI cho phép, nhấn xác nhận; nếu đã chặn thì ghi lại thông báo.<br>3. Đọc danh sách đơn để kiểm tra không có đơn mới. |
 | Expected Result | Không thanh toán được; có thông báo lỗi hoặc giải thích giỏ trống; không tạo đơn. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Theo người dùng thực thi Web: giỏ trống vẫn thanh toán 0 ₫ và hiển thị thanh toán thành công. Lịch sử đơn có đơn 0 ₫ không có sản phẩm. |
+| Status | Fail |
+| Evidence | [TC-B08-011.png](evidence/B08/TC-B08-011.png) |
+| Bug ID / Issue URL | [BUG-B08-003](../bug-reports/bugs.md) |
 | Cleanup | Ghi mã đơn thử nghiệm nếu có; dọn giỏ thử bằng thao tác được hỗ trợ. Nếu không dọn được thì dùng tài khoản thử nghiệm khác cho lần chạy sau. |
 
 ### TC-B08-012 — API từ chối thanh toán giỏ trống
