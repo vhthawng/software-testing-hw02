@@ -223,3 +223,84 @@ Historical entries before this log: [conversation_before_current.md](conversatio
 **Assistant response summary:** Đã tạo bộ thiết kế B08 để review/thực thi; nêu rõ giới hạn áp dụng BVA và việc còn thiếu so với rubric.
 **Verdict:** INCOMPLETE — raw tool transcript chưa export; bản ghi giữ prompt nguyên văn và output thực tế qua file/Git. Thiết kế đã có, chưa được sinh viên review, chưa thực thi và chưa xác nhận phần BVA theo bài giảng.
 **Student review:** Review fixture/expected, cách phân vùng quan hệ tiền và phần BVA; cung cấp actual/evidence sau khi thực thi. Không đòi xác nhận như điều kiện để tạo tài liệu đã được giao.
+
+## Entry 011 — Review các spec gap B08 và hướng giải quyết
+
+**Date/time:** 2026-10-18, Asia/Bangkok; exact time unavailable.
+**Tool/model:** Codex; model/version not confirmed.
+**Skills:** domain-testing và work-flow (conversation capture).
+
+**Prompt (user, verbatim):**
+
+> bạn hãy review các spec gap trong [B08_Checkout.md](analysis/B08_Checkout.md) và gợi ý hướng giải quyết giúp tôi
+
+**Assistant output record:** Đối chiếu G1–G6 với FR-08, API Cart & Orders và nguyên tắc spec-first. G1 nên tách checkout giỏ trống khỏi giới hạn tổng/số dòng; spec không nêu max không có nghĩa bắt buộc phải bổ sung max. G2 thực sự thiếu quy tắc precision/rounding; dùng fixture tính chính xác, không khẳng định ±1 là đơn vị nhỏ nhất hệ thống. G3 không chặn kiểm thử invariant tổng tiền: reject mismatch hoặc tính lại đúng T; không ép status/message. G4 nên tách địa chỉ khỏi hình dạng/kiểu total; không tự đặt required/min/max, nếu exploratory thì chỉ kết luận theo invariant có căn cứ. G5 là ghi chú implementation/setup, không phải thiếu yêu cầu nghiệp vụ; chuẩn bị riêng Web/API nhưng không biến sự tách rời hiện tại thành oracle đúng hoặc miễn kiểm tra clear-cart. G6 là giới hạn tài liệu/phương pháp, không phải spec gap nghiệp vụ; nhận định trước rằng BVA chỉ có thể áp dụng khi có min/max là quá tuyệt đối. Biên quan hệ có thể phù hợp nếu mô hình predicate và quy ước bài giảng được giải thích, nhưng R4 không quy định miền client total được chấp nhận nên không tự gán T−1/T/T+1 là BVA validation. Đề xuất giữ suite chính theo spec, rà quy ước BVA môn học; không nhập coupon FR-09 hoặc tự thêm requirement để đủ số lượng. Lượt này chỉ review/gợi ý; không sửa analysis hoặc test case và không thực thi SUT.
+
+**Artifacts:** [analysis được review](../analysis/B08_Checkout.md), conversation log này.
+**Verdict:** Review/gợi ý đã cung cấp; các policy đề xuất chưa được xác nhận thành requirement. Raw tool transcript chưa export.
+**Student review:** Cân nhắc tách lại G1/G4, chuyển G5/G6 sang ghi chú phương pháp; đối chiếu bài giảng trước khi chốt nhãn BVA. Các test hiện có vẫn Not Run.
+
+## Entry 012 — Chốt G1/G3 B08 và giải thích G2
+
+**Date/time:** 2026-10-18, Asia/Bangkok; exact time unavailable.
+**Tool/model:** Codex; model/version not confirmed.
+**Skills:** domain-testing, work-flow.
+
+**Prompt (user, verbatim):**
+
+> tôi nghĩ nên cân nhắc G1, G2, và G3. Phần G3 nếu client mismatch với backedn thì phải từ chối và báo lỗi. Về G1 nên check empty, còn max thì khỏi. Còn về G2 thì tôi chưa rõ lắm.
+
+**Clarification:** Assistant hỏi “Với checkout giỏ trống (G1), expected bạn muốn chốt là gì?” Người dùng chọn nguyên văn: “Từ chối, báo lỗi và không tạo đơn”.
+
+**Assistant output record:** Áp dụng D1 giỏ trống reject/error/no order và D2 mismatch reject/error/no order như yêu cầu bổ sung người dùng đã xác nhận. Cập nhật G1/G3, oracle O5, lớp C5/C6 và thêm C7/C8, matrix/trace/card cho TC011 Web empty và TC012 API empty; không thêm max. Đổi TC008 thành Domain+BVA B1 on n=1 và TC012 thành Domain+BVA B1 off n=0, độ mịn số nguyên 1 dòng. Giỏ rỗng dùng total=0 khớp Σ rỗng để không gây thêm lỗi mismatch. TC009/010 bắt buộc reject và báo lỗi, không tạo đơn; không áp đặt câu lỗi/status cụ thể. G2 chưa được xác nhận: dùng ví dụ giả sử 10.123×3=30.369 để giải thích lưu chính xác hay làm tròn cần policy; không tự thêm test tiền thập phân hoặc đơn vị nhỏ nhất. Bộ fixture hiện tại tính chính xác. Không sửa SUT hoặc thực thi test.
+
+**Artifacts:** [analysis](../analysis/B08_Checkout.md), [test cases](../test-cases/B08_Checkout.md), [progress](../WORK_PROGRESS.md), [AI Audit](../AI_Audit_Report.md).
+**Assistant response summary:** Đã cập nhật 12 TC (8 Domain-only, 2 Domain+BVA, 2 Functional), 12 Not Run; G1/G3 đã chốt, G2 còn mở. Nêu rõ D1/D2 là quyết định bổ sung, không ghi nhầm là nguyên văn FR-08.
+**Verdict:** Policy D1/D2 đã được người dùng xác nhận; G2 chưa chốt; test chưa thực thi. Raw tool transcript chưa export, output thực tế giữ trong artifact.
+**Student review:** Review các test giỏ trống/mismatch mới và B1 số dòng; chưa cần quyết định rounding để chạy fixture tiền nguyên hiện tại.
+
+## Entry 013 — Viết lại test case B08 cho dễ đọc
+
+**Date/time:** 2026-10-18, Asia/Bangkok; exact time unavailable.
+**Tool/model:** Codex; model/version not confirmed.
+**Skills:** domain-testing (output clarity), work-flow (conversation capture).
+
+**Prompt (user, verbatim):**
+
+> sao cái test [B08_Checkout.md](test-cases/B08_Checkout.md) , bạn ghi cái gì mà khó hiểu quá vậy?? R1, F1 gì trong đó tùm lum vậy
+
+**Assistant output record:** Thừa nhận dùng quá nhiều mã nội bộ gây khó đọc. Viết lại test-cases/B08_Checkout.md bằng tiếng Việt trực tiếp: bỏ R1–R5, F1/F2, D1/D2, U, P/Q, q/T khỏi hướng dẫn thực thi; ghi đầy đủ giá sản phẩm, số lượng, tổng tiền và trạng thái đăng nhập trong từng card. Bảng tổng hợp rút gọn để quét nhanh; nguồn yêu cầu và technique vẫn có trong card. Chỉ giữ C/B IDs trong trường Domain / Boundary để truy vết analysis. Chuẩn bị API dùng body mẫu và giải thích rõ giá trị thay đổi theo card. Giữ nguyên 12 TC IDs, các expected đã chốt và 12 Not Run; không thực thi hoặc sửa SUT.
+
+**Artifacts:** [test cases B08](../test-cases/B08_Checkout.md), conversation log.
+**Verdict:** Đã sửa cách trình bày theo phản hồi sinh viên; không khẳng định người dùng đã review bản viết lại. Raw tool transcript chưa export.
+**Student review:** Đọc steps/data/expected mới; không cần tra mã nội bộ để thực thi test.
+
+## Entry 014 — Phân loại B08 chạy được bằng Postman CLI
+
+**Date/time:** 2026-10-18, Asia/Bangkok; exact time unavailable.
+**Tool/model:** Codex; model/version not confirmed.
+**Skills:** work-flow (conversation capture).
+**Prompt (user, verbatim):**
+
+> test case nào bạn có thể dùng postman-cli test ngay cho tôi được?
+
+**Assistant output record:** Đối chiếu card B08 hiện tại: sáu test API TC-B08-006, 007, 008, 009, 010 và 012 có thể tự động hóa bằng Postman CLI. Nội dung tương ứng là JWT thiếu/sai, thanh toán hợp lệ và xóa giỏ API, total thấp/cao, giỏ API trống. Sáu test Web 001–005 và 011 cần trình duyệt; Postman không thay thế bằng chứng UI. Chạy API cần backend và fixture đúng card; lần trao đổi này chưa chạy collection hoặc xác nhận fixture/runtime sẵn sàng, không đổi trạng thái Not Run. Evidence thực thi dự kiến đặt dưới test-cases/evidence/B08/.
+**Artifacts:** [B08 test cases](../test-cases/B08_Checkout.md) được đọc; conversation log được append.
+**Verdict:** Đã xác định phạm vi công cụ; chưa thực thi test.
+
+## Entry 015 — Chạy 6 API B08 bằng Postman CLI
+
+**Date/time:** 2026-10-18, Asia/Bangkok; exact prompt time unavailable.
+**Tool/model:** Codex; model/version not confirmed; Postman CLI 1.75.0.
+**Skills:** work-flow và domain-testing (oracle/traceability).
+
+**Prompt (user, verbatim):**
+
+> Chạy các test case đó bằng cli đi.
+
+**Assistant output record:** Kiểm backend hiện không chạy và database.js khởi tạo có DROP TABLE. Chạy bản sao nguyên mã server.js/database.js trong database tạm riêng trên localhost:3000, giữ nguyên workspace SUT; source hashes khớp. Tạo collection Postman local với admin login, tạo sản phẩm thử giá 100000 và đọc lại catalog; mỗi TC đăng ký/login user riêng, xác minh giỏ trống ban đầu, thêm đúng sản phẩm/số lượng khi cần, snapshot orders. Chạy một lần collection 57 requests bằng Postman CLI reporter tích hợp; ghi response và before/after từ console JSON không chứa JWT. Setup đều đạt, không có transport/script error. TC006/007 Pass; TC008 Fail do giỏ còn sau tạo đơn đúng tiền; TC009/010 Fail do tạo đơn lưu total 199999/200001; TC012 Fail do giỏ trống tạo đơn 0. 67 assertions, 10 failures; CLI exit 1 đúng vì assertion fail. Trích các JSON console bị wrap dòng thành b08_api_results.json, giữ log gốc. Tạo ba bug Markdown nháp, cập nhật actual/status/evidence và thống kê. Dừng backend tạm sau thu thập; dữ liệu thử không nằm trong DB workspace.
+
+**Artifacts:** [collection](../test-cases/evidence/B08/b08_api_postman_collection.json), [CLI log](../test-cases/evidence/B08/postman-cli.log), [JSON results](../test-cases/evidence/B08/b08_api_results.json), [execution summary](../test-cases/evidence/B08/b08_api_execution_summary.md), [test cases](../test-cases/B08_Checkout.md), [analysis](../analysis/B08_Checkout.md), [bugs](../bug-reports/bugs.md), [progress](../WORK_PROGRESS.md), [AI Audit](../AI_Audit_Report.md).
+**Assistant response summary:** 6 API đã thực thi: 2 Pass, 4 Fail; 6 Web vẫn Not Run. Evidence gồm collection/log/JSON/summary. Ba bug nháp chưa đăng Issue và chưa có screenshot. Backend tạm nguyên mã dùng database độc lập, không reset dữ liệu gốc.
+**Verdict:** Execution hoàn tất cho sáu API đã giao; có kết quả Fail cần review, chưa tuyên bố hoàn tất toàn bộ B08. Raw tool transcript chưa export, CLI evidence thật được giữ trong log.
+**Student review:** Kiểm actual và ba bug nháp; chạy các test Web còn lại và thu evidence UI; G2 precision/rounding vẫn chưa chốt.

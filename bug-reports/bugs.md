@@ -51,3 +51,54 @@ The execution report marks TC-A04-002 (L=9) and TC-A04-004 (L=12) as **Fail**. T
 | Ảnh hưởng | Giá trị phone vi phạm prefix của FR-04 được lưu vào hồ sơ |
 | Bằng chứng | [TC-A04-005.png](../test-cases/evidence/A04/TC-A04-005.png) |
 | Screenshot / Issue | Có ảnh local; chưa đăng GitHub Issue |
+
+## BUG-B08-001 — API không xóa giỏ sau thanh toán thành công
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Đã tái hiện bằng Postman CLI; bug Markdown nháp, chưa đăng GitHub Issue |
+| Requirement | FR-08: sau thanh toán thành công, giỏ hàng được xóa |
+| Test case | TC-B08-008 trong [B08 test cases](../test-cases/B08_Checkout.md) |
+| Môi trường | 2026-10-18; Postman CLI 1.75.0; localhost:3000; backend nguyên mã, database thử nghiệm riêng |
+| Preconditions / Data | User thử nghiệm đăng nhập, giỏ API có đúng một sản phẩm giá 100000, quantity=2; tổng 200000 |
+| Steps | 1. GET /api/cart xác minh giỏ.<br>2. POST /api/checkout với JWT hợp lệ, body {"total_amount":200000,"shipping_address":"123 Le Loi, TP.HCM"}.<br>3. GET /api/orders/my-orders và GET /api/cart bằng token đó. |
+| Expected | Tạo đơn đúng 200000; giỏ API rỗng sau thành công |
+| Actual | HTTP 200, tạo đơn ID 1 đúng 200000; GET /api/cart vẫn trả sản phẩm giá 100000 × 2 |
+| Ảnh hưởng | Giỏ cũ còn sau checkout, người dùng có thể nhầm chưa đặt hoặc đặt lại các sản phẩm đó |
+| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [JSON snapshot](../test-cases/evidence/B08/b08_api_results.json), [summary](../test-cases/evidence/B08/b08_api_execution_summary.md) |
+| Screenshot / Issue | Chưa có screenshot, chưa đăng GitHub Issue |
+| Cleanup | Dữ liệu nằm trong database tạm; dừng backend thử nghiệm sau khi lưu evidence |
+
+## BUG-B08-002 — API lưu tổng tiền do client sửa thấp/cao hơn giỏ
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Đã tái hiện bằng Postman CLI; bug Markdown nháp, chưa đăng GitHub Issue |
+| Requirement | FR-08: backend tự tính tổng từ giỏ, không tin client total; bổ sung do người dùng xác nhận: mismatch phải reject, báo lỗi, không tạo đơn |
+| Test cases | TC-B08-009 và TC-B08-010 trong [B08 test cases](../test-cases/B08_Checkout.md) |
+| Môi trường | 2026-10-18; Postman CLI 1.75.0; localhost:3000; backend nguyên mã, database riêng |
+| Preconditions / Data | Mỗi TC dùng user mới, JWT hợp lệ; giỏ riêng có một sản phẩm giá catalog 100000 × 2, tổng đúng 200000; snapshot orders ban đầu rỗng |
+| Steps | 1. GET /api/cart xác minh giỏ và tự tính 200000.<br>2. POST /api/checkout với JWT hợp lệ, shipping_address="123 Le Loi, TP.HCM", total_amount=199999.<br>3. GET /api/orders/my-orders kiểm tiền lưu.<br>4. Với user/giỏ riêng khác, lặp lại gửi total_amount=200001. |
+| Expected | Mismatch bị từ chối, có lỗi, không tạo đơn; backend không lưu tiền giả mạo |
+| Actual | Cả hai trả HTTP 200 với Checkout successful. TC009 tạo đơn ID 2 lưu 199999; TC010 tạo đơn ID 3 lưu 200001; cả hai khác tổng giỏ 200000 |
+| Ảnh hưởng | Tính toàn vẹn tiền đơn hàng bị vi phạm; client có thể làm số tiền lưu thấp hoặc cao hơn tổng giỏ |
+| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [JSON snapshot](../test-cases/evidence/B08/b08_api_results.json), [summary](../test-cases/evidence/B08/b08_api_execution_summary.md) |
+| Screenshot / Issue | Chưa có screenshot, chưa đăng GitHub Issue |
+| Cleanup | Tài khoản/đơn nằm trong database tạm; dừng backend thử nghiệm sau khi lưu evidence |
+
+## BUG-B08-003 — API tạo đơn cho giỏ trống
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Đã tái hiện bằng Postman CLI; bug Markdown nháp, chưa đăng GitHub Issue |
+| Requirement | Quyết định bổ sung giỏ trống do người dùng xác nhận: phải từ chối, báo lỗi, không tạo đơn; FR-08 gốc chưa quy định riêng trường hợp này |
+| Test case | TC-B08-012 trong [B08 test cases](../test-cases/B08_Checkout.md) |
+| Môi trường | 2026-10-18; Postman CLI 1.75.0; localhost:3000; backend nguyên mã, database riêng |
+| Preconditions / Data | User mới có JWT hợp lệ; GET /api/cart trả []; orders trước test rỗng. Total gửi 0 khớp tổng giỏ trống, chỉ vi phạm điều kiện giỏ không trống |
+| Steps | 1. Xác minh giỏ trống.<br>2. POST /api/checkout với JWT hợp lệ và body {"total_amount":0,"shipping_address":"123 Le Loi, TP.HCM"}.<br>3. GET /api/orders/my-orders. |
+| Expected | Từ chối request, có lỗi và không tạo đơn |
+| Actual | HTTP 200 với Checkout successful, tạo đơn ID 4 có total_amount=0 |
+| Ảnh hưởng | Phát sinh đơn không có sản phẩm và tổng tiền 0 trái policy đã chốt |
+| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [JSON snapshot](../test-cases/evidence/B08/b08_api_results.json), [summary](../test-cases/evidence/B08/b08_api_execution_summary.md) |
+| Screenshot / Issue | Chưa có screenshot, chưa đăng GitHub Issue |
+| Cleanup | Đơn thử nằm trong database tạm; dừng backend thử nghiệm sau khi lưu evidence |

@@ -1,11 +1,11 @@
-﻿# Analysis: B08 — Checkout Web
+# Analysis: B08 — Checkout Web
 
 | | |
 |:---|:---|
 | **Tính năng / nền tảng** | FR-08 Checkout Web; API bổ sung cho JWT và tính toàn vẹn tổng tiền |
 | **Người thiết kế / ngày** | Codex hỗ trợ MSSV 23120355; tên sinh viên chưa cung cấp; 2026-10-18, Asia/Bangkok |
 | **Test case chi tiết** | [B08_Checkout.md](../test-cases/B08_Checkout.md) |
-| **Trạng thái** | Draft; chưa thực thi, chưa được sinh viên review |
+| **Trạng thái** | Draft; 6 API đã chạy: 2 Pass, 4 Fail; 6 Web Not Run; review tổng thể pending |
 
 ## 1. Phạm vi và nguồn
 
@@ -14,7 +14,7 @@
 | [EShop README](../eshop-sut/README.md) | v2.0, 2026-05-14; nguồn oracle | FR-06–09, FR-11, SEC-02; yêu cầu GUI chung | Không thiếu đoạn FR-08 |
 | [API specification](../eshop-sut/api_specification.md) | Không ghi phiên bản | Authentication; Products; Cart & Orders | Không định nghĩa response checkout/error đầy đủ |
 | [HW02](../2026.HW02.Domain%20Testing_En.md) | HW02-AI | Domain/BVA, audit, review, commit theo bước | Bài giảng chưa có trong workspace |
-| Code SUT | Chỉ hỗ trợ bước thực thi | Checkout.jsx, CartContext.jsx; route cart/checkout/my-orders trong server.js | Chưa chạy SUT; không dùng code làm oracle |
+| Code SUT | Chỉ hỗ trợ bước thực thi | Checkout.jsx, CartContext.jsx; route cart/checkout/my-orders trong server.js | 6 API đã chạy trên bản sao nguyên mã/database riêng; Web chưa chạy; không dùng code làm oracle |
 
 **Trong phạm vi:** đăng nhập trước checkout; tổng tự tính và không sửa trực tiếp; hiển thị đủ sản phẩm; backend tự tính tiền; xóa giỏ sau thành công. API chỉ bổ sung kiểm tra không thể chứng minh bằng UI thông thường.
 
@@ -24,13 +24,15 @@
 
 Các mã R1–R5 dưới đây là nhãn truy vết nội bộ cho từng bullet FR-08, không phải mã yêu cầu mới của SUT.
 
+**Quyết định bổ sung được người dùng xác nhận (2026-10-18):** D1: giỏ trống phải bị từ chối, báo lỗi và không tạo đơn. D2: client total khác tổng backend tính từ giỏ phải bị từ chối, báo lỗi và không tạo đơn. Đây là quyết định cho bài làm, không phải nguyên văn FR-08. Không ép câu lỗi/HTTP status cụ thể.
+
 ## 2. Input, context và quy tắc
 
 | Mã | Input / context | Loại | Kiểu, đơn vị | Ràng buộc | Nguồn | Explicit / Suy ra |
 |:---|:---|:---|:---|:---|:---|:---|
 | V1 | Phiên Web / JWT | Context | Đã đăng nhập; Bearer token | R1: chỉ người dùng đăng nhập được checkout; API cần JWT hợp lệ | FR-08 bullet 1; SEC-02 | Explicit |
-| V2 | Giỏ hàng của U | Dữ liệu nền | Danh sách sản phẩm, giá và số lượng | R2: tổng tự tính từ giỏ; R3: hiển thị đầy đủ danh sách đặt mua | FR-08 bullet 2–3 | Explicit; công thức T = Σ(pᵢ × qᵢ) suy ra từ tổng tiền giỏ |
-| V3 | total_amount client gửi | Input API / thử thao tác UI | Số tiền | R2: không sửa trực tiếp trên UI; R4: backend tự tính lại, không tin số client | FR-08 bullet 2, 4; API 4.3 | Explicit |
+| V2 | Giỏ hàng của U | Dữ liệu nền | Danh sách sản phẩm, giá và số lượng | R2: tổng tự tính từ giỏ; R3: hiển thị đầy đủ danh sách đặt mua; D1: giỏ có ít nhất 1 dòng | FR-08 bullet 2–3; D1 | Explicit; công thức T = Σ(pᵢ × qᵢ) suy ra từ tổng tiền giỏ |
+| V3 | total_amount client gửi | Input API / thử thao tác UI | Số tiền | R2: không sửa trực tiếp trên UI; R4: backend tự tính lại; D2: mismatch phải reject và báo lỗi | FR-08 bullet 2, 4; API 4.3; D2 | Explicit và bổ sung được xác nhận |
 | V4 | shipping_address | Input API nền | Chuỗi | API mô tả field; FR-08 không nêu validation | API 4.3 | Explicit về field; không suy ra required/min/max |
 
 **Nominal:** U role=user, JWT hợp lệ; không áp dụng coupon. Giỏ F1 có sản phẩm P giá 100000 ₫, số lượng 2, T=200000 ₫. Địa chỉ API cố định `123 Le Loi, TP.HCM`. U có email/mật khẩu riêng của người chạy; token không ghi vào tài liệu.
@@ -42,20 +44,21 @@ Các mã R1–R5 dưới đây là nhãn truy vết nội bộ cho từng bullet
 | O1 | Checkout không được hoàn thành nếu không có phiên/JWT hợp lệ | R1, SEC-02 | Response và danh sách đơn trước/sau bằng token hợp lệ riêng |
 | O2 | UI hiển thị đủ sản phẩm, số lượng; total bằng T và không sửa trực tiếp | R2–R3 | So sánh giỏ fixture và màn checkout; thao tác gõ/paste thông thường |
 | O3 | Nếu tạo đơn, total lưu bằng T từ giỏ, không theo giá trị sửa của client | R4 | GET /api/orders/my-orders, đối chiếu đơn mới với snapshot và công thức độc lập |
+| O5 | Giỏ trống hoặc total mismatch bị từ chối, có lỗi và không tạo đơn | D1, D2 | UI/response lỗi và snapshot orders trước/sau |
 | O4 | Sau thành công, giỏ tương ứng được xóa | R5: FR-08 bullet 5 | Web: quay về giỏ trong cùng phiên; API: GET /api/cart bằng token U |
 
-O1–O4 là oracle, không tạo input variable hoặc output class.
+O1–O5 là oracle, không tạo input variable hoặc output class.
 
 ## 3. Spec gap và quyết định phương pháp
 
 | Mã | Nội dung | Nguồn | Loại | Trạng thái | TC ảnh hưởng |
 |:---|:---|:---|:---|:---|:---|
-| G1 | Chưa nêu checkout giỏ trống, min/max tổng, max số dòng | FR-08 | Spec gap | Ngoài bộ chính; không tự tạo expected reject | Không có |
-| G2 | Chưa nêu độ chính xác/làm tròn tiền | FR-08 | Spec gap | Dùng fixture có phép tính chính xác; ±1 chỉ là bước lấy mẫu | 008–010 |
-| G3 | Chưa nêu reject toàn request hay ignore total_amount khi bị sửa | FR-08 | Spec gap | Chỉ ép invariant O3; reject hoặc tính lại đều phù hợp | 009–010 |
+| G1 | Checkout giỏ trống | Người dùng xác nhận D1 | Đã chốt | Reject, báo lỗi, không tạo đơn; max tổng/số dòng không bổ sung | 011–012 |
+| G2 | Độ chính xác/làm tròn tiền | FR-08 chưa mô tả | Spec gap | Chưa chốt; dùng phép tính chính xác, ±1 chỉ là bước lấy mẫu | 008–010 |
+| G3 | Xử lý total mismatch | Người dùng xác nhận D2 | Đã chốt | Bắt buộc reject, báo lỗi, không tạo đơn; không chấp nhận ignore rồi tạo đơn | 009–010 |
 | G4 | Chưa nêu validation địa chỉ, null/missing total, sai kiểu | FR-08/API | Spec gap | Không tạo lớp invalid theo phỏng đoán | Không có |
 | G5 | Web và API cart có cách lưu khác nhau trong implementation | Code hỗ trợ thực thi | Quyết định phương pháp | Chuẩn bị và xác minh riêng từng giỏ; API setup không thay cho Web setup | Toàn bộ |
-| G6 | Bài giảng chưa có; FR-08 không nêu ngưỡng số phù hợp BVA | HW02/FR-08 | Giới hạn phương pháp | Mục 5 giải thích; chưa tuyên bố đáp ứng đầy đủ BVA homework | Toàn bộ |
+| G6 | Bài giảng chưa có; cần đối chiếu quy ước BVA | HW02 và quyết định D1 | Giới hạn phương pháp | Đã có B1 số dòng theo D1; BVA tiền chờ G2 | 008, 012 |
 
 API body có total_amount không có nghĩa backend được tin giá trị đó. FR-08 quyết định oracle; API chỉ mô tả cách gọi. HTTP status/message/redirect cụ thể chỉ ghi actual nếu spec không bắt buộc.
 
@@ -69,27 +72,28 @@ API body có total_amount không có nghĩa backend được tin giá trị đó
 | C2 | V1 | Không có phiên/JWT | Không hợp lệ | Guest Web; bỏ Authorization API | R1, SEC-02 |
 | C3 | V1 | JWT không hợp lệ | Không hợp lệ | Bearer invalid.b08.token | SEC-02 |
 | C4 | V3 | Client total = T | Nhất quán với giỏ; backend vẫn phải tự tính | 200000 với F1 | R4 |
-| C5 | V3 | Client total < T | Không nhất quán; không được dùng làm tiền lưu | 199999 với F1 | R4 |
-| C6 | V3 | Client total > T | Không nhất quán; không được dùng làm tiền lưu | 200001 với F1 | R4 |
+| C5 | V3 | Client total < T | Không hợp lệ, phải reject và báo lỗi | 199999 với F1 | R4, D2 |
+| C6 | V3 | Client total > T | Không hợp lệ, phải reject và báo lỗi | 200001 với F1 | R4, D2 |
+| C7 | V2 | Giỏ có 0 dòng | Không hợp lệ, phải reject | Giỏ trống, T=0 | D1 |
+| C8 | V2 | Giỏ có ít nhất 1 dòng | Hợp lệ về điều kiện không trống; các điều kiện khác vẫn phải thỏa | F1, 1 dòng P × 2 | D1; FR-08 |
 
-C4–C6 là cách tách quan hệ phục vụ kiểm tra tính toàn vẹn; không phải đặc tả validation body bắt buộc reject C5/C6. Không tạo lớp theo kích thước giỏ khi spec chưa nêu giới hạn. F1/F2 là biến thể fixture để kiểm tra phép nhân/cộng và hiển thị đầy đủ danh sách.
+C4–C6 chia quan hệ total với T; D2 xác nhận mismatch phải reject. C7/C8 chia giỏ trống/không trống theo D1; không thêm max. F1/F2 là biến thể fixture.
 
 **Single Fault:** test JWT giữ F1, total=T, address cố định. Test sửa total giữ JWT hợp lệ và giỏ F1; chỉ đổi V3. Khi giỏ đổi, T và total gửi đúng phải đổi theo, vì đây là quan hệ phụ thuộc. Mỗi lần checkout có thể tiêu thụ giỏ nên phải dựng lại fixture cho từng TC, không chạy liên tiếp trên giỏ đã xóa.
 
 ## 5. Boundary Value Analysis
 
-**Kết quả phân tích biên:** FR-08 không nêu miền số [min,max], ngưỡng tiền hay giới hạn số lượng/dòng. Vì vậy không có biên đóng/mở và độ mịn được đặc tả để áp dụng BVA chuẩn cho các field của B08.
+D1 đã được người dùng chốt: giỏ phải có ít nhất 1 dòng. Số dòng n là số nguyên, không phụ thuộc độ chính xác tiền G2.
 
-| Boundary ID | Quy tắc xem xét | Đóng/mở | Độ mịn | On/off-point | Quyết định |
-|:---|:---|:---|:---|:---|:---|
-| Không gán ID | total backend = Σ(pᵢ × qᵢ) | Quan hệ bằng nhau, không phải giới hạn chấp nhận total client | Spec chưa nêu | Không tuyên bố có off-point sát nhất | Kiểm bằng Domain quan hệ C4–C6 |
-| Không gán ID | Min/max tổng hoặc giỏ trống | Chưa có trong FR-08 | Chưa có | Không xác định | Không tạo expected từ giả định |
+| Boundary ID | Class ID | Quy tắc / nguồn | Đóng/mở | Độ mịn | On-point | Off-point | Expected | TC |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| B1 | C7, C8 | n ≥ 1, D1 | Đóng | 1 dòng | n=1, F1 (P × 2 là 1 dòng) | n=0, giỏ trống | On: checkout hợp lệ thành công; off: reject, báo lỗi, không tạo đơn | 008 on, 012 off |
 
-**2-point/3-point:** không áp dụng BVA 2/3-point khi chưa có biên hợp lệ. Bộ ba T−1/T/T+1 trong TC008–010 là lấy mẫu quan hệ, không phải ba test BVA. Bước 1 ₫ là lựa chọn dữ liệu chính xác cho fixture; không khẳng định hệ thống chỉ nhận tiền nguyên hoặc đây là số thực sát T nhất.
+Dùng 2-point cho B1. TC008/012 cùng kiểm API: JWT hợp lệ, địa chỉ nominal, total khớp giỏ tương ứng; chỉ đổi điều kiện không trống. Giỏ rỗng dùng total=0 đúng tổng Σ rỗng, tránh đồng thời vi phạm D2. TC011 bổ sung giỏ trống trên Web.
 
-T=200000 được tính độc lập từ 100000 × 2. Với client total=199999 hoặc 200001, nếu SUT tạo đơn thì total lưu vẫn phải bằng 200000. Nếu SUT từ chối do mismatch thì vẫn phù hợp invariant R4; TC008 riêng kiểm tra đường thành công nominal. Một lần chạy với total đúng không thể tự chứng minh backend tính lại, nên cần cả TC009 và TC010.
+D2 xác nhận điều kiện client total = T. Có thể nghiên cứu biên quan hệ tại T, nhưng G2 chưa chốt độ chính xác/tolerance, nên chưa gán thêm BVA tiền cho T−1/T/T+1. Đây vẫn là đại diện Domain; bước 1 ₫ là lựa chọn dữ liệu, không phải đơn vị nhỏ nhất đã được spec quy định. T=200000 từ 100000 × 2; client gửi 199999/200001 đều phải reject, báo lỗi và không tạo đơn theo D2.
 
-**Giới hạn với HW:** đề yêu cầu BVA cho từng feature; phần này ghi trung thực kết quả đánh giá khả năng áp dụng, chưa tuyên bố B08 đáp ứng đầy đủ tiêu chí BVA. Cần đối chiếu bài giảng hoặc yêu cầu bổ sung được giảng viên xác nhận nếu muốn mở rộng BVA; không lấy ngưỡng coupon FR-09 của teammate để lấp khoảng trống.
+Không thêm max tổng/max dòng. B1 có nguồn D1 bổ sung được xác nhận, không ghi nhầm thành nguyên văn FR-08; quy ước BVA còn cần đối chiếu bài giảng.
 
 ## 6. Test Matrix
 
@@ -104,9 +108,11 @@ F1/F2, địa chỉ và U được định nghĩa ở mục 2. Chữ đậm là 
 | TC-B08-005 | R2 | Functional | Web; U; F1, sau đó **q(P)=3** qua giỏ | — | — | Hợp lệ | Mở lại checkout: T=300000 |
 | TC-B08-006 | R1, SEC-02 | Domain | API F1; total=200000; address nominal; **thiếu JWT** | C2, C4 | — | Không hợp lệ | Không checkout thành công; không tạo đơn cho U |
 | TC-B08-007 | R1, SEC-02 | Domain | API F1; total=200000; address nominal; **JWT sai** | C3, C4 | — | Không hợp lệ | Không checkout thành công; không tạo đơn cho U |
-| TC-B08-008 | R4–R5 | Domain | API; JWT U; F1; total=200000; address nominal | C1, C4 | — | Nhất quán | Thành công; đơn total=200000; giỏ API rỗng |
-| TC-B08-009 | R4 | Domain | API; JWT U; F1; **total=199999**; address nominal | C1, C5 | — | Không nhất quán | Reject hoặc tạo đơn total=200000; không lưu 199999 |
-| TC-B08-010 | R4 | Domain | API; JWT U; F1; **total=200001**; address nominal | C1, C6 | — | Không nhất quán | Reject hoặc tạo đơn total=200000; không lưu 200001 |
+| TC-B08-008 | R4–R5, D1 | Domain + BVA | API; JWT U; F1; total=200000; address nominal | C1, C4, C8 | B1 on, n=1 | Nhất quán | Thành công; đơn total=200000; giỏ API rỗng |
+| TC-B08-009 | R4, D2 | Domain | API; JWT U; F1; **total=199999**; address nominal | C1, C5 | — | Không nhất quán | Reject, báo lỗi, không tạo đơn theo D2 |
+| TC-B08-010 | R4, D2 | Domain | API; JWT U; F1; **total=200001**; address nominal | C1, C6 | — | Không nhất quán | Reject, báo lỗi, không tạo đơn theo D2 |
+| TC-B08-011 | D1 | Domain | Web; U; giỏ trống; không coupon | C1, C7 | — | Không hợp lệ | Từ chối, báo lỗi, không tạo đơn |
+| TC-B08-012 | D1 | Domain + BVA | API; JWT U; giỏ trống; total=0; address nominal | C1, C4, C7 | B1 off, n=0 | Không hợp lệ | Từ chối, báo lỗi, không tạo đơn |
 
 ## 7. Truy vết và độ phủ
 
@@ -124,25 +130,29 @@ F1/F2, địa chỉ và U được định nghĩa ở mục 2. Chữ đậm là 
 | C4 | 001, 002, 006, 007, 008 | Đã thiết kế | Total bằng T |
 | C5 | 009 | Đã thiết kế | Total thấp |
 | C6 | 010 | Đã thiết kế | Total cao |
-| BVA min/max, rounding | — | Chưa xác định | Spec không có ngưỡng/độ mịn |
+| D1, C7 | 011, 012 | Đã thiết kế | Giỏ trống bị chặn |
+| C8, B1 on | 008 | Đã thiết kế | 1 dòng, thành công |
+| B1 off | 012 | Đã thiết kế | 0 dòng, reject |
+| D2 | 009, 010 | Đã thiết kế | Reject mismatch |
+| G2: precision/rounding | — | Chưa chốt | Không tự thêm đơn vị tiền nhỏ nhất |
 
 TC IDs dạng số trong bảng này có prefix TC-B08-. Truy vết là độ phủ thiết kế, không phải kết quả thực thi.
 
 | Chỉ số | Số lượng |
 |:---|:---|
-| Tổng TC duy nhất | 10 |
+| Tổng TC duy nhất | 12 |
 | Chỉ Domain | 8 |
 | Chỉ BVA | 0 |
-| Cả Domain/BVA | 0 |
+| Cả Domain/BVA | 2 |
 | Chỉ kỹ thuật bổ sung | 2 |
-| Hợp lệ / Không hợp lệ xác thực / Mismatch total / Thao tác bị cấm | 4 / 3 / 2 / 1 |
-| Đã thực thi / Pass / Fail / Not Run | 0 / 0 / 0 / 10 |
+| Hợp lệ / Không hợp lệ / Thao tác bị cấm | 4 / 7 / 1 |
+| Đã thực thi / Pass / Fail / Not Run | 6 / 2 / 4 / 6 |
 
-N=8+0+0+2=10. Không định lượng mức giảm tổ hợp: miền tiền/giỏ không có tập giá trị hữu hạn được đặc tả. Mismatch không ép thành invalid request phải bị reject. Chưa có bug runtime hoặc evidence; không đọc code rồi gán Fail.
+N=8+0+2+2=12. Không định lượng mức giảm tổ hợp: miền tiền/giỏ không có tập giá trị hữu hạn được đặc tả. Mismatch phải reject theo D2. Đã có runtime evidence cho 6 API: [summary](../test-cases/evidence/B08/b08_api_execution_summary.md). Ba bug nháp: BUG-B08-001/002/003; 6 test Web chưa chạy.
 
 ## 8. Giới hạn và kỹ thuật bổ sung
 
-Cần bổ sung concurrency/idempotency, checkout nhiều lần, thay đổi giá đồng thời bằng state/concurrency testing khi có mục tiêu và oracle được chốt. Coupon, tồn kho, phí vận chuyển, validation địa chỉ không tự thêm vào phạm vi FR-08. Giới hạn BVA ở mục 5 là thiếu căn cứ spec, không có nghĩa bỏ qua yêu cầu BVA trong rubric.
+Cần bổ sung concurrency/idempotency, checkout nhiều lần, thay đổi giá đồng thời bằng state/concurrency testing khi có mục tiêu và oracle được chốt. Coupon, tồn kho, phí vận chuyển, validation địa chỉ không tự thêm vào phạm vi FR-08. B1 có căn cứ D1; chưa mở rộng BVA tiền khi G2 còn mở.
 
 ## 9. Review và thay đổi
 
@@ -150,3 +160,6 @@ Cần bổ sung concurrency/idempotency, checkout nhiều lần, thay đổi gi�
 |:---|:---|:---|:---|:---|:---|
 | v0.1 | 2026-10-18 | Scope, input/context, oracle và gaps | Spec-first | Toàn bộ | Chưa được sinh viên review |
 | v0.2 | 2026-10-18 | 6 lớp, 10 TC, matrix/trace; đánh giá BVA | Không tạo ngưỡng tiền hoặc field code-only | 001–010 | AI tự kiểm tra nhất quán; sinh viên chưa review |
+| v0.3 | 2026-10-18 | Áp dụng D1/D2; thêm TC011/012, B1; giữ G2 mở | Người dùng chốt policy G1/G3 | 008–012 | Policy đã xác nhận; test chưa thực thi |
+
+| v0.4 | 2026-10-18 | Chạy 6 API bằng Postman CLI: 2 Pass, 4 Fail; thu log/JSON và bug drafts | Runtime evidence trên backend nguyên mã, database tạm riêng | 006–010, 012 | Kết quả thật; sinh viên cần review |

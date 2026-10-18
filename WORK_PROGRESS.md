@@ -5,7 +5,7 @@ MSSV: 23120355. Chỉ tạo Markdown trong workspace; chưa tạo thư mục n�
 | Feature | Yêu cầu | Domain | BVA | Thực thi | Review sinh viên / AI gap |
 |---|---|---|---|---|---|
 | A04 | FR-04, SEC-02, SEC-06; bản spec-first đã cập nhật | 8 test chỉ Domain | 4 test thuộc cả Domain/BVA, 0 chỉ BVA | 13 đã chạy: 7 Pass, 6 Fail; 0 Not Run | AI self-review hoàn tất; sinh viên đã cung cấp actual/evidence, review cuối pending |
-| B08 | FR-08 R1–R5, SEC-02; spec-first | 8 Domain + 2 Functional; 10 TC | Đã đánh giá: chưa có ngưỡng spec để gán BVA chuẩn | 0 đã chạy; 10 Not Run | AI kiểm tra ID/card/link; sinh viên chưa review |
+| B08 | FR-08, SEC-02; policy giỏ trống/mismatch đã chốt | 8 chỉ Domain + 2 Functional | 2 Domain/BVA: B1 số dòng 0/1 | 6 API đã chạy: 2 Pass, 4 Fail; 6 Web Not Run | Có 3 bug runtime nháp; G2 còn mở |
 | C15 | Chưa bắt đầu | Chưa làm | Chưa làm | Chưa chạy | Chưa review |
 | D Mobile Register | Chưa bắt đầu | Chưa làm | Chưa làm | Chưa chạy | Chưa review |
 
@@ -19,10 +19,14 @@ Sinh viên cần đối chiếu bài giảng, review phân loại TC-A04-002/004
 
 ## B08 Checkout — thiết kế ban đầu
 
-- [Analysis](analysis/B08_Checkout.md): input/context, postconditions, spec gap, 6 lớp, BVA applicability, matrix và traceability.
-- [Test cases](test-cases/B08_Checkout.md): 10 TC (5 Web, 5 API), 8 chỉ Domain và 2 Functional. 0 executed, 10 Not Run; chưa có evidence hay bug runtime B08.
+- [Analysis](analysis/B08_Checkout.md): input/context, postconditions, spec gap, 8 lớp, BVA applicability, matrix và traceability.
+- [Test cases](test-cases/B08_Checkout.md): 12 TC (6 Web, 6 API): 8 chỉ Domain, 2 Domain/BVA và 2 Functional. 6 API executed: 2 Pass, 4 Fail; 6 Web Not Run. Có CLI log/JSON và 3 bug nháp.
 - Nguồn: FR-08, SEC-02 trong EShop README và API Cart & Orders. Không áp dụng coupon trong fixture.
 - Commit yêu cầu/scope: `f2bad5b`; thiết kế Domain và đánh giá BVA: `c44688e`. Đây là bản AI ban đầu bất biến để review, không cần nhân bản thành nhiều file audit.
-- BVA: FR-08 không nêu min/max/precision; T−1/T/T+1 là dữ liệu Domain theo quan hệ tổng, không gán nhãn BVA. Chưa khẳng định đáp ứng đầy đủ tiêu chí BVA HW; cần đối chiếu bài giảng/căn cứ bổ sung được xác nhận.
-- Kiểm tra tài liệu đã đạt: 10 ID khớp matrix/summary/card, đủ 13 trường/card, 10 Not Run, link local hợp lệ. Đây là kiểm tra artifact, không phải thực thi SUT.
-- Việc kế tiếp: sinh viên review expected/fixture và giới hạn BVA; chuẩn bị sản phẩm P/Q đúng giá, tài khoản và giỏ độc lập; chạy Web và API rồi cập nhật actual/evidence.
+- BVA: B1 dùng D1 giỏ không trống, n≥1; TC008 on n=1 và TC012 off n=0. Precision/rounding tiền G2 còn mở; chưa gán BVA tiền.
+- Kiểm tra cập nhật: 12 ID khớp matrix/summary/card; kết quả 2 Pass, 4 Fail, 6 Not Run; link evidence hợp lệ.
+- Việc kế tiếp: review kết quả API/bug drafts, chạy 6 test Web còn lại và thu ảnh; G2 precision/rounding chưa chốt.
+
+- Review mới: D1 yêu cầu giỏ trống reject/báo lỗi/không tạo đơn; D2 yêu cầu total mismatch reject/báo lỗi/không tạo đơn. Đây là yêu cầu bổ sung người dùng xác nhận, không nguyên văn FR-08; max không bổ sung.
+
+- API execution: [summary](test-cases/evidence/B08/b08_api_execution_summary.md), [collection](test-cases/evidence/B08/b08_api_postman_collection.json), [bug drafts](bug-reports/bugs.md). Backend nguyên mã chạy trên database tạm riêng; database workspace được bảo toàn. Web chưa thực thi.

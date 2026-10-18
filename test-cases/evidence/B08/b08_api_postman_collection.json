@@ -1,0 +1,1874 @@
+{
+  "info": {
+    "name": "HW02 B08 API execution (006,007,008,009,010,012)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Independent test users and API carts. Expected follows FR-08/SEC-02 plus user-confirmed reject policies for empty cart and total mismatch. No UI execution."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "runId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "SETUP admin login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@eshop.com\",\n  \"password\": \"Admin123!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+              "const b=pm.response.json();requireSetup('Admin login successful',pm.response.code===200&&typeof b.token==='string');pm.collectionVariables.set('adminToken',b.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "SETUP category",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/categories"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+              "const rows=pm.response.json();requireSetup('Category available',pm.response.code===200&&Array.isArray(rows)&&rows.length>0);pm.collectionVariables.set('categoryId',rows[0].id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "SETUP product 100000",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/products",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"B08 CLI Test Product {{runId}}\",\n  \"price\": 100000,\n  \"description\": \"Isolated B08 fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+              "const b=pm.response.json();requireSetup('Create product',pm.response.code>=200&&pm.response.code<300&&Number.isInteger(b.id));pm.collectionVariables.set('productId',b.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "SETUP verify catalog price",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/products"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+              "const rows=pm.response.json();const p=rows.find(x=>x.id===Number(pm.collectionVariables.get('productId')));requireSetup('Product catalog price 100000',!!p&&Number(p.price)===100000);pm.collectionVariables.set('productName',p.name);console.log('B08_FIXTURE '+JSON.stringify({id:p.id,name:p.name,price:p.price,quantity:2,expectedTotal:200000}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-B08-006",
+      "item": [
+        {
+          "name": "TC-B08-006 setup register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"B08 Test 006\",\n  \"email\": \"b08.{{runId}}.006@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-006 register',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-006 setup login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"b08.{{runId}}.006@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();requireSetup('TC-B08-006 login',pm.response.code===200&&typeof b.token==='string'&&b.user.role==='user');pm.collectionVariables.set('b08_006_token',b.token);pm.collectionVariables.set('b08_006_userId',b.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-006 setup empty cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_006_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-006 fresh cart',pm.response.code===200&&Array.isArray(cart)&&cart.length===0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-006 setup add product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_006_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{productId}}\",\n  \"name\": \"{{productName}}\",\n  \"price\": 100000,\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-006 add cart item',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-006 verify cart before",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_006_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();const total=cart.reduce((s,x)=>s+Number(x.price)*Number(x.quantity),0);requireSetup('TC-B08-006 cart fixture verified',pm.response.code===200&&cart.length===1&&total===200000&&Number(cart[0].id)===Number(pm.collectionVariables.get('productId'))&&Number(cart[0].price)===100000&&Number(cart[0].quantity)===2);pm.collectionVariables.set('b08_006_cartBefore',JSON.stringify(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-006',phase:'cart_before',cart,total}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-006 snapshot orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_006_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-006 snapshot orders',pm.response.code===200&&Array.isArray(rows)&&rows.length===0);pm.collectionVariables.set('b08_006_orderIds',JSON.stringify(rows.map(x=>x.id)));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-006',phase:'orders_before',orders:rows}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-006 CHECKOUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/checkout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"total_amount\": 200000,\n  \"shipping_address\": \"123 Le Loi, TP.HCM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();pm.collectionVariables.set('b08_006_response',JSON.stringify(b));pm.collectionVariables.set('b08_006_status',pm.response.code);console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-006',phase:'checkout',sentTotal:200000,status:pm.response.code,body:b}));pm.test('TC-B08-006: checkout rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-006 verify orders after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_006_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-006 read orders after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('b08_006_orderIds'));const added=rows.filter(x=>!before.includes(x.id));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-006',phase:'orders_after',newOrders:added}));pm.test('TC-B08-006: no new order',function(){pm.expect(added.length).to.eql(0);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-006 verify cart after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_006_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-006 read cart after',pm.response.code===200&&Array.isArray(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-006',phase:'cart_after',cart}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-B08-007",
+      "item": [
+        {
+          "name": "TC-B08-007 setup register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"B08 Test 007\",\n  \"email\": \"b08.{{runId}}.007@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-007 register',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-007 setup login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"b08.{{runId}}.007@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();requireSetup('TC-B08-007 login',pm.response.code===200&&typeof b.token==='string'&&b.user.role==='user');pm.collectionVariables.set('b08_007_token',b.token);pm.collectionVariables.set('b08_007_userId',b.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-007 setup empty cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_007_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-007 fresh cart',pm.response.code===200&&Array.isArray(cart)&&cart.length===0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-007 setup add product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_007_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{productId}}\",\n  \"name\": \"{{productName}}\",\n  \"price\": 100000,\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-007 add cart item',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-007 verify cart before",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_007_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();const total=cart.reduce((s,x)=>s+Number(x.price)*Number(x.quantity),0);requireSetup('TC-B08-007 cart fixture verified',pm.response.code===200&&cart.length===1&&total===200000&&Number(cart[0].id)===Number(pm.collectionVariables.get('productId'))&&Number(cart[0].price)===100000&&Number(cart[0].quantity)===2);pm.collectionVariables.set('b08_007_cartBefore',JSON.stringify(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-007',phase:'cart_before',cart,total}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-007 snapshot orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_007_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-007 snapshot orders',pm.response.code===200&&Array.isArray(rows)&&rows.length===0);pm.collectionVariables.set('b08_007_orderIds',JSON.stringify(rows.map(x=>x.id)));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-007',phase:'orders_before',orders:rows}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-007 CHECKOUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.b08.token"
+              }
+            ],
+            "url": "{{baseUrl}}/api/checkout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"total_amount\": 200000,\n  \"shipping_address\": \"123 Le Loi, TP.HCM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();pm.collectionVariables.set('b08_007_response',JSON.stringify(b));pm.collectionVariables.set('b08_007_status',pm.response.code);console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-007',phase:'checkout',sentTotal:200000,status:pm.response.code,body:b}));pm.test('TC-B08-007: checkout rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-007 verify orders after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_007_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-007 read orders after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('b08_007_orderIds'));const added=rows.filter(x=>!before.includes(x.id));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-007',phase:'orders_after',newOrders:added}));pm.test('TC-B08-007: no new order',function(){pm.expect(added.length).to.eql(0);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-007 verify cart after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_007_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-007 read cart after',pm.response.code===200&&Array.isArray(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-007',phase:'cart_after',cart}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-B08-008",
+      "item": [
+        {
+          "name": "TC-B08-008 setup register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"B08 Test 008\",\n  \"email\": \"b08.{{runId}}.008@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-008 register',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-008 setup login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"b08.{{runId}}.008@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();requireSetup('TC-B08-008 login',pm.response.code===200&&typeof b.token==='string'&&b.user.role==='user');pm.collectionVariables.set('b08_008_token',b.token);pm.collectionVariables.set('b08_008_userId',b.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-008 setup empty cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_008_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-008 fresh cart',pm.response.code===200&&Array.isArray(cart)&&cart.length===0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-008 setup add product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_008_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{productId}}\",\n  \"name\": \"{{productName}}\",\n  \"price\": 100000,\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-008 add cart item',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-008 verify cart before",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_008_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();const total=cart.reduce((s,x)=>s+Number(x.price)*Number(x.quantity),0);requireSetup('TC-B08-008 cart fixture verified',pm.response.code===200&&cart.length===1&&total===200000&&Number(cart[0].id)===Number(pm.collectionVariables.get('productId'))&&Number(cart[0].price)===100000&&Number(cart[0].quantity)===2);pm.collectionVariables.set('b08_008_cartBefore',JSON.stringify(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-008',phase:'cart_before',cart,total}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-008 snapshot orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_008_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-008 snapshot orders',pm.response.code===200&&Array.isArray(rows)&&rows.length===0);pm.collectionVariables.set('b08_008_orderIds',JSON.stringify(rows.map(x=>x.id)));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-008',phase:'orders_before',orders:rows}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-008 CHECKOUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_008_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/checkout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"total_amount\": 200000,\n  \"shipping_address\": \"123 Le Loi, TP.HCM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();pm.collectionVariables.set('b08_008_response',JSON.stringify(b));pm.collectionVariables.set('b08_008_status',pm.response.code);console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-008',phase:'checkout',sentTotal:200000,status:pm.response.code,body:b}));pm.test('TC-B08-008: checkout succeeds',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-008 verify orders after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_008_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-008 read orders after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('b08_008_orderIds'));const added=rows.filter(x=>!before.includes(x.id));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-008',phase:'orders_after',newOrders:added}));pm.test('TC-B08-008: one new order with correct amount',function(){pm.expect(added.length).to.eql(1);pm.expect(Number(added[0].total_amount)).to.eql(200000);pm.expect(Number(added[0].user_id)).to.eql(Number(pm.collectionVariables.get('b08_008_userId')));});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-008 verify cart after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_008_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-008 read cart after',pm.response.code===200&&Array.isArray(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-008',phase:'cart_after',cart}));pm.test('TC-B08-008: cart cleared after success',function(){pm.expect(cart).to.deep.eql([]);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-B08-009",
+      "item": [
+        {
+          "name": "TC-B08-009 setup register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"B08 Test 009\",\n  \"email\": \"b08.{{runId}}.009@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-009 register',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-009 setup login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"b08.{{runId}}.009@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();requireSetup('TC-B08-009 login',pm.response.code===200&&typeof b.token==='string'&&b.user.role==='user');pm.collectionVariables.set('b08_009_token',b.token);pm.collectionVariables.set('b08_009_userId',b.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-009 setup empty cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_009_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-009 fresh cart',pm.response.code===200&&Array.isArray(cart)&&cart.length===0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-009 setup add product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_009_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{productId}}\",\n  \"name\": \"{{productName}}\",\n  \"price\": 100000,\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-009 add cart item',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-009 verify cart before",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_009_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();const total=cart.reduce((s,x)=>s+Number(x.price)*Number(x.quantity),0);requireSetup('TC-B08-009 cart fixture verified',pm.response.code===200&&cart.length===1&&total===200000&&Number(cart[0].id)===Number(pm.collectionVariables.get('productId'))&&Number(cart[0].price)===100000&&Number(cart[0].quantity)===2);pm.collectionVariables.set('b08_009_cartBefore',JSON.stringify(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-009',phase:'cart_before',cart,total}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-009 snapshot orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_009_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-009 snapshot orders',pm.response.code===200&&Array.isArray(rows)&&rows.length===0);pm.collectionVariables.set('b08_009_orderIds',JSON.stringify(rows.map(x=>x.id)));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-009',phase:'orders_before',orders:rows}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-009 CHECKOUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_009_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/checkout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"total_amount\": 199999,\n  \"shipping_address\": \"123 Le Loi, TP.HCM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();pm.collectionVariables.set('b08_009_response',JSON.stringify(b));pm.collectionVariables.set('b08_009_status',pm.response.code);console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-009',phase:'checkout',sentTotal:199999,status:pm.response.code,body:b}));pm.test('TC-B08-009: checkout rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});pm.test('TC-B08-009: error message returned',function(){const msg=b.error||b.message;pm.expect(msg).to.be.a('string').and.not.empty;pm.expect(pm.response.code>=400).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-009 verify orders after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_009_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-009 read orders after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('b08_009_orderIds'));const added=rows.filter(x=>!before.includes(x.id));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-009',phase:'orders_after',newOrders:added}));pm.test('TC-B08-009: no new order',function(){pm.expect(added.length).to.eql(0);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-009 verify cart after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_009_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-009 read cart after',pm.response.code===200&&Array.isArray(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-009',phase:'cart_after',cart}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-B08-010",
+      "item": [
+        {
+          "name": "TC-B08-010 setup register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"B08 Test 010\",\n  \"email\": \"b08.{{runId}}.010@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-010 register',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-010 setup login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"b08.{{runId}}.010@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();requireSetup('TC-B08-010 login',pm.response.code===200&&typeof b.token==='string'&&b.user.role==='user');pm.collectionVariables.set('b08_010_token',b.token);pm.collectionVariables.set('b08_010_userId',b.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-010 setup empty cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_010_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-010 fresh cart',pm.response.code===200&&Array.isArray(cart)&&cart.length===0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-010 setup add product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_010_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{productId}}\",\n  \"name\": \"{{productName}}\",\n  \"price\": 100000,\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-010 add cart item',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-010 verify cart before",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_010_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();const total=cart.reduce((s,x)=>s+Number(x.price)*Number(x.quantity),0);requireSetup('TC-B08-010 cart fixture verified',pm.response.code===200&&cart.length===1&&total===200000&&Number(cart[0].id)===Number(pm.collectionVariables.get('productId'))&&Number(cart[0].price)===100000&&Number(cart[0].quantity)===2);pm.collectionVariables.set('b08_010_cartBefore',JSON.stringify(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-010',phase:'cart_before',cart,total}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-010 snapshot orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_010_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-010 snapshot orders',pm.response.code===200&&Array.isArray(rows)&&rows.length===0);pm.collectionVariables.set('b08_010_orderIds',JSON.stringify(rows.map(x=>x.id)));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-010',phase:'orders_before',orders:rows}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-010 CHECKOUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_010_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/checkout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"total_amount\": 200001,\n  \"shipping_address\": \"123 Le Loi, TP.HCM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();pm.collectionVariables.set('b08_010_response',JSON.stringify(b));pm.collectionVariables.set('b08_010_status',pm.response.code);console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-010',phase:'checkout',sentTotal:200001,status:pm.response.code,body:b}));pm.test('TC-B08-010: checkout rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});pm.test('TC-B08-010: error message returned',function(){const msg=b.error||b.message;pm.expect(msg).to.be.a('string').and.not.empty;pm.expect(pm.response.code>=400).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-010 verify orders after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_010_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-010 read orders after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('b08_010_orderIds'));const added=rows.filter(x=>!before.includes(x.id));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-010',phase:'orders_after',newOrders:added}));pm.test('TC-B08-010: no new order',function(){pm.expect(added.length).to.eql(0);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-010 verify cart after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_010_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-010 read cart after',pm.response.code===200&&Array.isArray(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-010',phase:'cart_after',cart}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-B08-012",
+      "item": [
+        {
+          "name": "TC-B08-012 setup register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"B08 Test 012\",\n  \"email\": \"b08.{{runId}}.012@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "requireSetup('TC-B08-012 register',pm.response.code>=200&&pm.response.code<300);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-012 setup login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"b08.{{runId}}.012@example.com\",\n  \"password\": \"B08Test123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();requireSetup('TC-B08-012 login',pm.response.code===200&&typeof b.token==='string'&&b.user.role==='user');pm.collectionVariables.set('b08_012_token',b.token);pm.collectionVariables.set('b08_012_userId',b.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-012 setup empty cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_012_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-012 fresh cart',pm.response.code===200&&Array.isArray(cart)&&cart.length===0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-012 verify cart before",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_012_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();const total=cart.reduce((s,x)=>s+Number(x.price)*Number(x.quantity),0);requireSetup('TC-B08-012 cart fixture verified',pm.response.code===200&&cart.length===0&&total===0);pm.collectionVariables.set('b08_012_cartBefore',JSON.stringify(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-012',phase:'cart_before',cart,total}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-012 snapshot orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_012_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-012 snapshot orders',pm.response.code===200&&Array.isArray(rows)&&rows.length===0);pm.collectionVariables.set('b08_012_orderIds',JSON.stringify(rows.map(x=>x.id)));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-012',phase:'orders_before',orders:rows}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-012 CHECKOUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_012_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/checkout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"total_amount\": 0,\n  \"shipping_address\": \"123 Le Loi, TP.HCM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const b=pm.response.json();pm.collectionVariables.set('b08_012_response',JSON.stringify(b));pm.collectionVariables.set('b08_012_status',pm.response.code);console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-012',phase:'checkout',sentTotal:0,status:pm.response.code,body:b}));pm.test('TC-B08-012: checkout rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});pm.test('TC-B08-012: error message returned',function(){const msg=b.error||b.message;pm.expect(msg).to.be.a('string').and.not.empty;pm.expect(pm.response.code>=400).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-012 verify orders after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_012_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/my-orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const rows=pm.response.json();requireSetup('TC-B08-012 read orders after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('b08_012_orderIds'));const added=rows.filter(x=>!before.includes(x.id));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-012',phase:'orders_after',newOrders:added}));pm.test('TC-B08-012: no new order',function(){pm.expect(added.length).to.eql(0);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-B08-012 verify cart after",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{b08_012_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cart"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function requireSetup(label, ok) { pm.test(label, function(){pm.expect(ok).to.eql(true);}); if(!ok){pm.execution.setNextRequest(null); throw new Error('SETUP_BLOCKED: '+label);} }",
+                  "const cart=pm.response.json();requireSetup('TC-B08-012 read cart after',pm.response.code===200&&Array.isArray(cart));console.log('B08_EVIDENCE '+JSON.stringify({tc:'TC-B08-012',phase:'cart_after',cart}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if(!pm.collectionVariables.get('runId')) pm.collectionVariables.set('runId', Date.now().toString());"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,231 @@
+{
+  "tool": "Postman CLI 1.75.0",
+  "date": "2026-10-18",
+  "timezone": "Asia/Bangkok",
+  "baseUrl": "http://localhost:3000",
+  "environment": "Unmodified server.js/database.js copied to temporary directory with isolated database; original workspace database preserved",
+  "sourceHashes": {
+    "server": "E2263811A1690A63A7DBB4446C3FD33FB87F50D073D9F8CDFAB7083A52F5E8ED",
+    "database": "50012F35C2CF0776DD837482D76ADF701F0EE40CDCB9D80143278FCCDE034717"
+  },
+  "counts": {
+    "testCases": 6,
+    "pass": 2,
+    "fail": 4,
+    "requests": 57,
+    "assertions": 67,
+    "failedAssertions": 10,
+    "postmanExitCode": 1
+  },
+  "fixture": {
+    "type": "fixture",
+    "id": 6,
+    "name": "B08 CLI Test Product 1792325357625",
+    "price": 100000,
+    "quantity": 2,
+    "expectedTotal": 200000
+  },
+  "results": [
+    {
+      "tc": "TC-B08-006",
+      "status": "Pass",
+      "cartBefore": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "expectedCartTotal": 200000,
+      "checkoutStatus": 401,
+      "sentTotal": 200000,
+      "response": {
+        "error": "Unauthorized"
+      },
+      "ordersBefore": [],
+      "newOrders": [],
+      "cartAfter": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "bug": null
+    },
+    {
+      "tc": "TC-B08-007",
+      "status": "Pass",
+      "cartBefore": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "expectedCartTotal": 200000,
+      "checkoutStatus": 403,
+      "sentTotal": 200000,
+      "response": {
+        "error": "Forbidden"
+      },
+      "ordersBefore": [],
+      "newOrders": [],
+      "cartAfter": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "bug": null
+    },
+    {
+      "tc": "TC-B08-008",
+      "status": "Fail",
+      "cartBefore": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "expectedCartTotal": 200000,
+      "checkoutStatus": 200,
+      "sentTotal": 200000,
+      "response": {
+        "message": "Checkout successful",
+        "orderId": 1
+      },
+      "ordersBefore": [],
+      "newOrders": [
+        {
+          "id": 1,
+          "user_id": 5,
+          "total_amount": 200000,
+          "status": "pending",
+          "shipping_address": "123 Le Loi, TP.HCM",
+          "created_at": "2026-10-18 12:09:20"
+        }
+      ],
+      "cartAfter": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "bug": "BUG-B08-001"
+    },
+    {
+      "tc": "TC-B08-009",
+      "status": "Fail",
+      "cartBefore": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "expectedCartTotal": 200000,
+      "checkoutStatus": 200,
+      "sentTotal": 199999,
+      "response": {
+        "message": "Checkout successful",
+        "orderId": 2
+      },
+      "ordersBefore": [],
+      "newOrders": [
+        {
+          "id": 2,
+          "user_id": 6,
+          "total_amount": 199999,
+          "status": "pending",
+          "shipping_address": "123 Le Loi, TP.HCM",
+          "created_at": "2026-10-18 12:09:21"
+        }
+      ],
+      "cartAfter": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "bug": "BUG-B08-002"
+    },
+    {
+      "tc": "TC-B08-010",
+      "status": "Fail",
+      "cartBefore": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "expectedCartTotal": 200000,
+      "checkoutStatus": 200,
+      "sentTotal": 200001,
+      "response": {
+        "message": "Checkout successful",
+        "orderId": 3
+      },
+      "ordersBefore": [],
+      "newOrders": [
+        {
+          "id": 3,
+          "user_id": 7,
+          "total_amount": 200001,
+          "status": "pending",
+          "shipping_address": "123 Le Loi, TP.HCM",
+          "created_at": "2026-10-18 12:09:21"
+        }
+      ],
+      "cartAfter": [
+        {
+          "id": "6",
+          "name": "B08 CLI Test Product 1792325357625",
+          "price": 100000,
+          "quantity": 2
+        }
+      ],
+      "bug": "BUG-B08-002"
+    },
+    {
+      "tc": "TC-B08-012",
+      "status": "Fail",
+      "cartBefore": [],
+      "expectedCartTotal": 0,
+      "checkoutStatus": 200,
+      "sentTotal": 0,
+      "response": {
+        "message": "Checkout successful",
+        "orderId": 4
+      },
+      "ordersBefore": [],
+      "newOrders": [
+        {
+          "id": 4,
+          "user_id": 8,
+          "total_amount": 0,
+          "status": "pending",
+          "shipping_address": "123 Le Loi, TP.HCM",
+          "created_at": "2026-10-18 12:09:22"
+        }
+      ],
+      "cartAfter": [],
+      "bug": "BUG-B08-003"
+    }
+  ],
+  "provenance": "Responses extracted from B08_EVIDENCE console JSON in postman-cli.log; line wraps joined, no extra requests performed"
+}

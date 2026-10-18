@@ -72,3 +72,29 @@ Các lượt làm bài mới được ghi append-only trong [conversation_log.md
 - **Review AI:** ID/matrix/summary/card, 13 trường/card và link đã kiểm tra. BVA chưa có min/max/precision được đặc tả; T−1/T/T+1 chỉ là relational Domain probes, không tự thêm threshold từ coupon/code. Ghi rõ giới hạn với rubric HW.
 - **Verdict sinh viên:** Chưa review/chưa gán VALID hoặc INVALID. Không có bug B08 được tái hiện hoặc evidence execution.
 - **Gap:** chưa đối chiếu bài giảng; chưa thể kiểm chứng chất lượng test bằng runtime. Chưa có trường hợp sinh viên phát hiện AI bỏ sót test/bug B08 để ghi là gap thực tế. Xem [conversation log](audit/conversation_log.md) để biết chi tiết lượt này.
+
+## B08 — Review G1/G3 được người dùng xác nhận
+
+- **Ngày:** 2026-10-18, Asia/Bangkok; Codex; dùng domain-testing và work-flow.
+- **D1 (G1):** người dùng chốt giỏ trống phải từ chối, báo lỗi và không tạo đơn. Không thêm max tổng/số dòng. Thêm TC-B08-011 (Web) và TC-B08-012 (API).
+- **D2 (G3):** người dùng chốt total client khác tổng backend phải từ chối, báo lỗi và không tạo đơn. Cập nhật TC009/010; không còn chấp nhận ignore rồi tạo đơn đúng tiền.
+- **BVA:** D1 cung cấp biên số dòng n≥1. B1 dùng 2-point: n=1 ở TC008, n=0 ở TC012; q=2 của P vẫn chỉ là 1 dòng giỏ. Total=0 cho giỏ trống để không đồng thời vi phạm D2.
+- **G2:** chưa chốt precision/rounding. Giải thích bằng phép tính giả sử 10.123×3=30.369: lưu 30.369, làm tròn 30.37 hoặc 30 cần policy riêng, không tự chọn. Đây là ví dụ giải thích, không khẳng định catalog chấp nhận giá đó. Bộ hiện tại dùng fixture tính chính xác bằng số nguyên.
+- **Output:** [analysis](analysis/B08_Checkout.md), [test cases](test-cases/B08_Checkout.md); 12 TC duy nhất: 8 chỉ Domain, 2 Domain/BVA, 2 Functional; 12 Not Run. Không có kết quả SUT mới.
+- **Nguồn:** D1/D2 là quyết định bổ sung do người dùng xác nhận trong chat, không nguyên văn FR-08. Lịch sử nhận định cũ được giữ ở audit/Git để truy vết.
+
+## B08 — Gap về cách trình bày do sinh viên phát hiện
+
+Người dùng phản hồi test case khó hiểu vì quá nhiều mã R1/F1 và ký hiệu nội bộ. AI đã ưu tiên cấu trúc truy vết nhưng chưa tối ưu hướng dẫn cho người chạy test. Đã viết lại [test cases](test-cases/B08_Checkout.md) bằng giá trị và tên điều kiện cụ thể; mã C/B chỉ giữ trong trường truy vết. Giữ 12 ID, expected và trạng thái Not Run. Đây là phản hồi về khả năng đọc/thực thi tài liệu, không phải bug SUT hoặc test bị bỏ sót.
+
+## B08 — Thực thi API bằng Postman CLI
+
+- **Prompt nguyên văn:** “Chạy các test case đó bằng cli đi.”
+- **Ngày/công cụ:** 2026-10-18, Asia/Bangkok; Codex và Postman CLI 1.75.0.
+- **Môi trường:** backend chưa chạy; startup database.js có DROP TABLE. AI tạo bản sao nguyên mã server.js/database.js trong thư mục tạm, dùng node_modules hiện có, chạy database riêng trên localhost:3000. Hash nguồn bản sao khớp workspace; không reset database gốc. Sau thu thập evidence đã dừng backend thử nghiệm.
+- **Collection:** tự tạo sản phẩm giá 100000 qua API Admin, đọc catalog xác minh, mỗi TC có user/giỏ mới và snapshot orders trước/sau. Setup assertion có fail-fast để tránh kết quả sai do fixture không đạt. Không dùng kết quả SUT làm oracle tổng tiền.
+- **Kết quả:** TC006 Pass (401, không đơn), TC007 Pass (403, không đơn); TC008 Fail (đơn đúng 200000 nhưng giỏ không xóa); TC009/010 Fail (lưu 199999/200001 thay vì từ chối); TC012 Fail (giỏ trống tạo đơn 0).
+- **Số liệu thật:** 57 requests, 67 assertions, 10 assertions failed; exit code 1. Tính theo test case: 2 Pass, 4 Fail, còn 6 Web Not Run. Không nhầm 10 assertions failed thành 10 TC fail.
+- **Artifacts:** [summary](test-cases/evidence/B08/b08_api_execution_summary.md), [CLI log](test-cases/evidence/B08/postman-cli.log), [response/snapshot JSON](test-cases/evidence/B08/b08_api_results.json), [collection](test-cases/evidence/B08/b08_api_postman_collection.json); cập nhật [test cases](test-cases/B08_Checkout.md), analysis và progress.
+- **Bug drafts:** BUG-B08-001 giỏ không xóa; BUG-B08-002 client total được tin và lưu sai; BUG-B08-003 giỏ trống tạo đơn. Xem [bugs.md](bug-reports/bugs.md). Chưa có screenshot/GitHub Issue; không tự đăng ngoài workspace.
+- **Verdict:** execution có evidence; sinh viên chưa review kết quả cuối. TC012 đánh theo quyết định bổ sung được xác nhận, phân biệt với FR-08 gốc. Chưa chạy Web, chưa suy ra kết quả UI.

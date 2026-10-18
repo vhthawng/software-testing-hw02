@@ -1,0 +1,547 @@
+﻿Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 'C:\Users\Admin\.postman\logs'
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+HW02 B08 API execution (006,007,008,009,010,012)
+
+Root SETUP admin login
+
+  POST http://localhost:3000/api/login [200 OK, 640 B, 70 ms]
+  Pass  Admin login successful
+
+Root SETUP category
+
+  GET http://localhost:3000/api/categories [200 OK, 358 B, 8 ms]
+  Pass  Category available
+
+Root SETUP product 100000
+
+  POST http://localhost:3000/api/products [200 OK, 303 B, 21 ms]
+  Pass  Create product
+
+Root SETUP verify catalog price
+
+  GET http://localhost:3000/api/products [200 OK, 1.34 KB, 6 ms]
+  Pass  Product catalog price 100000
+  -
+  | 'B08_FIXTURE {"id":6,"name":"B08 CLI Test Product 1792
+  | 325357625","price":100000,"quantity":2,"expectedTotal"
+  | :200000}'
+  -
+
+Folder TC-B08-006
+Sub-folder TC-B08-006 setup register
+
+  POST http://localhost:3000/api/register [200 OK, 316 B, 46 ms]
+  Pass  TC-B08-006 register
+
+Sub-folder TC-B08-006 setup login
+
+  POST http://localhost:3000/api/login [200 OK, 659 B, 9 ms]
+  Pass  TC-B08-006 login
+
+Sub-folder TC-B08-006 setup empty cart
+
+  GET http://localhost:3000/api/cart [200 OK, 267 B, 5 ms]
+  Pass  TC-B08-006 fresh cart
+
+Sub-folder TC-B08-006 setup add product
+
+  POST http://localhost:3000/api/cart [200 OK, 294 B, 6 ms]
+  Pass  TC-B08-006 add cart item
+
+Sub-folder TC-B08-006 verify cart before
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 5 ms]
+  Pass  TC-B08-006 cart fixture verified
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-006","phase":"cart_before"
+  | ,"cart":[{"id":"6","name":"B08 CLI Test Product 179232
+  | 5357625","price":100000,"quantity":2}],"total":200000}
+  | '
+  -
+
+Sub-folder TC-B08-006 snapshot orders
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 267 B, 6 ms]
+  Pass  TC-B08-006 snapshot orders
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-006","phase":"orders_befor
+  | e","orders":[]}'
+  -
+
+Sub-folder TC-B08-006 CHECKOUT
+
+  POST http://localhost:3000/api/checkout [401 Unauthorized, 301 B, 3 ms]
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-006","phase":"checkout","s
+  | entTotal":200000,"status":401,"body":{"error":"Unautho
+  | rized"}}'
+  -
+  Pass  TC-B08-006: checkout rejected
+
+Sub-folder TC-B08-006 verify orders after
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 267 B, 5 ms]
+  Pass  TC-B08-006 read orders after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-006","phase":"orders_after
+  | ","newOrders":[]}'
+  -
+  Pass  TC-B08-006: no new order
+
+Sub-folder TC-B08-006 verify cart after
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 4 ms]
+  Pass  TC-B08-006 read cart after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-006","phase":"cart_after",
+  | "cart":[{"id":"6","name":"B08 CLI Test Product 1792325
+  | 357625","price":100000,"quantity":2}]}'
+  -
+
+Folder TC-B08-007
+Sub-folder TC-B08-007 setup register
+
+  POST http://localhost:3000/api/register [200 OK, 316 B, 21 ms]
+  Pass  TC-B08-007 register
+
+Sub-folder TC-B08-007 setup login
+
+  POST http://localhost:3000/api/login [200 OK, 659 B, 13 ms]
+  Pass  TC-B08-007 login
+
+Sub-folder TC-B08-007 setup empty cart
+
+  GET http://localhost:3000/api/cart [200 OK, 267 B, 7 ms]
+  Pass  TC-B08-007 fresh cart
+
+Sub-folder TC-B08-007 setup add product
+
+  POST http://localhost:3000/api/cart [200 OK, 294 B, 4 ms]
+  Pass  TC-B08-007 add cart item
+
+Sub-folder TC-B08-007 verify cart before
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 4 ms]
+  Pass  TC-B08-007 cart fixture verified
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-007","phase":"cart_before"
+  | ,"cart":[{"id":"6","name":"B08 CLI Test Product 179232
+  | 5357625","price":100000,"quantity":2}],"total":200000}
+  | '
+  -
+
+Sub-folder TC-B08-007 snapshot orders
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 267 B, 4 ms]
+  Pass  TC-B08-007 snapshot orders
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-007","phase":"orders_befor
+  | e","orders":[]}'
+  -
+
+Sub-folder TC-B08-007 CHECKOUT
+
+  POST http://localhost:3000/api/checkout [403 Forbidden, 295 B, 5 ms]
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-007","phase":"checkout","s
+  | entTotal":200000,"status":403,"body":{"error":"Forbidd
+  | en"}}'
+  -
+  Pass  TC-B08-007: checkout rejected
+
+Sub-folder TC-B08-007 verify orders after
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 267 B, 5 ms]
+  Pass  TC-B08-007 read orders after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-007","phase":"orders_after
+  | ","newOrders":[]}'
+  -
+  Pass  TC-B08-007: no new order
+
+Sub-folder TC-B08-007 verify cart after
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 5 ms]
+  Pass  TC-B08-007 read cart after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-007","phase":"cart_after",
+  | "cart":[{"id":"6","name":"B08 CLI Test Product 1792325
+  | 357625","price":100000,"quantity":2}]}'
+  -
+
+Folder TC-B08-008
+Sub-folder TC-B08-008 setup register
+
+  POST http://localhost:3000/api/register [200 OK, 316 B, 17 ms]
+  Pass  TC-B08-008 register
+
+Sub-folder TC-B08-008 setup login
+
+  POST http://localhost:3000/api/login [200 OK, 659 B, 5 ms]
+  Pass  TC-B08-008 login
+
+Sub-folder TC-B08-008 setup empty cart
+
+  GET http://localhost:3000/api/cart [200 OK, 267 B, 5 ms]
+  Pass  TC-B08-008 fresh cart
+
+Sub-folder TC-B08-008 setup add product
+
+  POST http://localhost:3000/api/cart [200 OK, 294 B, 6 ms]
+  Pass  TC-B08-008 add cart item
+
+Sub-folder TC-B08-008 verify cart before
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 6 ms]
+  Pass  TC-B08-008 cart fixture verified
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-008","phase":"cart_before"
+  | ,"cart":[{"id":"6","name":"B08 CLI Test Product 179232
+  | 5357625","price":100000,"quantity":2}],"total":200000}
+  | '
+  -
+
+Sub-folder TC-B08-008 snapshot orders
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 267 B, 7 ms]
+  Pass  TC-B08-008 snapshot orders
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-008","phase":"orders_befor
+  | e","orders":[]}'
+  -
+
+Sub-folder TC-B08-008 CHECKOUT
+
+  POST http://localhost:3000/api/checkout [200 OK, 312 B, 23 ms]
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-008","phase":"checkout","s
+  | entTotal":200000,"status":200,"body":{"message":"Check
+  | out successful","orderId":1}}'
+  -
+  Pass  TC-B08-008: checkout succeeds
+
+Sub-folder TC-B08-008 verify orders after
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 406 B, 5 ms]
+  Pass  TC-B08-008 read orders after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-008","phase":"orders_after
+  | ","newOrders":[{"id":1,"user_id":5,"total_amount":2000
+  | 00,"status":"pending","shipping_address":"123 Le Loi, 
+  | TP.HCM","created_at":"2026-10-18 12:09:20"}]}'
+  -
+  Pass  TC-B08-008: one new order with correct amount
+
+Sub-folder TC-B08-008 verify cart after
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 4 ms]
+  Pass  TC-B08-008 read cart after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-008","phase":"cart_after",
+  | "cart":[{"id":"6","name":"B08 CLI Test Product 1792325
+  | 357625","price":100000,"quantity":2}]}'
+  -
+  1. TC-B08-008: cart cleared after success
+
+Folder TC-B08-009
+Sub-folder TC-B08-009 setup register
+
+  POST http://localhost:3000/api/register [200 OK, 316 B, 16 ms]
+  Pass  TC-B08-009 register
+
+Sub-folder TC-B08-009 setup login
+
+  POST http://localhost:3000/api/login [200 OK, 659 B, 6 ms]
+  Pass  TC-B08-009 login
+
+Sub-folder TC-B08-009 setup empty cart
+
+  GET http://localhost:3000/api/cart [200 OK, 267 B, 4 ms]
+  Pass  TC-B08-009 fresh cart
+
+Sub-folder TC-B08-009 setup add product
+
+  POST http://localhost:3000/api/cart [200 OK, 294 B, 7 ms]
+  Pass  TC-B08-009 add cart item
+
+Sub-folder TC-B08-009 verify cart before
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 4 ms]
+  Pass  TC-B08-009 cart fixture verified
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-009","phase":"cart_before"
+  | ,"cart":[{"id":"6","name":"B08 CLI Test Product 179232
+  | 5357625","price":100000,"quantity":2}],"total":200000}
+  | '
+  -
+
+Sub-folder TC-B08-009 snapshot orders
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 267 B, 6 ms]
+  Pass  TC-B08-009 snapshot orders
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-009","phase":"orders_befor
+  | e","orders":[]}'
+  -
+
+Sub-folder TC-B08-009 CHECKOUT
+
+  POST http://localhost:3000/api/checkout [200 OK, 312 B, 18 ms]
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-009","phase":"checkout","s
+  | entTotal":199999,"status":200,"body":{"message":"Check
+  | out successful","orderId":2}}'
+  -
+  2. TC-B08-009: checkout rejected
+  3. TC-B08-009: error message returned
+
+Sub-folder TC-B08-009 verify orders after
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 406 B, 5 ms]
+  Pass  TC-B08-009 read orders after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-009","phase":"orders_after
+  | ","newOrders":[{"id":2,"user_id":6,"total_amount":1999
+  | 99,"status":"pending","shipping_address":"123 Le Loi, 
+  | TP.HCM","created_at":"2026-10-18 12:09:21"}]}'
+  -
+  4. TC-B08-009: no new order
+
+Sub-folder TC-B08-009 verify cart after
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 4 ms]
+  Pass  TC-B08-009 read cart after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-009","phase":"cart_after",
+  | "cart":[{"id":"6","name":"B08 CLI Test Product 1792325
+  | 357625","price":100000,"quantity":2}]}'
+  -
+
+Folder TC-B08-010
+Sub-folder TC-B08-010 setup register
+
+  POST http://localhost:3000/api/register [200 OK, 316 B, 21 ms]
+  Pass  TC-B08-010 register
+
+Sub-folder TC-B08-010 setup login
+
+  POST http://localhost:3000/api/login [200 OK, 659 B, 5 ms]
+  Pass  TC-B08-010 login
+
+Sub-folder TC-B08-010 setup empty cart
+
+  GET http://localhost:3000/api/cart [200 OK, 267 B, 5 ms]
+  Pass  TC-B08-010 fresh cart
+
+Sub-folder TC-B08-010 setup add product
+
+  POST http://localhost:3000/api/cart [200 OK, 294 B, 4 ms]
+  Pass  TC-B08-010 add cart item
+
+Sub-folder TC-B08-010 verify cart before
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 5 ms]
+  Pass  TC-B08-010 cart fixture verified
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-010","phase":"cart_before"
+  | ,"cart":[{"id":"6","name":"B08 CLI Test Product 179232
+  | 5357625","price":100000,"quantity":2}],"total":200000}
+  | '
+  -
+
+Sub-folder TC-B08-010 snapshot orders
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 267 B, 6 ms]
+  Pass  TC-B08-010 snapshot orders
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-010","phase":"orders_befor
+  | e","orders":[]}'
+  -
+
+Sub-folder TC-B08-010 CHECKOUT
+
+  POST http://localhost:3000/api/checkout [200 OK, 312 B, 19 ms]
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-010","phase":"checkout","s
+  | entTotal":200001,"status":200,"body":{"message":"Check
+  | out successful","orderId":3}}'
+  -
+  5. TC-B08-010: checkout rejected
+  6. TC-B08-010: error message returned
+
+Sub-folder TC-B08-010 verify orders after
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 406 B, 6 ms]
+  Pass  TC-B08-010 read orders after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-010","phase":"orders_after
+  | ","newOrders":[{"id":3,"user_id":7,"total_amount":2000
+  | 01,"status":"pending","shipping_address":"123 Le Loi, 
+  | TP.HCM","created_at":"2026-10-18 12:09:21"}]}'
+  -
+  7. TC-B08-010: no new order
+
+Sub-folder TC-B08-010 verify cart after
+
+  GET http://localhost:3000/api/cart [200 OK, 351 B, 5 ms]
+  Pass  TC-B08-010 read cart after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-010","phase":"cart_after",
+  | "cart":[{"id":"6","name":"B08 CLI Test Product 1792325
+  | 357625","price":100000,"quantity":2}]}'
+  -
+
+Folder TC-B08-012
+Sub-folder TC-B08-012 setup register
+
+  POST http://localhost:3000/api/register [200 OK, 316 B, 20 ms]
+  Pass  TC-B08-012 register
+
+Sub-folder TC-B08-012 setup login
+
+  POST http://localhost:3000/api/login [200 OK, 659 B, 7 ms]
+  Pass  TC-B08-012 login
+
+Sub-folder TC-B08-012 setup empty cart
+
+  GET http://localhost:3000/api/cart [200 OK, 267 B, 6 ms]
+  Pass  TC-B08-012 fresh cart
+
+Sub-folder TC-B08-012 verify cart before
+
+  GET http://localhost:3000/api/cart [200 OK, 267 B, 4 ms]
+  Pass  TC-B08-012 cart fixture verified
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-012","phase":"cart_before"
+  | ,"cart":[],"total":0}'
+  -
+
+Sub-folder TC-B08-012 snapshot orders
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 267 B, 6 ms]
+  Pass  TC-B08-012 snapshot orders
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-012","phase":"orders_befor
+  | e","orders":[]}'
+  -
+
+Sub-folder TC-B08-012 CHECKOUT
+
+  POST http://localhost:3000/api/checkout [200 OK, 312 B, 16 ms]
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-012","phase":"checkout","s
+  | entTotal":0,"status":200,"body":{"message":"Checkout s
+  | uccessful","orderId":4}}'
+  -
+  8. TC-B08-012: checkout rejected
+  9. TC-B08-012: error message returned
+
+Sub-folder TC-B08-012 verify orders after
+
+  GET http://localhost:3000/api/orders/my-orders [200 OK, 401 B, 7 ms]
+  Pass  TC-B08-012 read orders after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-012","phase":"orders_after
+  | ","newOrders":[{"id":4,"user_id":8,"total_amount":0,"s
+  | tatus":"pending","shipping_address":"123 Le Loi, TP.HC
+  | M","created_at":"2026-10-18 12:09:22"}]}'
+  -
+ 10. TC-B08-012: no new order
+
+Sub-folder TC-B08-012 verify cart after
+
+  GET http://localhost:3000/api/cart [200 OK, 267 B, 5 ms]
+  Pass  TC-B08-012 read cart after
+  -
+  | 'B08_EVIDENCE {"tc":"TC-B08-012","phase":"cart_after",
+  | "cart":[]}'
+  -
+
+--------------------------------------------------------------------
+|                         |           executed |            failed |
+--------------------------+--------------------+--------------------
+|              iterations |                  1 |                 0 |
+--------------------------+--------------------+--------------------
+|                requests |                 57 |                 0 |
+--------------------------+--------------------+--------------------
+|            test-scripts |                 57 |                 0 |
+--------------------------+--------------------+--------------------
+|      prerequest-scripts |                 57 |                 0 |
+--------------------------+--------------------+--------------------
+|              assertions |                 67 |                10 |
+--------------------------------------------------------------------
+| total run duration: 5.1 s                                        |
+--------------------------------------------------------------------
+| total data received: 5.87 KB (approx)                            |
+--------------------------------------------------------------------
+| average response time: 9 ms [min: 3 ms, max: 70 ms, s.d.: 10 ms] |
+--------------------------------------------------------------------
+
+   #  failure         detail                                               
+                                                                           
+ 01.  AssertionError  TC-B08-008: cart cleared after success               
+                      expected [ { id: '6', …(3) } ] to deeply equal []    
+                      at assertion:1 in test-script                        
+                      inside "TC-B08-008 / TC-B08-008 verify cart after"   
+                                                                           
+ 02.  AssertionError  TC-B08-009: checkout rejected                        
+                      expected true to deeply equal false                  
+                      at assertion:0 in test-script                        
+                      inside "TC-B08-009 / TC-B08-009 CHECKOUT"            
+                                                                           
+ 03.  AssertionError  TC-B08-009: error message returned                   
+                      expected false to deeply equal true                  
+                      at assertion:1 in test-script                        
+                      inside "TC-B08-009 / TC-B08-009 CHECKOUT"            
+                                                                           
+ 04.  AssertionError  TC-B08-009: no new order                             
+                      expected 1 to deeply equal +0                        
+                      at assertion:1 in test-script                        
+                      inside "TC-B08-009 / TC-B08-009 verify orders after" 
+                                                                           
+ 05.  AssertionError  TC-B08-010: checkout rejected                        
+                      expected true to deeply equal false                  
+                      at assertion:0 in test-script                        
+                      inside "TC-B08-010 / TC-B08-010 CHECKOUT"            
+                                                                           
+ 06.  AssertionError  TC-B08-010: error message returned                   
+                      expected false to deeply equal true                  
+                      at assertion:1 in test-script                        
+                      inside "TC-B08-010 / TC-B08-010 CHECKOUT"            
+                                                                           
+ 07.  AssertionError  TC-B08-010: no new order                             
+                      expected 1 to deeply equal +0                        
+                      at assertion:1 in test-script                        
+                      inside "TC-B08-010 / TC-B08-010 verify orders after" 
+                                                                           
+ 08.  AssertionError  TC-B08-012: checkout rejected                        
+                      expected true to deeply equal false                  
+                      at assertion:0 in test-script                        
+                      inside "TC-B08-012 / TC-B08-012 CHECKOUT"            
+                                                                           
+ 09.  AssertionError  TC-B08-012: error message returned                   
+                      expected false to deeply equal true                  
+                      at assertion:1 in test-script                        
+                      inside "TC-B08-012 / TC-B08-012 CHECKOUT"            
+                                                                           
+ 10.  AssertionError  TC-B08-012: no new order                             
+                      expected 1 to deeply equal +0                        
+                      at assertion:1 in test-script                        
+                      inside "TC-B08-012 / TC-B08-012 verify orders after" 
+Postman credentials are required for publishing run details to Postman cloud.
+Please specify it by using the `postman login` command
