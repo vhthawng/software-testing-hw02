@@ -28,3 +28,7 @@ Artifact đã được sinh viên audit: 0; chưa tính tỷ lệ đúng/sai. Ch
 ## Artifact bước Domain
 
 Cùng prompt A04 phía trên; Codex; ngày 2026-10-18. Output nguyên văn: [snapshot phân tích và card](audit/A04_02_domain_initial.md). 22 TC Draft, chưa thực thi và chưa được sinh viên audit; chưa gán verdict. Snapshot giữ bản đầu, chưa đại diện bản cuối sau self-review của AI.
+
+## Artifact bước BVA và self-review
+
+Cùng prompt A04 phía trên; Codex; ngày 2026-10-18. Output nguyên văn: [snapshot BVA và card](audit/A04_03_bva_initial.md). 24 TC Draft, chưa thực thi, chưa được sinh viên audit. Verdict và lý do theo bài giảng chưa được sinh viên điền. AI tự phát hiện payload của case sửa riêng tên/địa chỉ/email chưa đồng bộ với steps, đã sửa trước thực thi; xem khác biệt giữa snapshot 02 và 03. Không gán đây là phát hiện của sinh viên. Dữ liệu rỗng/null và GUI còn mở được ghi rõ ở analysis.

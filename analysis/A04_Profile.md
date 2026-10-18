@@ -98,66 +98,113 @@ Các lớp C19–21 chưa có expected đầy đủ; C28 bị cấm là mục ti
 
 ## 5. Boundary Value Analysis
 
-Chưa thiết kế ở bước phân tích yêu cầu.
+**Cách xác định biên:** FR-04 yêu cầu 10 ≤ L ≤ 11, hai biên đóng L=10 và L=11. Phone luôn là chuỗi ASCII, bắt đầu bằng 0 và chỉ có digits trong nhóm này để cô lập độ dài.
+
+**Độ mịn:** ±1 chữ số; dữ liệu ASCII nên cách đếm không phụ thuộc grapheme/code unit.
+
+**2-point hay 3-point:** chọn 2-point theo quy ước on/off của skill, chưa đối chiếu bài giảng. Hai cặp là (10,9) và (11,12). Với miền hợp lệ chỉ có 10/11, tập hợp bốn giá trị cũng chính là hợp của hai bộ 3-point (9,10,11) và (10,11,12), nhưng báo cáo chỉ gắn nhãn lựa chọn 2-point. Không phát minh biên min/max tên hoặc địa chỉ; prefix là điều kiện tập ký tự, không gọi là BVA số.
+
+| Boundary ID | Class ID liên quan | Quy tắc / nguồn | Đóng / mở | Độ mịn | On-point | Off-point | Expected | Lý do chọn |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| B1 | C1, C2 | FR-04: L ≥ 10 | Đóng | 1 chữ số | 0912345678 (10) | 091234567 (9) | On: chấp nhận và lưu; Off: không lưu phone sai | Kiểm nhầm ≥ thành > hoặc nhận dưới min |
+| B2 | C1, C3 | FR-04: L ≤ 11 | Đóng | 1 chữ số | 09123456789 (11) | 091234567890 (12) | On: chấp nhận và lưu; Off: không lưu phone sai | Kiểm nhầm ≤ thành < hoặc nhận vượt max |
+
+Không có công thức tiền; expected về độ dài tính trực tiếp từ số ký tự các chuỗi cụ thể. L=10/11 không phải hai lớp EP khác nhau theo quy tắc gốc, nhưng cần cả hai điểm BVA. Chạy từng điểm trên Web và API riêng.
 
 ## 6. Test Matrix
 
+Chữ đậm trong mô tả bước chỉ biến khác nominal; JSON dưới đây là dữ liệu đầy đủ. Các case tên/địa chỉ/email giữ phone snapshot 0987654321 để không vô tình đổi thêm trường. Single Fault xét điều kiện sai, không chỉ số field.
+
 | TC ID | Requirement / nguồn | Technique | Dữ liệu đầy đủ | Class IDs | Boundary / điểm | Validity | Expected |
 |:---|:---|:---|:---|:---|:---|:---|:---|
-| TC-A04-001 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C1, C22, C11, C14, C17 | — | valid | Chấp nhận cập nhật U; đọc lại sau refresh/GET cho thấy name, phone, shipping_address đúng payload, email và role giữ nguyên. |
-| TC-A04-002 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"091234567","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C2, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-003 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"091234567890","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C3, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-004 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"1912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C4, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-005 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"091234567a","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C5, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-006 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"09123-5678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C6, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-007 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"09123 5678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C7, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-008 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C1, C22, C11, C14, C17 | — | valid | Chấp nhận cập nhật U; đọc lại sau refresh/GET cho thấy name, phone, shipping_address đúng payload, email và role giữ nguyên. |
-| TC-A04-009 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"091234567","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C2, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-010 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"091234567890","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C3, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-011 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"1912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C4, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-012 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"091234567a","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C5, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-013 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"09123-5678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C6, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-014 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"09123 5678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C7, C23, C11, C14, C17 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
-| TC-A04-015 | FR-04 | Domain | Web; `{"name":"Nguyễn Thị Bình","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C8, C22, C11, C14, C17 | — | valid | Họ tên U được lưu đúng Nguyễn Thị Bình; phone và địa chỉ giữ nguyên snapshot. Refresh vẫn giữ tên mới. |
-| TC-A04-016 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"45 Nguyễn Huệ, Quận 1, TP.HCM"}`; token=U hợp lệ | C9, C22, C11, C14, C17 | — | valid | Địa chỉ U được lưu đúng 45 Nguyễn Huệ, Quận 1, TP.HCM; name và phone giữ nguyên snapshot. Refresh vẫn giữ địa chỉ mới. |
-| TC-A04-017 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ; thử gõ email khác trên UI | C10, C27, C11, C14, C17 | — | invalid | Không thể sửa email bằng thao tác UI thông thường (chỉ đọc/disabled); sau cập nhật trường cho phép và refresh, email U vẫn bằng snapshot. |
-| TC-A04-018 | FR-04, SEC-02 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=thiếu | C12, C24, C14, C17 | — | invalid | Không cập nhật hồ sơ U hoặc W; trả phản hồi từ chối xác thực. Kiểm lại bằng token hợp lệ, dữ liệu giữ nguyên; không ép mã HTTP cụ thể. |
-| TC-A04-019 | FR-04, SEC-02 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=invalid.a04.token | C13, C24, C14, C17 | — | invalid | Không cập nhật U hoặc W; từ chối xác thực với token sai. Đọc lại bằng token hợp lệ cho thấy snapshot không đổi. |
-| TC-A04-020 | FR-04, SEC-06 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM","role":"admin"}`; token=U hợp lệ | C18, C25, C11, C14 | — | invalid | Role lưu của U vẫn là user sau request và đăng nhập lại. Cho phép reject toàn request hoặc bỏ qua role và cập nhật trường được phép; không chấp nhận role=admin. Không dùng role trong JWT cũ làm bằng chứng duy nhất. |
-| TC-A04-021 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM","id":"W.id (thay bằng ID thực)"}`; token=U hợp lệ | C15, C26, C11, C17 | — | invalid | Hồ sơ W giữ nguyên snapshot khi dùng token U. Có thể từ chối request hoặc bỏ qua target rồi cập nhật U; không được cập nhật W. Đọc lại W bằng token W. |
-| TC-A04-022 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM","user_id":"W.id (thay bằng ID thực)"}`; token=U hợp lệ | C16, C26, C11, C17 | — | invalid | Hồ sơ W giữ nguyên snapshot khi dùng token U. Có thể từ chối request hoặc bỏ qua target rồi cập nhật U; không được cập nhật W. Đọc lại W bằng token W. |
+| TC-A04-001 | FR-04 | Cả hai | Web; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C1, C22 | B1 on (10) | valid | Chấp nhận cập nhật U; đọc lại sau refresh/GET cho thấy name, phone, shipping_address đúng payload, email và role giữ nguyên. |
+| TC-A04-002 | FR-04 | Cả hai | Web; `{"name":"Nguyễn Văn An","phone":"091234567","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C2, C23 | B1 off (9) | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-003 | FR-04 | Cả hai | Web; `{"name":"Nguyễn Văn An","phone":"091234567890","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C3, C23 | B2 off (12) | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-004 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"1912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C4, C23 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-005 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"091234567a","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C5, C23 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-006 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"09123-5678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C6, C23 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-007 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"09123 5678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C7, C23 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-008 | FR-04 | Cả hai | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C1, C22 | B1 on (10) | valid | Chấp nhận cập nhật U; đọc lại sau refresh/GET cho thấy name, phone, shipping_address đúng payload, email và role giữ nguyên. |
+| TC-A04-009 | FR-04 | Cả hai | API; `{"name":"Nguyễn Văn An","phone":"091234567","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C2, C23 | B1 off (9) | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-010 | FR-04 | Cả hai | API; `{"name":"Nguyễn Văn An","phone":"091234567890","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C3, C23 | B2 off (12) | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-011 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"1912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C4, C23 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-012 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"091234567a","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C5, C23 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-013 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"09123-5678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C6, C23 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-014 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"09123 5678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C7, C23 | — | invalid | Không lưu SĐT không hợp lệ; phone của U sau đọc lại giữ snapshot trước test. Không ép nguyên văn message hoặc mã HTTP. |
+| TC-A04-015 | FR-04 | Domain | Web; `{"name":"Nguyễn Thị Bình","phone":"0987654321","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C8, C22 | — | valid | Họ tên U được lưu đúng Nguyễn Thị Bình; phone và địa chỉ giữ nguyên snapshot. Refresh vẫn giữ tên mới. |
+| TC-A04-016 | FR-04 | Domain | Web; `{"name":"Nguyễn Văn An","phone":"0987654321","shipping_address":"45 Nguyễn Huệ, Quận 1, TP.HCM"}`; token=U hợp lệ | C9, C22 | — | valid | Địa chỉ U được lưu đúng 45 Nguyễn Huệ, Quận 1, TP.HCM; name và phone giữ nguyên snapshot. Refresh vẫn giữ địa chỉ mới. |
+| TC-A04-017 | FR-04 | Domain | Web; `{"name":"Nguyễn Thị Bình","phone":"0987654321","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ; thử gõ a04.changed@example.com trên UI | C10, C27 | — | invalid | Không thể sửa email bằng thao tác UI thông thường (chỉ đọc/disabled); sau cập nhật trường cho phép và refresh, email U vẫn bằng snapshot. |
+| TC-A04-018 | FR-04, SEC-02 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=thiếu | C12, C24 | — | invalid | Không cập nhật hồ sơ U hoặc W; trả phản hồi từ chối xác thực. Kiểm lại bằng token hợp lệ, dữ liệu giữ nguyên; không ép mã HTTP cụ thể. |
+| TC-A04-019 | FR-04, SEC-02 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=invalid.a04.token | C13, C24 | — | invalid | Không cập nhật U hoặc W; từ chối xác thực với token sai. Đọc lại bằng token hợp lệ cho thấy snapshot không đổi. |
+| TC-A04-020 | FR-04, SEC-06 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM","role":"admin"}`; token=U hợp lệ | C18, C25 | — | invalid | Role lưu của U vẫn là user sau request và đăng nhập lại. Cho phép reject toàn request hoặc bỏ qua role và cập nhật trường được phép; không chấp nhận role=admin. Không dùng role trong JWT cũ làm bằng chứng duy nhất. |
+| TC-A04-021 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM","id":"W.id (thay bằng ID thực)"}`; token=U hợp lệ | C16, C26 | — | invalid | Hồ sơ W giữ nguyên snapshot khi dùng token U. Có thể từ chối request hoặc bỏ qua target rồi cập nhật U; không được cập nhật W. Đọc lại W bằng token W. |
+| TC-A04-022 | FR-04 | Domain | API; `{"name":"Nguyễn Văn An","phone":"0912345678","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM","user_id":"W.id (thay bằng ID thực)"}`; token=U hợp lệ | C16, C26 | — | invalid | Hồ sơ W giữ nguyên snapshot khi dùng token U. Có thể từ chối request hoặc bỏ qua target rồi cập nhật U; không được cập nhật W. Đọc lại W bằng token W. |
+| TC-A04-023 | FR-04 | Cả hai | Web; `{"name":"Nguyễn Văn An","phone":"09123456789","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C1, C22 | B2 on (11) | valid | Chấp nhận cập nhật U; đọc lại sau refresh/GET cho thấy name, phone, shipping_address đúng payload, email và role giữ nguyên. |
+| TC-A04-024 | FR-04 | Cả hai | API; `{"name":"Nguyễn Văn An","phone":"09123456789","shipping_address":"123 Lê Lợi, Quận 1, TP.HCM"}`; token=U hợp lệ | C1, C22 | B2 on (11) | valid | Chấp nhận cập nhật U; đọc lại sau refresh/GET cho thấy name, phone, shipping_address đúng payload, email và role giữ nguyên. |
+
 ## 7. Truy vết và độ phủ
 
-- C1 → TC-A04-001, TC-A04-008
-- C2 → TC-A04-002, TC-A04-009
-- C3 → TC-A04-003, TC-A04-010
-- C4 → TC-A04-004, TC-A04-011
-- C5 → TC-A04-005, TC-A04-012
-- C6 → TC-A04-006, TC-A04-013
-- C7 → TC-A04-007, TC-A04-014
-- C8 → TC-A04-015
-- C9 → TC-A04-016
-- C10 → TC-A04-017
-- C11 → TC-A04-001, TC-A04-002, TC-A04-003, TC-A04-004, TC-A04-005, TC-A04-006, TC-A04-007, TC-A04-008, TC-A04-009, TC-A04-010, TC-A04-011, TC-A04-012, TC-A04-013, TC-A04-014, TC-A04-015, TC-A04-016, TC-A04-017, TC-A04-020, TC-A04-021, TC-A04-022
-- C12 → TC-A04-018
-- C13 → TC-A04-019
-- C14 → TC-A04-001, TC-A04-002, TC-A04-003, TC-A04-004, TC-A04-005, TC-A04-006, TC-A04-007, TC-A04-008, TC-A04-009, TC-A04-010, TC-A04-011, TC-A04-012, TC-A04-013, TC-A04-014, TC-A04-015, TC-A04-016, TC-A04-017, TC-A04-018, TC-A04-019, TC-A04-020
-- C15 → TC-A04-021
-- C16 → TC-A04-022
-- C17 → TC-A04-001, TC-A04-002, TC-A04-003, TC-A04-004, TC-A04-005, TC-A04-006, TC-A04-007, TC-A04-008, TC-A04-009, TC-A04-010, TC-A04-011, TC-A04-012, TC-A04-013, TC-A04-014, TC-A04-015, TC-A04-016, TC-A04-017, TC-A04-018, TC-A04-019, TC-A04-021, TC-A04-022
-- C18 → TC-A04-020
-- C19 → Chưa phủ: chờ làm rõ spec
-- C20 → Chưa phủ: chờ làm rõ spec
-- C21 → Chưa phủ: chờ làm rõ spec
-- C22 → TC-A04-001, TC-A04-008, TC-A04-015, TC-A04-016
-- C23 → TC-A04-002, TC-A04-003, TC-A04-004, TC-A04-005, TC-A04-006, TC-A04-007, TC-A04-009, TC-A04-010, TC-A04-011, TC-A04-012, TC-A04-013, TC-A04-014
-- C24 → TC-A04-018, TC-A04-019
-- C25 → TC-A04-020
-- C26 → TC-A04-021, TC-A04-022
-- C27 → TC-A04-017
-- C28 → Không đạt tới được theo spec; kiểm ngăn chặn bằng C25/C26
+Đây là độ phủ thiết kế, không phải kết quả chạy. C19–21 là khoảng trống spec; không đưa vào mẫu số “đã phủ”. C28 là đầu ra bị cấm.
 
-Tổng 22 TC Domain; 0 đã chạy. BVA chưa thiết kế. Mức giảm: Không định lượng, không giả định tập tổ hợp hữu hạn.
+| Requirement / Class / Boundary point | TC IDs | Trạng thái | Lý do |
+|:---|:---|:---|:---|
+| C1 | TC-A04-001, TC-A04-008, TC-A04-023, TC-A04-024 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C2 | TC-A04-002, TC-A04-009 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C3 | TC-A04-003, TC-A04-010 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C4 | TC-A04-004, TC-A04-011 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C5 | TC-A04-005, TC-A04-012 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C6 | TC-A04-006, TC-A04-013 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C7 | TC-A04-007, TC-A04-014 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C8 | TC-A04-015 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C9 | TC-A04-016 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C10 | TC-A04-017 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C11 | — | Không đạt tới được | Chưa rõ yêu cầu, không tự đặt expected |
+| C12 | TC-A04-018 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C13 | TC-A04-019 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C14 | — | Không đạt tới được | Chưa rõ yêu cầu, không tự đặt expected |
+| C15 | — | Không đạt tới được | Chưa rõ yêu cầu, không tự đặt expected |
+| C16 | TC-A04-021, TC-A04-022 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C17 | — | Không đạt tới được | Chưa rõ yêu cầu, không tự đặt expected |
+| C18 | TC-A04-020 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C19 | — | Chưa phủ | Chưa rõ yêu cầu, không tự đặt expected |
+| C20 | — | Chưa phủ | Chưa rõ yêu cầu, không tự đặt expected |
+| C21 | — | Chưa phủ | Chưa rõ yêu cầu, không tự đặt expected |
+| C22 | TC-A04-001, TC-A04-008, TC-A04-015, TC-A04-016, TC-A04-023, TC-A04-024 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C23 | TC-A04-002, TC-A04-003, TC-A04-004, TC-A04-005, TC-A04-006, TC-A04-007, TC-A04-009, TC-A04-010, TC-A04-011, TC-A04-012, TC-A04-013, TC-A04-014 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C24 | TC-A04-018, TC-A04-019 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C25 | TC-A04-020 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C26 | TC-A04-021, TC-A04-022 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C27 | TC-A04-017 | Đã thiết kế | Dữ liệu/expected kiểm tra lớp này |
+| C28 | — | Không đạt tới được | Theo spec phải bị ngăn; test C25/C26 bảo vệ invariant |
+| B1 on (10) | TC-A04-001, TC-A04-008 | Đã thiết kế | Web/API |
+| B1 off (9) | TC-A04-002, TC-A04-009 | Đã thiết kế | Web/API |
+| B2 on (11) | TC-A04-023, TC-A04-024 | Đã thiết kế | Web/API |
+| B2 off (12) | TC-A04-003, TC-A04-010 | Đã thiết kế | Web/API |
+| FR-04: cập nhật name/address | TC-A04-015, TC-A04-016 | Đã thiết kế | Sửa từng trường, refresh |
+| FR-04: phone | TC-A04-001–014, TC-A04-023–024 | Đã thiết kế | Lớp format và biên |
+| FR-04: email UI | TC-A04-017 | Đã thiết kế | Không suy rộng sang API |
+| FR-04 / SEC-02: xác thực | TC-A04-018, TC-A04-019 | Đã thiết kế | Thiếu và sai token |
+| FR-04 / SEC-06: role | TC-A04-020 | Đã thiết kế | Kiểm role lưu, không chỉ JWT cũ |
+| FR-04: ownership | TC-A04-021, TC-A04-022 | Đã thiết kế | id/user_id khác U |
+| FR-21 / FR-22 / SEC-04 liên quan profile | — | Chưa phủ | Cần vòng GUI và hiển thị an toàn bổ sung |
+
+**Thống kê (không đếm đôi):**
+
+| Chỉ số | Số lượng |
+|:---|:---|
+| Tổng test case duy nhất | 24 |
+| Chỉ Domain | 16 |
+| Chỉ BVA | 0 |
+| Thuộc cả hai | 8 |
+| Hợp lệ / Không hợp lệ | 6 / 18 |
+| Đã thực thi / Pass / Fail | 0 / 0 / 0 |
+| Not Run | 24 |
+
+N = 16 + 0 + 8 = 24. **Mức giảm:** Không định lượng vì không có không gian dữ liệu hữu hạn đã chốt.
+
+**Thiếu sót đã biết:** chưa chốt các lớp C19–21; chưa có GUI/security bổ sung, token hết hạn/thu hồi (spec không chốt expiry), field target khác id/user_id, concurrency. Ownership hiện chỉ kiểm hai cách gửi target phổ biến, không chứng minh toàn bộ khả năng truy cập chéo. Test âm khác lớp vẫn có thể nhiều lỗi thực thi, cần xác nhận runtime.
+
+Test chi tiết: [A04_Profile.md](../test-cases/A04_Profile.md).
 
 ## 8. Giới hạn và kỹ thuật bổ sung
 
@@ -170,3 +217,5 @@ EP/BVA không chứng minh toàn bộ bảo mật, tương tác hay trình tự.
 | v0.1 | 2026-10-18 | Trích yêu cầu, nguồn, nominal và điểm chưa rõ | Bước đầu A04 | Chưa có TC | Chưa review |
 
 | v0.2 | 2026-10-18 | Thiết kế lớp, ma trận và 22 card Domain | Tách Web/API và negative đơn | Toàn bộ TC hiện tại | Chưa review |
+
+| v0.3 | 2026-10-18 | Bổ sung B1/B2 và 2 TC 11 chữ số; 8 TC gắn cả Domain/BVA; sửa payload test đơn trường | Đủ bốn giá trị 9/10/11/12 trên Web/API, đồng bộ dữ liệu | TC-A04-001–003,008–010,015–017,023–024 | AI self-review; sinh viên chưa review |
