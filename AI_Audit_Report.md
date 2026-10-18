@@ -24,3 +24,7 @@ Snapshot lưu nội dung AI tạo ban đầu; các thay đổi sau này không g
 ## Tổng kết và khai báo
 
 Artifact đã được sinh viên audit: 0; chưa tính tỷ lệ đúng/sai. Chưa có kết luận trải nghiệm 80–150 từ hoặc chữ ký. Chưa thể điền khai báo “tôi đã review/chỉnh sửa” thay sinh viên. AI Critique 200–300 từ sẽ viết sau trải nghiệm thực tế, không tạo sẵn bằng kinh nghiệm giả.
+
+## Artifact bước Domain
+
+Cùng prompt A04 phía trên; Codex; ngày 2026-10-18. Output nguyên văn: [snapshot phân tích và card](audit/A04_02_domain_initial.md). 22 TC Draft, chưa thực thi và chưa được sinh viên audit; chưa gán verdict. Snapshot giữ bản đầu, chưa đại diện bản cuối sau self-review của AI.
