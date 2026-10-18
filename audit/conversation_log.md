@@ -187,3 +187,20 @@ Historical entries before this log: [conversation_before_current.md](conversatio
 **Assistant response summary:** Đã cập nhật trạng thái thành 7 Pass/6 Fail/0 Not Run, di chuyển ảnh và dọn evidence theo yêu cầu. Các link evidence tồn tại trừ TC-A04-004 vì workspace không có ảnh tương ứng.  
 **Verdict:** INCOMPLETE — artifact đã cập nhật; cần sinh viên review phân loại Fail của TC-A04-002/004, bổ sung evidence TC-A04-004 nếu có và review ba bug draft trước khi chốt.  
 **Student review:** Xác nhận trạng thái 002/004 theo oracle FR-04; cung cấp ảnh 004 nếu có; kiểm tra actual, bug draft và các link evidence.
+
+## Entry 009 — Commit A04 và chuẩn bị B08
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed  
+**Skills:** work-flow, domain-testing  
+
+**Prompt (user, verbatim):**
+
+> Vậy là test case cho feature A04 này đã xong, hãy thực hiện commit nó đi. Và chuẩn bị đến feature tiếp theo
+
+**Assistant output record:** Kiểm tra working tree và lịch sử commit. Commit skill/workflow dùng chung trước bằng `92bd123 chore: refine HW02 testing workflow skills`, sau đó commit artifact hoàn thiện A04 bằng `581b52b A04: execute profile tests and record evidence`. Commit A04 gồm analysis/test case, evidence ảnh và Postman, bug drafts, AI audit, conversation history và progress. Working tree sạch sau commit. Đọc nhanh FR-08 và API Cart & Orders để chuẩn bị B08; cập nhật WORK_PROGRESS với phạm vi spec, endpoint liên quan và bước kế tiếp. Chưa tạo analysis/test case B08 và chưa thực thi B08.
+
+**Artifacts:** [A04 commit `581b52b`](../test-cases/A04_Profile.md), [WORK_PROGRESS](../WORK_PROGRESS.md), [conversation log](conversation_log.md). Nguồn chuẩn bị B08: [EShop README](../eshop-sut/README.md), [API specification](../eshop-sut/api_specification.md).  
+**Assistant response summary:** A04 đã commit; B08 được đặt làm feature kế tiếp với phạm vi FR-08: đăng nhập, backend tự tính tổng từ giỏ, không tin `total_amount` client, xóa giỏ sau checkout thành công.  
+**Verdict:** COMPLETE for requested commit/preparation; B08 chưa bắt đầu thiết kế.  
+**Student review:** Xác nhận hash commit và phạm vi B08 trước khi gọi domain-testing cho feature tiếp theo.
