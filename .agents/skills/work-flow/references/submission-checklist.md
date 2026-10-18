@@ -7,11 +7,48 @@
 | report.md | 4 feature mỗi pool một; giải thích từng bước Domain/BVA, test case, kết quả, bằng chứng và AI gap. Liên kết đầy đủ tới analysis, test case và bằng chứng trong Markdown. |
 | bug-reports/bugs.md | Bug, ảnh và link GitHub Issues nhóm; mỗi issue có screenshot. Chưa tái hiện/chưa đăng ghi đúng trạng thái. |
 | AI_Audit_Report.md | Phụ lục khai báo dùng AI; mỗi interaction có công cụ, ngày giờ, prompt, output. Thiếu dữ liệu phải ghi rõ. |
+| `audit/conversation_log.md` | Log append-only của mọi lượt chat liên quan đến bài: prompt, output, skill/tool, timestamp, artifact, verdict và phần review; các mục thiếu raw transcript phải ghi `INCOMPLETE`. |
 | AI_Critique.md | Đoạn 200–300 từ về AI sai/thiếu/bias, nguyên nhân, bài học; sinh viên review. |
 | git_commit_log.txt | Lịch sử thật, commit theo bước/feature. |
 | README.md | Bảng tự đánh giá; số feature, test thiết kế/executed/pass/fail/chưa chạy; số bug; video demo. |
 | Skill và video | Khuyến khích, 10 điểm rubric; nộp skill cùng YouTube demo end-to-end một feature hoàn chỉnh nếu làm. Không tạo link giả. |
 | Hỗ trợ | Test data, script, ảnh, video/link và phụ lục thực tế. |
+
+## Cấu trúc thư mục nộp ở giai đoạn cuối
+
+Chỉ tạo thư mục này khi hoàn thiện/đóng gói. Hiện tại các file được làm trực tiếp trong workspace, không nằm dưới thư mục này. Giữ các mục PDF trong kế hoạch, nhưng không tạo file PDF rỗng, giả hoặc tự chuyển đổi; nếu người dùng cung cấp PDF thật thì giữ lại khi đóng gói.
+
+```text
+23120355_HW02_AI_DomainTesting_090/
+├── README.md
+├── report.md
+├── report.pdf                  # Dự kiến; không generate
+├── AI_Critique.md
+├── AI_Critique.pdf             # Dự kiến; không generate
+├── AI_Audit_Report.md
+├── AI_Audit_Report.pdf         # Dự kiến; không generate
+├── git_commit_log.txt
+├── analysis/                  # Phụ lục phân tích Domain/BVA
+│   ├── A04_Profile.md
+│   ├── B08_Checkout.md
+│   ├── C15_ProductManagement.md
+│   └── D_MobileRegister.md
+├── test-cases/
+│   ├── A04_Profile.md
+│   ├── B08_Checkout.md
+│   ├── C15_ProductManagement.md
+│   └── D_MobileRegister.md
+├── bug-reports/
+│   └── bugs.md
+├── evidence/
+│   ├── A04/
+│   ├── B08/
+│   ├── C15/
+│   └── D_MobileRegister/
+└── skills/                    # Sao chép các skill đã dùng/xây dựng
+```
+
+`090` là giá trị trong tên thư mục người dùng đưa, không chứng nhận điểm đã tự đánh giá. Nếu người dùng điều chỉnh điểm cuối cùng, cập nhật tên trước đóng gói. Sao chép artifact từ workspace, giữ nguyên bản làm việc, kiểm tra liên kết tương đối sau sao chép. Nếu thiếu PDF thật, ghi rõ thiếu và không tuyên bố ZIP đã đủ hồ sơ theo đề gốc.
 
 ## Tổng hợp
 

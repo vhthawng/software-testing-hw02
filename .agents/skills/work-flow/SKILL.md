@@ -1,4 +1,4 @@
----
+﻿---
 name: work-flow
 description: Điều phối làm và chuẩn bị bài nộp HW02 Domain Testing trên EShop, gồm AI Audit, review và gap analysis, Git commit theo bước, thực thi và bug report, tổng hợp báo cáo Markdown và ZIP. Dùng khi tiếp tục hoặc kiểm tra tiến độ HW02; gọi domain-testing cho thiết kế kỹ thuật.
 ---
@@ -14,11 +14,22 @@ Skill điều phối bài làm; dùng [domain-testing](../domain-testing/SKILL.m
 - Phạm vi đã chọn: A04/FR-04 Web Profile, B08/FR-08 Web Checkout, C15/FR-15 Admin Product CRUD, D Mobile Register thuộc FR-20 với quy tắc FR-01. Không tự đổi. Chưa đủ thông tin nhóm thì không khẳng định đã không trùng.
 - Khi thực sự bắt đầu làm bài, lưu `WORK_PROGRESS.md`: feature, bước, artifact, review/execution, commit thật và việc thiếu. Tên này là quy ước địa phương.
 
+## Vị trí file trong giai đoạn làm bài
+
+Lưu artifact trực tiếp dưới workspace hiện tại `D:/university/software-testing/HW02/`; chỉ tạo file/thư mục khi bước tương ứng cần đến. Chưa tạo thư mục nộp bài hoặc bản sao đóng gói trong lúc thiết kế/thực thi.
+
+- File chung tại root: `README.md`, `report.md`, `AI_Critique.md`, `AI_Audit_Report.md`, `git_commit_log.txt` và `WORK_PROGRESS.md`.
+- Test case: `test-cases/A04_Profile.md`, `test-cases/B08_Checkout.md`, `test-cases/C15_ProductManagement.md`, `test-cases/D_MobileRegister.md`.
+- Phân tích tương ứng: `analysis/A04_Profile.md`, `analysis/B08_Checkout.md`, `analysis/C15_ProductManagement.md`, `analysis/D_MobileRegister.md`. Đây là đường dẫn output truyền cho domain-testing, thay cho mặc định features/<feature-id>/. Điều chỉnh link trong template theo tên/vị trí thực tế.
+- Bug ở `bug-reports/bugs.md`; bằng chứng theo `evidence/A04/`, `evidence/B08/`, `evidence/C15/`, `evidence/D_MobileRegister/`.
+- Skill tiếp tục được chỉnh tại `.agents/skills/`; chỉ sao chép vào `skills/` của thư mục nộp ở giai đoạn cuối. Không sửa mã nguồn SUT để làm test pass.
+- Nếu root đã có file, đọc và tích hợp nội dung cần thiết, không ghi đè nội dung không liên quan.
+
 ## Chu trình mỗi tính năng
 
 1. Ghi yêu cầu, phạm vi, nguồn. Gọi domain-testing và lưu artifact ở từng mốc: phân tích yêu cầu; miền và test Domain; biên và test BVA; thực thi; bug report; review AI/chỉnh sửa. Không làm xong toàn bộ rồi tạo lịch sử giả.
 2. Giữ bản AI ban đầu và thay đổi sau review. Có thể xuất nháp; không tự ghi sinh viên đã review hoặc bịa phản hồi của họ. Chỉ chờ khi quyết định thực sự chặn bước phụ thuộc.
-3. Chạy trên đúng nền tảng; D cần bằng chứng Mobile, API không thay thế kiểm thử UI Mobile. Ghi môi trường, actual và evidence. Chưa chạy để Not Run/Blocked phù hợp, ghi lý do. Đọc code chỉ là dấu hiệu cần xác nhận.
+3. Chạy trên đúng nền tảng; D cần bằng chứng Mobile, API không thay thế kiểm thử UI Mobile. Ghi actual và evidence khi thực thi. Chưa chạy để Not Run/Blocked phù hợp, ghi lý do; không cần thêm một trường Execution context riêng trong từng test card. Đọc code chỉ là dấu hiệu cần xác nhận.
 4. Bug Markdown có ID, requirement, môi trường, preconditions/data/steps, expected/actual, ảnh, TC và ảnh hưởng. Đề yêu cầu GitHub Issues nhóm kèm screenshot từng issue. Chuẩn bị nội dung/ảnh trước; skill không tự cấp quyền đăng ra ngoài. Chỉ đăng khi có chỉ dẫn cho phép; chưa có thì giữ nháp, đánh dấu chưa đăng.
 5. AI gap analysis mỗi feature: AI ban đầu thiếu/sai gì, ai phát hiện, phần sửa/bổ sung, nguyên nhân có căn cứ (prompt/công cụ/độ phức tạp). Phân biệt nguyên nhân biết và suy đoán; không tạo lỗi AI giả.
 
@@ -28,6 +39,13 @@ Skill điều phối bài làm; dùng [domain-testing](../domain-testing/SKILL.m
 - Lưu review và bản trước/sau, hoặc link tới phiên bản bất biến trong repo. Link tới file đang bị ghi đè không đủ giữ lịch sử tương tác.
 - Không tuyên bố thu được toàn bộ chat nếu công cụ không cung cấp. Tương tác cũ/output/thời gian thiếu phải ghi rõ và yêu cầu export/bổ sung khi cần; không suy diễn thành log thật.
 - Critique là đoạn 200–300 từ dựa trên trải nghiệm thật: sai/thiếu/bias, nguyên nhân, bài học. Bản AI hỗ trợ cần sinh viên review; không bịa trải nghiệm. Critique toàn bài không thay thế gap analysis từng feature.
+
+## Conversation capture — bắt buộc cho mọi lượt làm bài
+
+- Mỗi lượt chat liên quan đến HW02 phải được ghi vào file append-only `audit/conversation_log.md`, gồm prompt người dùng, output của AI, ngày/giờ theo Asia/Bangkok, công cụ/model nếu biết, skill được áp dụng, artifact/link tạo hoặc sửa, verdict và phần sinh viên cần review. Bao gồm cả câu hỏi làm rõ, phản biện, kiểm tra skill, cập nhật skill và quyết định phạm vi; không bỏ qua vì đó là “trao đổi” thay vì test case.
+- Ghi prompt và output nguyên văn khi transcript/export cho phép. Nếu chỉ truy xuất được tóm tắt hoặc artifact, ghi rõ `INCOMPLETE` và lý do; không biến bản tóm tắt thành raw output. Không tự bịa timestamp, prompt, verdict hoặc phản hồi sinh viên.
+- Sau khi hoàn thành các thay đổi của lượt hiện tại và trước khi trả lời cuối, append entry của lượt đó vào log. Entry phải ghi rõ nếu có phần chưa thể lưu. Không đưa yêu cầu của người dùng vào audit chỉ khi người dùng yêu cầu loại trừ cụ thể; nếu không có yêu cầu loại trừ thì ghi cả lượt hiện tại.
+- `AI_Audit_Report.md` phải liên kết tới conversation log và tóm tắt phạm vi đầy đủ. File lịch sử cũ như `audit/conversation_before_current.md` được giữ nguyên để truy vết, nhưng các lượt mới phải ghi vào `audit/conversation_log.md`.
 
 ## Git theo bước
 
