@@ -50,11 +50,11 @@ Một field upload thực chất là **nhiều biến độc lập gộp trong m
 ### 7.2. Định dạng: tách ba thuộc tính
 - **Phần mở rộng** (`.jpg`, `.png`, `.gif`): đại diện cho từng định dạng được phép; thêm các lớp không hợp lệ: ảnh thật nhưng định dạng khác (`.bmp`), không phải ảnh (`.txt`, `.pdf`), không có đuôi, đuôi kép (`photo.jpg.exe`).
 - **Hoa/thường của đuôi**: `JPG`, `Png`. Hành vi tùy hệ thống nên **phải xác nhận** có phân biệt hay không, không tự đoán. Nếu đã chốt "phân biệt" thì đây là lớp không hợp lệ; nếu "không phân biệt" thì là lớp hợp lệ.
-- **Biến thể đuôi không có trong spec** (như `.jpeg` khi spec chỉ ghi `jpg`): mặc định coi là không hợp lệ theo nguyên tắc "không liệt kê thì không chấp nhận", nhưng vẫn ghi vào giả định để xác nhận.
+- **Biến thể đuôi không có trong spec** (như `.jpeg` khi spec chỉ ghi `jpg`): chỉ coi không hợp lệ khi spec xác định danh sách cho phép là đầy đủ/đóng. Nếu chỉ là ví dụ, ghi chưa rõ, không kết luận bug dựa trên giả định.
 - **Nội dung thực** so với đuôi: file `.txt` đổi tên thành `.jpg` là lớp riêng (hệ thống có kiểm tra magic bytes/nội dung hay chỉ kiểm tra đuôi).
 
 ### 7.3. Kích thước ảnh (pixel)
-- Nếu spec chỉ ghi "recommended" thì **không phải quy tắc validate**: mọi kích thước đều hợp lệ. Vẫn chọn các đại diện (đúng kích thước khuyến nghị, rất nhỏ như 1×1, rất lớn, khác tỷ lệ) để quan sát hiển thị (méo, cắt, co giãn), và ghi rõ đây là kết quả *quan sát*, không tính fail.
+- Nếu spec chỉ ghi "recommended" thì **không phải quy tắc validate**: không suy ra mọi kích thước đều hợp lệ hoặc đều bị cấm; các yêu cầu bắt buộc khác vẫn áp dụng. Vẫn chọn các đại diện (đúng kích thước khuyến nghị, rất nhỏ như 1×1, rất lớn, khác tỷ lệ) để quan sát hiển thị (méo, cắt, co giãn), và ghi rõ đây là kết quả *quan sát*, không tính fail.
 - Chỉ áp dụng BVA cho rộng/cao khi spec có giới hạn bắt buộc.
 
 ### 7.4. Tên file

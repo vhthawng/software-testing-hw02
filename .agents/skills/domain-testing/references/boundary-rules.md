@@ -10,7 +10,7 @@
 7. Biên phụ thuộc và biên của đầu ra: ví dụ có số (rút tiền)
 
 ## 1. Định nghĩa
-- **Biên (boundary)**: giá trị mà tại đó điều kiện trong code đổi kết quả (ví dụ `tuổi >= 18`).
+- **Biên (boundary)**: giá trị mà tại đó điều kiện trong đặc tả/mô hình miền đổi kết quả (ví dụ `tuổi >= 18`).
 - **On-point**: giá trị nằm ĐÚNG trên biên.
 - **Off-point**: giá trị gần nhất nằm ở phía KIA của điều kiện, tức là thay đổi nhỏ nhất làm đảo kết quả.
 - **In-point**: giá trị nằm sâu bên trong lớp (đại diện EP).
@@ -31,8 +31,8 @@ Quy tắc kiểm tra nhanh: on-point và off-point phải cho **kết quả ngư
 Khoảng `[min, max]` có hai biên → test cả hai. Khoảng mở hai đầu `(min, max)` cũng có hai biên. Quy tắc một phía (`x >= 0`) chỉ có một biên.
 
 ## 3. 2-point và 3-point
-- **2-point (mặc định)**: on-point + off-point cho mỗi biên. Đủ để phát hiện lỗi đổi toán tử.
-- **3-point**: dưới / đúng / trên giá trị biên. Dùng cho tiền, an toàn, tuân thủ quy định, hoặc khi spec mơ hồ về biên bao gồm hay không. Tốn thêm khoảng 1,5 lần.
+- **2-point (nếu phù hợp quy ước bài giảng)**: on-point + off-point cho mỗi biên. Có thể phát hiện một số lỗi đổi toán tử, không bảo đảm mọi lỗi biên.
+- **3-point**: dưới / đúng / trên giá trị biên. Dùng cho tiền, an toàn, tuân thủ quy định, hoặc khi spec mơ hồ về biên bao gồm hay không. Không dùng thêm điểm test để thay thế việc làm rõ spec mơ hồ.
 Luôn nói rõ đã dùng loại nào.
 
 ## 4. Độ mịn ("giá trị sát nhất" là bao nhiêu)
@@ -102,3 +102,5 @@ Các lớp của **đầu ra "số dư sau rút"** (đánh số liên tục cùn
 Ngưỡng đầu ra: −0.01 / 0.00 (O1/O2) và −3000.00 / (không đạt được −3000.01) cho ra cùng các điểm Amount đã liệt kê ở bảng trên; nhờ truy ngược này, mỗi test về đầu ra trùng với một test về biên đầu vào, nên có thể gộp.
 
 Lưu ý nhỏ: nếu spec có hai điều kiện báo "Insufficient Funds" chồng lấn nhau (ví dụ `Amount > balance` và `Amount > balance + credit limit`), đó là **mâu thuẫn** cần xác nhận ở Bước 0 trước khi chọn biên, vì nó quyết định số dư 1000.11 là rút được hay bị chặn.
+## Căn cứ chọn biên
+Dùng spec thay vì code làm oracle. Ưu tiên quy trình bài giảng/người dùng; nếu thiếu ghi rõ chưa đối chiếu. Độ mịn và giới hạn implementation không tự trở thành yêu cầu nghiệp vụ.
