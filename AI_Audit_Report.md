@@ -1,4 +1,4 @@
-# AI Audit Report — HW02 (đang làm)
+﻿# AI Audit Report — HW02 (đang làm)
 
 “I use AI tools for the following tasks,”: phân tích FR-04, thiết kế Domain/BVA và ghi tài liệu. Công cụ: Codex trong phiên chat hiện tại; model/version không xác nhận. MSSV 23120355; họ tên/lớp chưa cung cấp.
 
@@ -32,3 +32,32 @@ Cùng prompt A04 phía trên; Codex; ngày 2026-10-18. Output nguyên văn: [sna
 ## Artifact bước BVA và self-review
 
 Cùng prompt A04 phía trên; Codex; ngày 2026-10-18. Output nguyên văn: [snapshot BVA và card](audit/A04_03_bva_initial.md). 24 TC Draft, chưa thực thi, chưa được sinh viên audit. Verdict và lý do theo bài giảng chưa được sinh viên điền. AI tự phát hiện payload của case sửa riêng tên/địa chỉ/email chưa đồng bộ với steps, đã sửa trước thực thi; xem khác biệt giữa snapshot 02 và 03. Không gán đây là phát hiện của sinh viên. Dữ liệu rỗng/null và GUI còn mở được ghi rõ ở analysis.
+
+## Conversation audit before the current request
+
+Các lượt trao đổi trước về lựa chọn feature, cấu trúc bài, Git, kiểm tra/cập nhật skill và thiết kế A04 được lưu trong [conversation_before_current.md](audit/conversation_before_current.md). File đó giữ prompt người dùng, output đã được truy xuất từ transcript hoặc artifact local, verdict và phần sửa của sinh viên. Các mục không có timestamp/export đầy đủ được đánh dấu `INCOMPLETE`; không suy diễn thời gian hay chép output tóm tắt thành raw output.
+
+Các lượt làm bài mới được ghi append-only trong [conversation_log.md](audit/conversation_log.md), theo quy tắc của [work-flow](.agents/skills/work-flow/SKILL.md). Log bao gồm câu hỏi, phản biện, kiểm tra/cập nhật skill và artifact; lượt hiện tại được ghi vì người dùng yêu cầu lưu các chat tiếp theo.
+
+## A04 spec-first review and correction
+
+- **Prompt:** Người dùng yêu cầu review lại [analysis/A04_Profile.md](analysis/A04_Profile.md) và [test-cases/A04_Profile.md](test-cases/A04_Profile.md) theo các guardrail đã chỉnh.
+- **Công cụ/skill:** Codex; [domain-testing](.agents/skills/domain-testing/SKILL.md) và [work-flow](.agents/skills/work-flow/SKILL.md).
+- **Output và thay đổi:** [A04_04_spec_review.md](audit/A04_04_spec_review.md) ghi findings và before/after. Analysis mới tách input/context khỏi observable output, bỏ output classes và field code-only; test-cases mới còn 13 test, không nhân đôi Web/API.
+- **Verdict hiện tại:** INCOMPLETE — AI self-review, Web execution và API execution đã thực hiện; sinh viên cung cấp actual/evidence nhưng review tổng thể và đối chiếu bài giảng còn pending.
+- **Student review required:** kiểm tra lại phạm vi Web/API, quy ước BVA 2-point, expected reject/retention và dữ liệu fixture; xác nhận 7 Pass/6 Fail, phân loại TC-A04-002/004 và các bug draft trước khi chốt.
+
+## A04 API execution
+
+- **Prompt:** Người dùng yêu cầu dùng Postman CLI để chạy từ TC-A04-010 trở đi và đặt evidence dưới `test-cases/evidence/`.
+- **Công cụ:** Postman CLI v1.75.0; collection [a04_api_postman_collection.json](test-cases/evidence/A04/a04_api_postman_collection.json); SUT local backend.
+- **Output thực tế:** [a04_api_execution_summary.md](test-cases/evidence/A04/a04_api_execution_summary.md) và [postman-cli.log](test-cases/evidence/A04/postman-cli.log). Log đã redacted token.
+- **Verdict:** TC-A04-010 Pass, TC-A04-011 Pass, TC-A04-012 Fail, TC-A04-013 Pass. BUG-A04-001 được ghi nháp tại [bug-reports/bugs.md](bug-reports/bugs.md), chưa đăng GitHub Issue.
+- **Caveat:** Postman CLI không cho dùng `--output` khi chưa đăng nhập Postman Cloud; CLI reporter tích hợp được dùng và lưu đầy đủ. Sinh viên cần review actual/evidence trước khi nộp.
+
+## A04 Web execution
+
+- **Prompt:** Người dùng cung cấp actual state cho TC-A04-001 đến TC-A04-009 và yêu cầu cập nhật test case, chuyển ảnh vào `test-cases/evidence/A04/`, xoá artifact dư.
+- **Output thực tế:** TC-A04-001–005 được báo Fail; TC-A04-006–009 Pass. Ảnh `TC-A04-001.png`, `TC-A04-002.png`, `TC-A04-003.png`, `TC-A04-005.png` đến `TC-A04-009.png` đã chuyển vào [evidence/A04](test-cases/evidence/A04/). Không có file `TC-A04-004.png` trong workspace nên card ghi thiếu evidence, không tạo ảnh giả.
+- **Bug drafts:** [BUG-A04-002](bug-reports/bugs.md) cho UI từ chối phone hợp lệ L=10/11; [BUG-A04-003](bug-reports/bugs.md) cho UI lưu phone không bắt đầu bằng 0. TC-A04-002/004 vẫn được giữ trạng thái Fail theo báo cáo của sinh viên, nhưng hành vi quan sát phù hợp expected invalid class theo FR-04; cần sinh viên xác nhận lại phân loại.
+- **Cleanup:** Xoá `backend.stderr.log` rỗng và `backend.stdout.log` khỏi evidence/A04; giữ collection, summary, CLI log và ảnh thực tế.

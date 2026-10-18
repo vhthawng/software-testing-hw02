@@ -1,0 +1,426 @@
+﻿{
+    "info":  {
+                 "_postman_id":  "a04-api-20261018",
+                 "name":  "HW02 A04 API - TC010 to TC013",
+                 "description":  "API execution for A04 TC-A04-010..013. Expected assertions follow FR-04, SEC-02 and SEC-06. Status/message are not fixed unless specified.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "variable":  [
+                     {
+                         "key":  "baseUrl",
+                         "value":  "http://localhost:3000"
+                     },
+                     {
+                         "key":  "uEmail",
+                         "value":  "test@eshop.com"
+                     },
+                     {
+                         "key":  "uPassword",
+                         "value":  "Test1234!"
+                     },
+                     {
+                         "key":  "wEmail",
+                         "value":  "admin@eshop.com"
+                     },
+                     {
+                         "key":  "wPassword",
+                         "value":  "Admin123!"
+                     },
+                     {
+                         "key":  "uToken",
+                         "value":  ""
+                     },
+                     {
+                         "key":  "wToken",
+                         "value":  ""
+                     }
+                 ],
+    "item":  [
+                 {
+                     "name":  "Setup - Login U",
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"email\": \"{{uEmail}}\",\n  \"password\": \"{{uPassword}}\"\n}"
+                                              },
+                                     "url":  "{{baseUrl}}/api/login"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Setup login U returns 200\u0027, function () { pm.expect(pm.response.code).to.eql(200); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027Setup login U returns token\u0027, function () { pm.expect(body.token).to.be.a(\u0027string\u0027).and.not.empty; });",
+                                                                   "pm.collectionVariables.set(\u0027uToken\u0027, body.token);"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "Setup - Snapshot U",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{uToken}}"
+                                                    }
+                                                ],
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Snapshot U returns 200\u0027, function () { pm.expect(pm.response.code).to.eql(200); });\nconst body = pm.response.json();\nconst snapshot = { name: body.name, phone: body.phone, shipping_address: body.shipping_address, email: body.email, role: body.role };\npm.collectionVariables.set(\u0027u_snapshot\u0027, JSON.stringify(snapshot));\nObject.keys(snapshot).forEach(function (key) { pm.collectionVariables.set(\u0027u_\u0027 + key + \u0027_json\u0027, JSON.stringify(snapshot[key])); });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-010 - Missing JWT",
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"TC-A04-010\",\n  \"phone\": \"0912345678\",\n  \"shipping_address\": \"123 Le Loi, Q1, TP.HCM\"\n}"
+                                              },
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027TC-A04-010: missing JWT is not successful\u0027, function () { pm.expect(pm.response.code \u003e= 200 \u0026\u0026 pm.response.code \u003c 300).to.be.false; });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-010 - Verify U unchanged",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{uToken}}"
+                                                    }
+                                                ],
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "const body = pm.response.json();\nconst expected = JSON.parse(pm.collectionVariables.get(\u0027u_snapshot\u0027));\npm.test(\u0027SNAPSHOT_UNCHANGED\u0027, function () { [\u0027name\u0027,\u0027phone\u0027,\u0027shipping_address\u0027,\u0027email\u0027,\u0027role\u0027].forEach(function (key) { pm.expect(body[key], key).to.eql(expected[key]); }); });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-011 - Invalid JWT",
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    },
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer invalid.a04.token"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"TC-A04-011\",\n  \"phone\": \"0912345678\",\n  \"shipping_address\": \"123 Le Loi, Q1, TP.HCM\"\n}"
+                                              },
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027TC-A04-011: invalid JWT is not successful\u0027, function () { pm.expect(pm.response.code \u003e= 200 \u0026\u0026 pm.response.code \u003c 300).to.be.false; });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-011 - Verify U unchanged",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{uToken}}"
+                                                    }
+                                                ],
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "const body = pm.response.json();\nconst expected = JSON.parse(pm.collectionVariables.get(\u0027u_snapshot\u0027));\npm.test(\u0027SNAPSHOT_UNCHANGED\u0027, function () { [\u0027name\u0027,\u0027phone\u0027,\u0027shipping_address\u0027,\u0027email\u0027,\u0027role\u0027].forEach(function (key) { pm.expect(body[key], key).to.eql(expected[key]); }); });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "Setup - Login W",
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"email\": \"{{wEmail}}\",\n  \"password\": \"{{wPassword}}\"\n}"
+                                              },
+                                     "url":  "{{baseUrl}}/api/login"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Setup login W returns 200\u0027, function () { pm.expect(pm.response.code).to.eql(200); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.collectionVariables.set(\u0027wToken\u0027, body.token);"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "Setup - Snapshot W",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{wToken}}"
+                                                    }
+                                                ],
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Snapshot W returns 200\u0027, function () { pm.expect(pm.response.code).to.eql(200); });\nconst body = pm.response.json();\nconst snapshot = { name: body.name, phone: body.phone, shipping_address: body.shipping_address, email: body.email, role: body.role };\npm.collectionVariables.set(\u0027w_snapshot\u0027, JSON.stringify(snapshot));"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-013 - Update U through /me",
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    },
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{uToken}}"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Nguyen Thi Binh\",\n  \"phone\": \"0912345678\",\n  \"shipping_address\": \"123 Le Loi, Q1, TP.HCM\"\n}"
+                                              },
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027TC-A04-013: update request returns success\u0027, function () { pm.expect(pm.response.code \u003e= 200 \u0026\u0026 pm.response.code \u003c 300).to.be.true; });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-013 - Verify U",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{uToken}}"
+                                                    }
+                                                ],
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "const body = pm.response.json();\nconst expected = JSON.parse(pm.collectionVariables.get(\u0027u_snapshot\u0027));\npm.test(\u0027TC-A04-013: U changed according to body\u0027, function () { pm.expect(body.name).to.eql(\u0027Nguyen Thi Binh\u0027); pm.expect(body.phone).to.eql(\u00270912345678\u0027); pm.expect(body.shipping_address).to.eql(\u0027123 Le Loi, Q1, TP.HCM\u0027); pm.expect(body.email).to.eql(expected.email); pm.expect(body.role).to.eql(expected.role); });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-013 - Verify W unchanged",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{wToken}}"
+                                                    }
+                                                ],
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "const body = pm.response.json();\nconst expected = JSON.parse(pm.collectionVariables.get(\u0027w_snapshot\u0027));\npm.test(\u0027TC-A04-013: W remains unchanged\u0027, function () { [\u0027name\u0027,\u0027phone\u0027,\u0027shipping_address\u0027,\u0027email\u0027,\u0027role\u0027].forEach(function (key) { pm.expect(body[key], key).to.eql(expected[key]); }); });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-012 - Role injection",
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    },
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{uToken}}"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Nguyen Thi Binh\",\n  \"phone\": \"0912345678\",\n  \"shipping_address\": \"123 Le Loi, Q1, TP.HCM\",\n  \"role\": \"admin\"\n}"
+                                              },
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027TC-A04-012: role probe received a response\u0027, function () { pm.expect(pm.response.code).to.be.within(200, 599); });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "TC-A04-012 - Verify role invariant",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{uToken}}"
+                                                    }
+                                                ],
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027TC-A04-012: stored role is not admin\u0027, function () { pm.expect(body.role).to.not.eql(\u0027admin\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 },
+                 {
+                     "name":  "[Cleanup] Restore U profile",
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    },
+                                                    {
+                                                        "key":  "Authorization",
+                                                        "value":  "Bearer {{uToken}}"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Test User\",\n  \"phone\": null,\n  \"shipping_address\": null,\n  \"role\": \"user\"\n}"
+                                              },
+                                     "url":  "{{baseUrl}}/api/users/me"
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Cleanup restores U profile\u0027, function () { pm.expect(pm.response.code \u003e= 200 \u0026\u0026 pm.response.code \u003c 300).to.be.true; });"
+                                                               ]
+                                                  }
+                                   }
+                               ]
+                 }
+             ]
+}

@@ -1,0 +1,316 @@
+﻿postman.cmd : Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, 
+mkdir 'C:\Users\Admin\.postman\logs'
+At line:2 char:1
++ & 'C:\Users\Admin\AppData\Roaming\npm\postman.cmd' collection run 'te ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Warning: Could ...\.postman\logs':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+Warning: Could not create log directory at C:\Users\Admin\.postman\logs: EPERM: operation not permitted, mkdir 
+'C:\Users\Admin\.postman\logs'
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+HW02 A04 API - TC010 to TC013
+
+Root Setup - Login U
+
+  POST http://localhost:3000/api/login  
+  200 OK * 28 ms time * 346 B^ 631 Bv size * 9^ 8v headers * 0 cookies
+  - ^ raw * 58 B
+  | {
+  |   "email": "test@eshop.com",
+  |   "password": "Test1234!"
+  | }
+  - 
+  - v application/json * text * json * utf8 * 362 B
+  | {"message":"Login successful","token":"<REDACTED>","user":{"id":2,"name":"Test User","email":
+  | "test@eshop.com","password":"Test1234!","role":"user",
+  | "login_attempts":0,"locked_until":null,"reset_token":n
+  | ull,"shipping_address":"","phone":""}}
+  -
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  2 ms      17 ms   1 ms         1 ms            4 ms             2 ms       3 ms      33 ms 
+
+  Pass  Setup login U returns 200
+  Pass  Setup login U returns token
+
+Root Setup - Snapshot U
+
+  GET http://localhost:3000/api/users/me  
+  200 OK * 7 ms time * 395 B^ 448 Bv size * 8^ 8v headers * 0 cookies
+  - v application/json * text * json * utf8 * 180 B
+  | {"id":2,"name":"Test User","email":"test@eshop.com","p
+  | assword":"Test1234!","role":"user","login_attempts":0,
+  | "locked_until":null,"reset_token":null,"shipping_addre
+  | ss":"","phone":""}
+  -
+  prepare   wait   dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1 ms      1 ms   (cache)      (cache)         3 ms             2 ms       393 us    8 ms  
+
+  Pass  Snapshot U returns 200
+
+Root TC-A04-010 - Missing JWT
+
+  PUT http://localhost:3000/api/users/me  
+  401 Unauthorized * 3 ms time * 389 B^ 301 Bv size * 9^ 8v headers * 0 cookies
+  - ^ raw * 99 B
+  | {
+  |   "name": "TC-A04-010",
+  |   "phone": "0912345678",
+  |   "shipping_address": "123 Le Loi, Q1, TP.HCM"
+  | }
+  - 
+  - v application/json * text * json * utf8 * 24 B
+  | {"error":"Unauthorized"}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1 ms      322 us   (cache)      (cache)         868 us           867 us     139 us    3 ms  
+
+  Pass  TC-A04-010: missing JWT is not successful
+
+Root TC-A04-010 - Verify U unchanged
+
+  GET http://localhost:3000/api/users/me  
+  200 OK * 3 ms time * 395 B^ 448 Bv size * 8^ 8v headers * 0 cookies
+  - v application/json * text * json * utf8 * 180 B
+  | {"id":2,"name":"Test User","email":"test@eshop.com","p
+  | assword":"Test1234!","role":"user","login_attempts":0,
+  | "locked_until":null,"reset_token":null,"shipping_addre
+  | ss":"","phone":""}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  907 us    361 us   (cache)      (cache)         1 ms             811 us     102 us    3 ms  
+
+  Pass  SNAPSHOT_UNCHANGED
+
+Root TC-A04-011 - Invalid JWT
+
+  PUT http://localhost:3000/api/users/me  
+  403 Forbidden * 5 ms time * 430 B^ 295 Bv size * 10^ 8v headers * 0 cookies
+  - ^ raw * 99 B
+  | {
+  |   "name": "TC-A04-011",
+  |   "phone": "0912345678",
+  |   "shipping_address": "123 Le Loi, Q1, TP.HCM"
+  | }
+  - 
+  - v application/json * text * json * utf8 * 21 B
+  | {"error":"Forbidden"}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  948 us    396 us   (cache)      (cache)         2 ms             1 ms       196 us    5 ms  
+
+  Pass  TC-A04-011: invalid JWT is not successful
+
+Root TC-A04-011 - Verify U unchanged
+
+  GET http://localhost:3000/api/users/me  
+  200 OK * 5 ms time * 395 B^ 448 Bv size * 8^ 8v headers * 0 cookies
+  - v application/json * text * json * utf8 * 180 B
+  | {"id":2,"name":"Test User","email":"test@eshop.com","p
+  | assword":"Test1234!","role":"user","login_attempts":0,
+  | "locked_until":null,"reset_token":null,"shipping_addre
+  | ss":"","phone":""}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1 ms      356 us   (cache)      (cache)         2 ms             1 ms       121 us    5 ms  
+
+  Pass  SNAPSHOT_UNCHANGED
+
+Root Setup - Login W
+
+  POST http://localhost:3000/api/login  
+  200 OK * 6 ms time * 347 B^ 640 Bv size * 9^ 8v headers * 0 cookies
+  - ^ raw * 59 B
+  | {
+  |   "email": "admin@eshop.com",
+  |   "password": "Admin123!"
+  | }
+  - 
+  - v application/json * text * json * utf8 * 371 B
+  | {"message":"Login successful","token":"<REDACTED>","user":{"id":1,"name":"Admin User","emai
+  | l":"admin@eshop.com","password":"Admin123!","role":"ad
+  | min","login_attempts":0,"locked_until":null,"reset_tok
+  | en":null,"shipping_address":null,"phone":null}}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  13 ms     597 us   (cache)      (cache)         4 ms             955 us     176 us    19 ms 
+
+  Pass  Setup login W returns 200
+
+Root Setup - Snapshot W
+
+  GET http://localhost:3000/api/users/me  
+  200 OK * 4 ms time * 397 B^ 455 Bv size * 8^ 8v headers * 0 cookies
+  - v application/json * text * json * utf8 * 187 B
+  | {"id":1,"name":"Admin User","email":"admin@eshop.com",
+  | "password":"Admin123!","role":"admin","login_attempts"
+  | :0,"locked_until":null,"reset_token":null,"shipping_ad
+  | dress":null,"phone":null}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1 ms      464 us   (cache)      (cache)         2 ms             948 us     149 us    5 ms  
+
+  Pass  Snapshot W returns 200
+
+Root TC-A04-013 - Update U through /me
+
+  PUT http://localhost:3000/api/users/me  
+  200 OK * 16 ms time * 552 B^ 296 Bv size * 10^ 8v headers * 0 cookies
+  - ^ raw * 104 B
+  | {
+  |   "name": "Nguyen Thi Binh",
+  |   "phone": "0912345678",
+  |   "shipping_address": "123 Le Loi, Q1, TP.HCM"
+  | }
+  - 
+  - v application/json * text * json * utf8 * 29 B
+  | {"message":"Profile updated"}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1 ms      441 us   (cache)      (cache)         12 ms            2 ms       881 us    17 ms 
+
+  Pass  TC-A04-013: update request returns success
+
+Root TC-A04-013 - Verify U
+
+  GET http://localhost:3000/api/users/me  
+  200 OK * 24 ms time * 395 B^ 486 Bv size * 8^ 8v headers * 0 cookies
+  - v application/json * text * json * utf8 * 218 B
+  | {"id":2,"name":"Nguyen Thi Binh","email":"test@eshop.c
+  | om","password":"Test1234!","role":"user","login_attemp
+  | ts":0,"locked_until":null,"reset_token":null,"shipping
+  | _address":"123 Le Loi, Q1, TP.HCM","phone":"0912345678
+  | "}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1 ms      450 us   (cache)      (cache)         22 ms            892 us     188 us    25 ms 
+
+  Pass  TC-A04-013: U changed according to body
+
+Root TC-A04-013 - Verify W unchanged
+
+  GET http://localhost:3000/api/users/me  
+  200 OK * 3 ms time * 397 B^ 455 Bv size * 8^ 8v headers * 0 cookies
+  - v application/json * text * json * utf8 * 187 B
+  | {"id":1,"name":"Admin User","email":"admin@eshop.com",
+  | "password":"Admin123!","role":"admin","login_attempts"
+  | :0,"locked_until":null,"reset_token":null,"shipping_ad
+  | dress":null,"phone":null}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  844 us    279 us   (cache)      (cache)         1 ms             638 us     101 us    3 ms  
+
+  Pass  TC-A04-013: W remains unchanged
+
+Root TC-A04-012 - Role injection
+
+  PUT http://localhost:3000/api/users/me  
+  200 OK * 20 ms time * 571 B^ 296 Bv size * 10^ 8v headers * 0 cookies
+  - ^ raw * 123 B
+  | {
+  |   "name": "Nguyen Thi Binh",
+  |   "phone": "0912345678",
+  |   "shipping_address": "123 Le Loi, Q1, TP.HCM",
+  |   "role": "admin"
+  | }
+  - 
+  - v application/json * text * json * utf8 * 29 B
+  | {"message":"Profile updated"}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1 ms      486 us   (cache)      (cache)         16 ms            2 ms       426 us    21 ms 
+
+  Pass  TC-A04-012: role probe received a response
+
+Root TC-A04-012 - Verify role invariant
+
+  GET http://localhost:3000/api/users/me  
+  200 OK * 4 ms time * 395 B^ 487 Bv size * 8^ 8v headers * 0 cookies
+  - v application/json * text * json * utf8 * 219 B
+  | {"id":2,"name":"Nguyen Thi Binh","email":"test@eshop.c
+  | om","password":"Test1234!","role":"admin","login_attem
+  | pts":0,"locked_until":null,"reset_token":null,"shippin
+  | g_address":"123 Le Loi, Q1, TP.HCM","phone":"091234567
+  | 8"}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  913 us    412 us   (cache)      (cache)         2 ms             878 us     113 us    4 ms  
+
+  1. TC-A04-012: stored role is not admin
+
+Root [Cleanup] Restore U profile
+
+  PUT http://localhost:3000/api/users/me  
+  200 OK * 17 ms time * 535 B^ 296 Bv size * 10^ 8v headers * 0 cookies
+  - ^ raw * 88 B
+  | {
+  |   "name": "Test User",
+  |   "phone": null,
+  |   "shipping_address": null,
+  |   "role": "user"
+  | }
+  - 
+  - v application/json * text * json * utf8 * 29 B
+  | {"message":"Profile updated"}
+  -
+  prepare   wait     dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1 ms      449 us   (cache)      (cache)         12 ms            3 ms       948 us    19 ms 
+
+  Pass  Cleanup restores U profile
+
+-----------------------------------------------------------------------
+|                         |            executed |              failed |
+--------------------------+---------------------+----------------------
+|              iterations |                   1 |                   0 |
+--------------------------+---------------------+----------------------
+|                requests |                  14 |                   0 |
+--------------------------+---------------------+----------------------
+|            test-scripts |                  14 |                   0 |
+--------------------------+---------------------+----------------------
+|      prerequest-scripts |                   0 |                   0 |
+--------------------------+---------------------+----------------------
+|              assertions |                  15 |                   1 |
+-----------------------------------------------------------------------
+| total run duration: 1420 ms                                         |
+-----------------------------------------------------------------------
+| total data received: 2.16 KB (approx)                               |
+-----------------------------------------------------------------------
+| average response time: 10 ms [min: 3 ms, max: 28 ms, s.d.: 8 ms]    |
+-----------------------------------------------------------------------
+| average DNS lookup time: 1 ms [min: 1 ms, max: 1 ms, s.d.: 0 us]    |
+-----------------------------------------------------------------------
+| average first byte time: 6 ms [min: 868 us, max: 22 ms, s.d.: 6 ms] |
+-----------------------------------------------------------------------
+
+  #  failure         detail                                       
+                                                                  
+ 1.  AssertionError  TC-A04-012: stored role is not admin         
+                     expected 'admin' to not deeply equal 'admin' 
+                     at assertion:0 in test-script                
+                     inside "TC-A04-012 - Verify role invariant"  
+Postman credentials are required for publishing run details to Postman cloud.
+Please specify it by using the `postman login` command
+

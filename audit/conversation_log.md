@@ -1,0 +1,189 @@
+﻿# Conversation audit log — HW02
+
+This is the append-only log for task-related conversations after the initial history snapshot. It includes user questions, assistant responses, skill checks/updates and artifact changes. Dates use Asia/Bangkok. If a raw transcript or exact time is unavailable, the entry is marked `INCOMPLETE` rather than reconstructed as exact text.
+
+Historical entries before this log: [conversation_before_current.md](conversation_before_current.md).
+
+## Entry 001 — Make future chat turns part of the audit
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed  
+**Skills:** `work-flow`, `skill-creator` guidance  
+
+**Prompt (user, verbatim):**
+
+> các đoạn chat bây giờ giữa tôi và bạn cũng nên đưa vào audit. Cập nhật lại workflow để làm việc đó luôn.
+
+**Assistant output record:** Codex read the skill-creator guidance and current `work-flow`, `submission-checklist`, `AI_Audit_Report.md` and historical conversation audit. It updated the workflow so every task-related chat turn, including questions, skill inspection/update and the current turn, is appended to `audit/conversation_log.md` with prompt, output, timestamp, tool/skill, artifacts, verdict and review state. It added the conversation log to the submission checklist and created this entry. The current request is included because the user explicitly requested that current chats be audited.
+
+**Artifacts:** [work-flow](../.agents/skills/work-flow/SKILL.md), [submission checklist](../.agents/skills/work-flow/references/submission-checklist.md), this log, and [AI Audit Report](../AI_Audit_Report.md).  
+**Assistant response summary:** Đã cập nhật workflow để các lượt chat liên quan đến HW02 được ghi append-only vào conversation log; bổ sung log vào checklist và liên kết từ AI Audit. Đã kiểm tra guardrails và liên kết file.  
+**Verdict:** INCOMPLETE — raw tool transcript không được export; file này giữ prompt nguyên văn và output record trung thực.  
+**Student review:** Required before submission.
+
+## Entry 002 — Review lại A04 theo spec-first guardrails
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed  
+**Skills:** domain-testing, work-flow  
+
+**Prompt (user, verbatim):**
+
+> Dựa trên các điều chỉnh, hãy review lại phần [A04_Profile.md](analysis/A04_Profile.md)  và [A04_Profile.md](test-cases/A04_Profile.md)
+
+**Assistant output record:** Đọc lại domain-testing/work-flow, README EShop FR-04/SEC-02/SEC-06, API specification và hai artifact A04. Phát hiện V8/V9 là postcondition nhưng bị dùng như biến/lớp; id/user_id không có trong API contract; test Web/API bị nhân đôi; các trường hợp chưa được spec mô tả bị biến thành lớp hoặc expected. Viết lại analysis theo cấu trúc input/context, observable outputs, spec gaps, Domain, BVA, matrix và trace. Viết lại test-cases thành 13 test duy nhất: bốn điểm BVA phone, các lớp phone, name/address, email UI và API security/ownership có căn cứ.
+
+**Artifacts:** [A04 analysis](../analysis/A04_Profile.md), [A04 test cases](../test-cases/A04_Profile.md), [review record](A04_04_spec_review.md), [AI Audit Report](../AI_Audit_Report.md).  
+**Assistant response summary:** Đã review và cập nhật hai file theo spec-first; giữ test Not Run vì chưa thực thi; tạo bản ghi findings/before-after trong audit.  
+**Verdict:** INCOMPLETE — raw tool transcript và exact time không được export; output record ghi đúng các thay đổi thực tế. Sinh viên cần review trước khi chạy.  
+**Student review:** Required: xác nhận phạm vi Web/API, quy ước BVA và expected trước execution.
+
+**Entry 002 post-review verification (same turn):** WORK_PROGRESS.md was updated from the old 24-test state to the reviewed 13-test state. Matrix/summary/card validation found 13 matching IDs, 13 cards, 2 BVA boundaries, 12 input/context classes, and no V8/V9 or output classes in the reviewed artifacts.
+
+## Entry 003 — Có nên test name/address empty/null/missing/whitespace?
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed  
+**Skills:** work-flow, domain-testing  
+
+**Prompt (user, verbatim):**
+
+> Bạn có ý kiến như thế nào về việc Không nêu name/address có bắt buộc hay không; không nêu cách xử lý empty, null, missing hoặc whitespace-only.
+> Có nên đưa nó vào để test không? nếu đưa vào thì result như thế nào là hợp lý??
+
+**Assistant output record:** Giải thích rằng đây là spec gap. Không nên đưa các trường hợp này vào bộ test Domain/BVA chính với Pass/Fail oracle tự suy đoán. Có thể giữ chúng như exploratory/spec-clarification probes, ghi requirement G1, trạng thái Blocked hoặc Not Run, expected là “chưa có oracle; ghi nhận actual và yêu cầu chốt đặc tả”. Nếu nhóm chốt rõ một policy mới, phải ghi quyết định đó là requirement/decision được xác nhận trước khi thiết kế expected reject/accept.
+
+**Artifacts:** Chưa thay đổi artifact; câu hỏi được giải thích dựa trên G1 trong [A04 analysis](../analysis/A04_Profile.md).  
+**Verdict:** INCOMPLETE — chưa có quyết định chính thức của sinh viên/nhóm về policy name/address.  
+**Student review:** Cần chọn giữ ngoài phạm vi, hoặc chốt policy riêng trước khi thêm test vào bộ chính.
+
+
+**Entry 003 post-review update (same turn):** Read backend/database.js, backend/server.js and frontend-web/src/pages/Profile.jsx. Added an implementation-observation section to analysis/A04_Profile.md and audit/A04_04_spec_review.md. The observations identify nullable database columns, database reset/seeding, missing backend phone validation, client-controlled role update and a frontend phone regex that conflicts with FR-04; they remain candidate divergences until runtime evidence exists.
+
+## Entry 004 — Gỡ implementation observations khỏi artifact
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed  
+**Skills:** work-flow, domain-testing  
+
+**Prompt (user, verbatim):**
+
+> bỏ phần đó đi. Không cần thêm vào, tôi chỉ hỏi thôi
+
+**Assistant output record:** Đã xóa phần “implementation observations” khỏi analysis/A04_Profile.md và audit/A04_04_spec_review.md. Giữ nguyên bộ test/spec-first trước đó. Conversation audit vẫn giữ các lượt trao đổi vì audit log là append-only theo workflow; không xem phần trao đổi này là nội dung deliverable cần dùng làm oracle.
+
+**Artifacts:** [A04 analysis](../analysis/A04_Profile.md), [A04 review record](A04_04_spec_review.md), conversation log.  
+**Verdict:** COMPLETE for requested removal; A04 test design remains Draft/Not Run.  
+**Student review:** Chưa cần review thêm implementation observations vì đã gỡ khỏi artifact.
+
+
+## Entry 005 — Evidence và bỏ Execution context
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed  
+**Skills:** work-flow, domain-testing  
+
+**Prompt (user, verbatim):**
+
+> về phần evidence trong test case là tôi test rồi chụp hình lại gửi cho bạn hả?? có cần không?? còn execution context thì cũng nên bỏ luôn đi.
+
+**Assistant output record:** Giải thích Evidence là bằng chứng thực thi do sinh viên thu thập, có thể là ảnh, log hoặc video; chưa chạy thì để —. Không nhất thiết gửi trực tiếp trong chat nếu file được đặt trong thư mục evidence và liên kết từ test case; bằng chứng đặc biệt quan trọng cho Fail/bug report. Đã bỏ dòng Execution context khỏi A04 test cards và domain-testing report template; workflow được đổi để không yêu cầu một trường Execution context riêng. Evidence trong template được ghi là link thực tế nếu đã thu thập, chưa có để —.
+
+**Artifacts:** [A04 test cases](../test-cases/A04_Profile.md), [report template](../.agents/skills/domain-testing/references/report-template.md), [work-flow](../.agents/skills/work-flow/SKILL.md).  
+**Verdict:** COMPLETE for requested format change; A04 remains Not Run.  
+**Student review:** Khi thực thi, thêm ảnh/log/video vào evidence/<feature>/ và điền link; không tạo evidence giả.
+
+
+## Entry 006 — Khả năng tự mở Web để chạy A04
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed  
+**Skills:** work-flow, domain-testing  
+
+**Prompt (user, verbatim):**
+
+> Bạn tử mở web test các phần trong [A04_Profile.md](test-cases/A04_Profile.md) có được không??
+
+**Assistant output record:** Kiểm tra cấu trúc SUT, package.json, Node/npm và các công cụ browser automation. Frontend và backend có node_modules, nhưng workspace không có Playwright/Puppeteer/Selenium/Cypress hoặc browser executable được phát hiện. Có thể đọc/chỉnh test case và chạy API/server bằng Node; chưa thể tự tương tác Web UI trong môi trường hiện tại nếu không có browser automation/connector.
+
+**Artifacts:** Chưa thay đổi artifact.  
+**Verdict:** INCOMPLETE — cần browser automation hoặc trình duyệt điều khiển được để thực thi UI A04; chưa chạy test.  
+**Student review:** Nếu muốn chạy UI tự động, cần cung cấp/cho phép môi trường browser automation; nếu không, sinh viên chạy Web thủ công và đưa evidence vào evidence/A04/.
+
+
+## Entry 007 — Thực thi API từ TC-A04-010 bằng Postman CLI
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed; Postman CLI v1.75.0  
+**Skills:** work-flow, domain-testing  
+
+**Prompt (user, verbatim):**
+
+> từ test case 010 trở đi, tôi đã cài postman-cli, bạn hãy dùng nó mà test. evidence nên được đặt trong [evidence](test-cases/evidence/)
+
+**Assistant output record:** Khởi động EShop backend local trên port 3000, tạo collection Postman cho TC-A04-010 đến TC-A04-013, chạy bằng CLI reporter tích hợp và lưu log dưới `test-cases/evidence/A04/`. Lần chạy cuối có 14 requests, 14 test scripts, 15 assertions: TC-A04-010 Pass (thiếu JWT trả 401 và U không đổi), TC-A04-011 Pass (JWT sai trả 403 và U không đổi), TC-A04-012 Fail (role của U bị lưu thành admin), TC-A04-013 Pass (U đổi đúng, W không đổi). Sửa collection để snapshot giữ đúng giá trị null/rỗng trước lần chạy cuối; role U được cleanup về user. Redact token trong log trước khi lưu. Tạo bug draft cho SEC-06 và cập nhật Actual Result/Status/Evidence trong test-cases và analysis.
+
+**Artifacts:** [Postman collection](../test-cases/evidence/A04/a04_api_postman_collection.json), [CLI log](../test-cases/evidence/A04/postman-cli.log), [execution summary](../test-cases/evidence/A04/a04_api_execution_summary.md), [A04 test cases](../test-cases/A04_Profile.md), [A04 analysis](../analysis/A04_Profile.md), [BUG-A04-001](../bug-reports/bugs.md), [WORK_PROGRESS](../WORK_PROGRESS.md), [AI Audit Report](../AI_Audit_Report.md).  
+**Assistant response summary:** Đã dùng Postman CLI đúng yêu cầu và đặt evidence trong `test-cases/evidence/A04/`; test case ghi 3 Pass/1 Fail, bug SEC-06 được ghi nháp. `--output` không dùng được vì CLI yêu cầu đăng nhập Postman Cloud, nên dùng CLI reporter và lưu stdout/stderr; token đã redacted.  
+**Verdict:** INCOMPLETE — API execution hoàn tất cho bốn test case; TC-A04-012 không đạt SEC-06 và chưa đăng GitHub Issue; các test A04-001 đến A04-009 vẫn Not Run; sinh viên cần review actual/evidence.  
+**Student review:** Kiểm tra lại 3 Pass/1 Fail, expected theo spec, bug draft và evidence trước khi nộp; không coi kết quả API là bằng chứng cho các test Web UI chưa chạy.
+
+**Entry 007 post-run cleanup addendum:** The first collection run had an isolation defect: its old cleanup converted nullable phone/address values to empty strings. Before finalizing evidence, the collection cleanup was changed to explicit seed values (`phone: null`, `shipping_address: null`, `role: user`) and the full collection was rerun. The final `postman-cli.log` and summary reflect this final run; tokens were redacted. The working-tree `.postman` CLI cache was removed because the submission evidence is kept under `test-cases/evidence/A04/`.
+
+## Entry 008 — Cập nhật trạng thái Web A04 và sắp xếp evidence
+
+**Date/time:** 2026-10-18; exact time unavailable  
+**Tool/model:** Codex; model/version not confirmed  
+**Skills:** work-flow, domain-testing  
+
+**Prompt (user, verbatim):**
+
+> TC-A04-001 - Failed
+> Hiển thị dialog thông báo "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."
+> Không có bất kỳ request post nào được gọi xuống API.
+>
+> TC-A04-002 - Failed
+> Hiển thị dialgo thông báo "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."
+> Không có bất kỳ request post nào được gọi xuống API.
+>
+> TC-A04-003 - Failed
+> Hiển thị dialgo thông báo "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."
+> Không có bất kỳ request post nào được gọi xuống API.
+>
+> TC-A04-004 - Failed - Evidence like above tests
+>
+> Hiển thị dialgo thông báo "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."
+> Không có bất kỳ request post nào được gọi xuống API.
+>
+> TC-A04-005 - Failed
+>
+> Hiển thị dialgo thông báo "Cập nhật thành công"
+> Có request gửi về backend.
+> Refresh trang vẫn giữ giá trị đã cập nhật
+> Không có bất kỳ request post nào được gọi xuống API.
+>
+> TC-A04-006 - Pass
+>
+> Hiển thị dialgo thông báo "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."
+> Phone chứa non-digit không được commit; giá trị lưu giữ snapshot.
+>
+> TC-A04-007 - Pass
+> Hiển thị dialgo thông báo "Cập nhật thành công"
+> Name lưu là Nguyễn Thị Bình; phone và address giữ nguyên snapshot.
+>
+> TC-A04-008 - Pass
+> Hiển thị dialgo thông báo "Cập nhật thành công"
+> Address lưu đúng giá trị gửi; name và phone giữ nguyên snapshot.
+>
+> TC-A04-009 - Pass
+> Field email bị disabled trên UI, không cho thay đổi hay focus
+> Email không thể thay đổi bằng thao tác UI thông thường; email lưu sau refresh vẫn bằng snapshot.
+>
+> đây là state của các test case trước. Hãy cập nhật file test để update các states, di chuyển các image của A04 vào folder A04 luôn đi. Trong A04 những file nào không cần thiết cho evidence thì xoá đi.
+
+**Assistant output record:** Cập nhật 13 summary rows và card actual/status/evidence trong [A04 test cases](../test-cases/A04_Profile.md). TC-A04-001–005 được ghi Fail theo báo cáo, TC-A04-006–009 Pass; TC-A04-010–013 giữ kết quả API trước đó. Di chuyển tám ảnh có thật (`TC-A04-001.png`, `002.png`, `003.png`, `005.png`–`009.png`) từ `test-cases/evidence/` vào `test-cases/evidence/A04/`. Không có ảnh `TC-A04-004.png`, nên không tạo evidence giả và card ghi rõ thiếu file. Xoá `backend.stderr.log` rỗng và `backend.stdout.log` khỏi A04; giữ collection, summary, CLI log và ảnh. Tạo BUG-A04-002 cho UI từ chối phone hợp lệ L=10/11 và BUG-A04-003 cho UI lưu phone không bắt đầu bằng 0. Ghi chú riêng rằng TC-A04-002/004 được báo Fail dù hành vi từ chối phù hợp expected invalid class theo FR-04, chờ sinh viên xác nhận phân loại.
+
+**Artifacts:** [A04 test cases](../test-cases/A04_Profile.md), [A04 analysis](../analysis/A04_Profile.md), [bug reports](../bug-reports/bugs.md), [A04 evidence](../test-cases/evidence/A04/), [AI Audit Report](../AI_Audit_Report.md), [WORK_PROGRESS](../WORK_PROGRESS.md).  
+**Assistant response summary:** Đã cập nhật trạng thái thành 7 Pass/6 Fail/0 Not Run, di chuyển ảnh và dọn evidence theo yêu cầu. Các link evidence tồn tại trừ TC-A04-004 vì workspace không có ảnh tương ứng.  
+**Verdict:** INCOMPLETE — artifact đã cập nhật; cần sinh viên review phân loại Fail của TC-A04-002/004, bổ sung evidence TC-A04-004 nếu có và review ba bug draft trước khi chốt.  
+**Student review:** Xác nhận trạng thái 002/004 theo oracle FR-04; cung cấp ảnh 004 nếu có; kiểm tra actual, bug draft và các link evidence.
