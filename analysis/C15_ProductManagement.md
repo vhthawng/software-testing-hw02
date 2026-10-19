@@ -59,3 +59,27 @@ O1–O5 là kết quả quan sát, không tạo output class giả.
 | G6 | Bài giảng chưa có | HW02 | Giới hạn phương pháp | Dùng BVA 2-point cho tên, cần sinh viên đối chiếu | 002–005 |
 
 Không tự dùng các policy chốt cho B08 làm yêu cầu C15. Các gap không chặn test có oracle rõ. Mọi status còn Not Run cho đến khi có execution thật.
+
+## 4. Domain Testing: phân vùng tương đương
+
+Chia tên theo bắt buộc/max, giá theo bắt buộc và dấu, danh mục theo có trong danh sách, JWT/role theo FR-12. Splitting Principle dùng để tách giá 0/âm và token thiếu/sai vì đại diện các điều kiện cần kiểm riêng. Không tách ký tự Unicode hay giá cực đại nếu spec không định nghĩa predicate đó.
+
+| Class ID | Input/context | Điều kiện | Validity | Đại diện | Nguồn |
+|:---|:---|:---|:---|:---|:---|
+| C1 | name | 1–255 ký tự | Hợp lệ | C15 Test Product; A; A lặp 255 | FR-15 |
+| C2 | name | Rỗng, 0 ký tự | Không hợp lệ | Chuỗi rỗng | FR-15 |
+| C3 | name | >255 ký tự | Không hợp lệ | A lặp 256 | FR-15 |
+| C4 | price | >0 | Hợp lệ | 100000; 1 | FR-15 |
+| C5 | price | Không nhập | Không hợp lệ | Ô giá trống | FR-15 bắt buộc |
+| C6 | price | =0 | Không hợp lệ | 0 | FR-15 |
+| C7 | price | <0 | Không hợp lệ | -1 | FR-15 |
+| C8 | category_id | Thuộc danh sách hiện có | Hợp lệ | ID thật đọc từ categories | FR-15 |
+| C9 | category_id | Không cung cấp khi tạo | Không hợp lệ | POST thiếu category_id | FR-15 bắt buộc |
+| C10 | category_id | Không thuộc danh sách | Không hợp lệ | ID dương đã xác minh không tồn tại | FR-15 |
+| C11 | JWT/role | JWT hợp lệ, role admin | Hợp lệ | Token Admin lấy lúc chạy | FR-12 |
+| C12 | JWT | Không gửi | Không hợp lệ | Bỏ Authorization | FR-12, SEC-02 |
+| C13 | JWT | Token sai | Không hợp lệ | invalid.c15.token | FR-12, SEC-02 |
+| C14 | role | Token hợp lệ, role user | Không hợp lệ đối với Admin | Token user thật | FR-12, SEC-03 |
+
+Single Fault: test tên/giá/danh mục giữ những field còn lại chuẩn và Admin hợp lệ. Test quyền giữ body chuẩn và ID tồn tại. Test hợp lệ có thể đồng thời kiểm nhiều trường; test sửa đối chứng kiểm toàn bộ ID khác vì FR-15 nói các sản phẩm khác giữ nguyên. Không coi response/snapshot là biến đầu vào.
+
