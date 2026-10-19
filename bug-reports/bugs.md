@@ -139,3 +139,83 @@ The execution report marks TC-A04-002 (L=9) and TC-A04-004 (L=12) as **Fail**. T
 | Screenshot / Issue | Có ảnh Web local; chưa đăng GitHub Issue |
 
 **Quan sát phụ thuộc của TC-B08-005:** người dùng không đổi số lượng ngay trong giỏ được; thêm lại cùng sản phẩm từ trang chính tạo hai dòng ×2 và ×1, checkout vẫn cập nhật tổng. Điều khiển số lượng và gộp sản phẩm thuộc FR-07; ghi nhận để theo dõi, chưa đếm thành bug B08 hoặc gán Fail cho phép tính tổng B08. Test theo bước gốc hiện Blocked.
+
+## BUG-C15-001 — Lưu được tên sản phẩm vượt 255 ký tự
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Web do người dùng báo cáo; API sửa đã tái hiện bằng CLI; bug nháp chưa đăng Issue |
+| Requirement | FR-15: tên sản phẩm tối đa 255 ký tự |
+| Test cases | TC-C15-005 (Web tạo mới), TC-C15-031 (API sửa) |
+| Môi trường | 2026-10-19; Web theo người dùng, backend http://localhost:3000; Postman CLI 1.75.0 |
+| Preconditions / Data | Admin hợp lệ, giá 100000, danh mục có thật; name gồm 256 ASCII A cho API sửa |
+| Steps | 1. Tạo sản phẩm thử riêng có tên hợp lệ.<br>2. PUT /api/products/<ID thử> bằng JWT Admin, full body chuẩn chỉ đổi name thành A lặp 256.<br>3. GET /api/products đọc lại name và đếm độ dài. |
+| Expected | Không lưu tên dài 256; dữ liệu hợp lệ trước đó giữ nguyên |
+| Actual | Web TC005: người dùng báo sản phẩm được tạo với tên đủ 256. CLI TC031: HTTP 200, ID 20 lưu đủ 256 ký tự |
+| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [JSON](../test-cases/evidence/C15/c15_backend_results.json), [summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md); Web có báo cáo người dùng, chưa có ảnh C15 trong workspace |
+| Ảnh hưởng | Dữ liệu sản phẩm vi phạm giới hạn tên; cả tạo Web và cập nhật API có đường lưu sai |
+| Cleanup / Issue | Sản phẩm CLI đã dọn, catalog cuối khớp baseline; chưa có screenshot/GitHub Issue |
+
+## BUG-C15-002 — Web tạo được sản phẩm khi giá để trống
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Người dùng đã tái hiện Web; bug nháp, AI chưa tự chạy UI |
+| Requirement | FR-15: giá bắt buộc |
+| Test case | TC-C15-006 |
+| Preconditions / Data | Admin đăng nhập, tên/danh mục hợp lệ; ô giá trống |
+| Steps | 1. Mở form thêm sản phẩm.<br>2. Điền tên, danh mục hợp lệ và để giá trống.<br>3. Lưu sản phẩm, kiểm kết quả tạo. |
+| Expected | Không tạo sản phẩm khi thiếu giá |
+| Actual | Người dùng báo sản phẩm được tạo với giá để trống; không tự suy ra đã được chuyển thành số 0 |
+| Evidence | Báo cáo trong [conversation log](../audit/conversation_log.md), Entry 019; chưa có ảnh TC006; không có CLI riêng cho giá trống trong lượt này |
+| Ảnh hưởng | Bỏ qua trường bắt buộc giá; dữ liệu không đủ theo FR-15 |
+| Screenshot / Issue | Chưa có ảnh, chưa đăng GitHub Issue |
+
+## BUG-C15-003 — Lưu được giá không dương
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Web do người dùng báo cáo; API cập nhật giá 0 đã tái hiện CLI; bug nháp |
+| Requirement | FR-15: giá phải >0 |
+| Test cases | TC-C15-007 (Web giá 0), TC-C15-009 (Web giá âm), TC-C15-032 (API sửa giá 0) |
+| Môi trường | 2026-10-19; backend đang chạy localhost:3000; CLI 1.75.0; Web theo người dùng |
+| Preconditions / Data | Admin; sản phẩm thử riêng hợp lệ giá 100000; chỉ đổi price=0 trong API |
+| Steps | 1. PUT /api/products/<ID thử> bằng JWT Admin và full body chuẩn, price=0.<br>2. GET /api/products đọc lại giá.<br>3. Đường Web: tạo mới với giá 0 hoặc âm theo TC007/009. |
+| Expected | Không tạo/sửa sản phẩm thành giá 0 hoặc âm |
+| Actual | Người dùng báo tạo được giá 0 và giá âm trên Web. CLI TC032 trả HTTP 200, ID 21 lưu price=0 |
+| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [JSON](../test-cases/evidence/C15/c15_backend_results.json); chưa có ảnh Web C15 trong workspace |
+| Ảnh hưởng | Giá sản phẩm vi phạm miền dương |
+| Cleanup / Issue | Dọn đúng sản phẩm CLI; catalog ban đầu bảo toàn; chưa có screenshot/GitHub Issue |
+
+## BUG-C15-004 — Nút Sửa trên Web Admin không mở được thao tác sửa
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Theo báo cáo người dùng; chưa tự tái hiện UI; bug nháp |
+| Requirement | FR-15: Admin được sửa sản phẩm |
+| Test case / phụ thuộc | TC-C15-012 Fail; TC013/014/015 Blocked vì không tới được bước nhập dữ liệu sửa |
+| Môi trường | Web Admin, báo cáo 2026-10-19; browser/build chưa cung cấp |
+| Preconditions / Data | Admin đã đăng nhập, danh sách có sản phẩm thử để sửa |
+| Steps | 1. Mở tab Sản phẩm.<br>2. Bấm Sửa trên dòng sản phẩm thử.<br>3. Quan sát thao tác/form sửa. |
+| Expected | Mở/chọn đúng sản phẩm để Admin nhập thay đổi và lưu |
+| Actual | Người dùng báo bấm Sửa không trigger event/thao tác mong đợi, không test tiếp được cập nhật trên UI |
+| Đối chiếu backend | TC030 API sửa hợp lệ Pass, mọi ID khác không đổi; điều này không bác bỏ lỗi UI và không xác nhận hiển thị Web ngay sau lưu |
+| Evidence | Báo cáo người dùng tại [conversation log](../audit/conversation_log.md), Entry 019; [API đối chiếu](../test-cases/evidence/C15/c15_backend_recheck_summary.md). Chưa có screenshot/video nút Sửa |
+| Ảnh hưởng | Chặn đường sửa Web và các test validation khi sửa |
+| Screenshot / Issue | Chưa có ảnh, chưa đăng GitHub Issue; không suy ra nguyên nhân code từ báo cáo UI |
+
+## BUG-C15-005 — Backend cho tạo và sửa tên sản phẩm thành rỗng
+
+| Trường | Nội dung |
+|:---|:---|
+| Trạng thái | Đã tái hiện Postman CLI; bug nháp |
+| Requirement | FR-15: tên bắt buộc |
+| Test cases | TC-C15-029 (POST), TC-C15-033 (PUT). TC002 Web chặn tên rỗng vẫn Pass tại FE |
+| Môi trường | 2026-10-19; backend đang chạy localhost:3000; Postman CLI 1.75.0 |
+| Preconditions / Data | Admin JWT hợp lệ; name="", price=100000, mô tả/ảnh chuẩn, category_id có thật |
+| Steps | 1. Snapshot products trước test.<br>2. POST /api/products với full body có name="".<br>3. GET list kiểm sản phẩm mới.<br>4. Với sản phẩm thử riêng có tên hợp lệ, PUT full body chỉ đổi name="".<br>5. GET list kiểm name. |
+| Expected | Không tạo hoặc lưu tên rỗng; dữ liệu trước thao tác giữ nguyên |
+| Actual | POST trả 200 tạo ID 18 có name=""; PUT trả 200, ID 22 lưu name="" |
+| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [JSON](../test-cases/evidence/C15/c15_backend_results.json), [summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md) |
+| Ảnh hưởng | Có thể bỏ qua validation FE bằng API, lưu sản phẩm thiếu tên |
+| Cleanup / Issue | Đã xóa các fixture CLI, so sánh cuối khớp catalog gốc; chưa có screenshot/GitHub Issue |

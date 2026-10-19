@@ -120,3 +120,15 @@ Người dùng phản hồi test case khó hiểu vì quá nhiều mã R1/F1 và
 - **Review AI:** đã kiểm 28 ID khớp matrix/summary/card, 13 trường/card, 28 Not Run, 14 classes và link local. Card dùng giá trị/tên rõ, không lặp mã viết tắt như phản hồi B08. Nếu UI chặn tên 256, ghi rõ input thực tế, không tuyên bố backend nhận 256.
 - **Giới hạn:** precision tiền/bài giảng chưa có; chưa kiểm mọi validation backend hay danh mục invalid khi sửa; các thiếu sót được ghi trong analysis. Chưa có bug C15 runtime, chưa có evidence, chưa có phản hồi review sinh viên để tự gán verdict hoặc AI gap thực tế.
 - **Verdict sinh viên:** Pending. Không tự ghi VALID hoặc ký xác nhận thay sinh viên. Chi tiết hội thoại tại [conversation log](audit/conversation_log.md).
+
+## C15 — Kết quả Web và kiểm tra backend theo yêu cầu
+
+- **Ngày:** 2026-10-19, Asia/Bangkok. Codex cập nhật báo cáo; Postman CLI 1.75.0 chạy API; không tự chạy UI.
+- **Nguồn Web:** người dùng báo TC001/003/004/008/011/016/028 Pass, TC005/006/007/009/012 Fail. TC002 FE chặn tên rỗng được ghi Pass cho test Web; không coi đó là validation backend. TC013–015 Blocked vì nút Sửa không hoạt động; không thay thế bằng kết quả API.
+- **Bổ sung có ủy quyền rõ:** người dùng yêu cầu dùng Postman CLI kiểm lại BE cho TC002 và TC012–015. Thêm ID riêng TC029–033 thay vì đổi nền tảng hoặc ghi đè kết quả Web. Không tự chạy 12 API cũ chưa được yêu cầu trong lượt này.
+- **Kết quả CLI:** TC029 Fail (POST tạo tên rỗng), TC030 Pass (PUT sửa hợp lệ, mọi ID khác giữ nguyên), TC031 Fail (PUT tên 256), TC032 Fail (PUT giá 0), TC033 Fail (PUT tên rỗng). 28 requests, 34 assertions, 4 assertion failures, exit 1.
+- **Fixture/cleanup:** backend đang chạy có dữ liệu Web của người dùng; không restart/reset DB. Chỉ tạo 5 sản phẩm thử riêng ID 18–22 và xóa sau evidence. Assertion cuối Pass: 14 sản phẩm ban đầu khớp toàn bộ dữ liệu theo ID. Log không bật verbose, không ghi token thật.
+- **Artifacts:** [collection](test-cases/evidence/C15/c15_backend_recheck_collection.json), [CLI log](test-cases/evidence/C15/postman-cli.log), [JSON results](test-cases/evidence/C15/c15_backend_results.json), [summary](test-cases/evidence/C15/c15_backend_recheck_summary.md), [test cases](test-cases/C15_ProductManagement.md), [analysis](analysis/C15_ProductManagement.md).
+- **Tổng mới:** 33 TC: 23 chỉ Domain, 7 Domain+BVA, 3 Functional; 9 Pass, 9 Fail, 3 Blocked, 12 Not Run. Completed=Pass+Fail=18; attempted=21 gồm 3 Blocked.
+- **Bug drafts:** 5 C15 bugs: tên >255; giá trống; giá không dương; nút Sửa Web không hoạt động (nguồn người dùng); backend tên rỗng. Chưa có ảnh C15 trong workspace hoặc GitHub Issue. Chi tiết tại [bugs.md](bug-reports/bugs.md).
+- **Review/gap:** UI required có thể che lỗi backend, nên thêm kiểm trực tiếp API khi người dùng yêu cầu. UI không mở được sửa là giới hạn execution; không kết luận API không sửa được. TC030 không kiểm hiển thị Web ngay sau sửa nên phần đó vẫn chưa phủ runtime.

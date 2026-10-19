@@ -362,3 +362,76 @@ Historical entries before this log: [conversation_before_current.md](conversatio
 **Assistant response summary:** Đã thiết kế C15 Domain/BVA với 28 test dễ đọc; chưa thực thi. BVA tên có căn cứ, G2 precision giá và các thiếu sót khác được ghi rõ.
 **Verdict:** Thiết kế có artifact và self-review; sinh viên chưa review, chưa thực thi, bài giảng chưa đối chiếu. Raw tool transcript chưa export; output thật được giữ qua file và Git.
 **Student review:** Kiểm scope/quy ước BVA, chuẩn bị category/product ID thật, rồi chạy Web và API theo card; không dùng đọc code để đánh Pass/Fail.
+
+## Entry 018 — Xác định test C15 chạy được bằng Postman CLI
+
+**Date/time:** 2026-10-19, Asia/Bangkok; exact time unavailable.
+**Tool/model:** Codex; model/version not confirmed.
+**Skills:** work-flow (conversation capture).
+**Prompt (user, verbatim):**
+
+> các test case nào trong c15 là bạn test bằng post-cli được.
+
+**Assistant output record:** Đối chiếu các card C15: 12 test API chạy được bằng Postman CLI gồm TC-C15-010, TC-C15-017–027. TC010/017 kiểm danh mục thiếu/không tồn tại; TC018–026 là POST/PUT/DELETE với JWT thiếu/sai/token user thường; TC027 là Admin CRUD hợp lệ. 16 test gắn nhãn Web cần trình duyệt, không dùng API thay bằng chứng UI. Lượt này chỉ phân loại công cụ; chưa chạy C15 hoặc đổi status Not Run.
+**Artifacts:** [C15 test cases](../test-cases/C15_ProductManagement.md) được đọc; conversation log được append.
+**Verdict:** Đã cung cấp phạm vi Postman CLI, chưa thực thi.
+
+## Entry 019 — Kết quả C15 Web và chạy lại backend bằng CLI
+
+**Date/time:** 2026-10-19, Asia/Bangkok; exact prompt time unavailable.
+**Tool/model:** Codex; model/version not confirmed; Postman CLI 1.75.0.
+**Skills:** work-flow, domain-testing (oracle, BVA, phân tách Web/API).
+
+**Prompt (user, verbatim):**
+
+> TC-C15-001 - PASS
+> Tạo một sản phẩm mới đúng dữ liệu; đọc lại được sau refresh.
+>
+> TC-C15-002 -
+> Form FE chặn không cho để name trống,  **Hãy kiểm tra lại bên phía BE** bang postman-cli
+>
+> TC-C15-003 - PASS
+> Tạo sản phẩm thành công; tên lưu đúng A, không mất ký tự.
+>
+> TC-C15-004 - PASS
+> Sản phẩm được tạo; tên lưu đủ 255 ký tự, bằng chính chuỗi đã gửi.
+>
+> TC-C15-005 - FAILED
+> Sản phẩm được tạo; tên lưu đủ 256 ký tự, bằng chính chuỗi đã gửi.
+>
+> TC-C15-006 - FAILED
+> SẢN PHẨM ĐƯỢC TẠO VỚI GIÁ ĐỂ TRỐNG
+>
+> TC-C15-007 - FAILED
+> SẢN PHẨM ĐƯỢC TẠO THÀNH CÔNG VỚI GIÁ 0Đ
+>
+> TC-C15-008 - PASSED
+> SẢN PHẨM ĐƯỢC TẠO THÀNH CÔNG VỚI GIÁ 1Đ
+>
+> TC-C15-009 - FAILED
+> SẢN PHẨM ĐƯỢC TẠO THÀNH CÔNG VỚI GIÁ -1Đ
+>
+> TC-C15-011 - PASSED
+> Sản phẩm lưu đúng ID danh mục đã chọn, không tự đổi về danh mục mặc định.
+>
+> TC-C15-012 - FAILED
+> CLICK VÀO NÚT 'SỬA' KHÔNG KÍCH HOẠT BẤT KỲ EVENTS NÀO (CHƯA KIỂM TRA BÊN BE - **DÙNG POSTMAN-CLI KTRA LẠI**
+>
+> TC-C15-013 - *LIKE 012* KIỂM TRA LẠI VỚI POSTMAN-CLI (VÌ NÚT SỬA KHÔNG TRIGGER ANY EVENTS NÀO)
+>
+> TC-C15-014, 015 - *LIKE 012* RE-CHECK WITH POSTMAN-CLI
+>
+> TC-C15-016 - PASSED
+> Sản phẩm bị xóa không còn trong danh sách; sản phẩm đối chứng và các ID khác vẫn giữ nguyên. Không bắt buộc phải xuất hiện dialog xác nhận.
+>
+> TC-C15-028 - PASSED
+> UI HIỂN THỊ DIALOG NOTICE 'BẠN KHÔNG PHẢI LÀ ADMIN', TỪ CHỐI ĐĂNG NHẬP
+>
+> ĐÂY LÀ CÁC PHẦN TÔI ĐÃ TEST, CÓ MỘT VÀI PHẦN UPDATE KHÔNG THỂ TEST TRÊN UI VÌ NÓ KHÔNG TRIGGER, NÊN CẦN BẠN CHẠY LẠI CLI
+
+**Assistant output record:** Nhập kết quả 16 Web theo báo cáo người dùng: 8 Pass (gồm TC002 FE chặn required), 5 Fail, 3 Blocked (013–015 vì nút Sửa). Giữ TC012 Fail UI, không suy ra nguyên nhân code. Thêm và chạy 5 API riêng TC029–033 bằng Postman CLI cho backend create name rỗng và các update hợp lệ/name256/price0/name rỗng. Backend localhost:3000 đang chạy chứa dữ liệu Web; không restart hay reset DB. Collection chỉ tạo 5 sản phẩm thử riêng, snapshot danh sách trước/sau; dùng JWT Admin và category thật. TC029/031/032/033 Fail vì dữ liệu vi phạm được lưu; TC030 Pass, sửa đúng mục tiêu và mọi ID khác giữ nguyên. 28 requests, 34 assertions, 4 failed; exit 1. Cleanup xóa ID 18–22, assertion cuối Pass: catalog 14 sản phẩm gốc khớp toàn bộ dữ liệu. CLI log chỉ ghi console response/snapshot của test, không ghi JWT/login body. JSON results được trích từ log bằng ghép dòng wrap, không chạy thêm request. Không chạy 12 API cũ chưa được giao trong lượt này. Tạo 5 bug C15 nháp và cập nhật analysis/test cases/progress/AI audit; chưa có ảnh C15 hoặc Issue.
+
+**Artifacts:** [C15 test cases](../test-cases/C15_ProductManagement.md), [analysis](../analysis/C15_ProductManagement.md), [collection](../test-cases/evidence/C15/c15_backend_recheck_collection.json), [CLI log](../test-cases/evidence/C15/postman-cli.log), [JSON results](../test-cases/evidence/C15/c15_backend_results.json), [summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md), [bugs](../bug-reports/bugs.md), [progress](../WORK_PROGRESS.md), [AI Audit](../AI_Audit_Report.md).
+**Assistant response summary:** 5 kiểm backend: 1 Pass, 4 Fail. Web có status riêng; TC002 FE Pass nhưng backend tên rỗng Fail, TC012 UI Fail nhưng API update hợp lệ Pass. Tổng 33 TC: 9 Pass, 9 Fail, 3 Blocked, 12 Not Run.
+**Verdict:** Hoàn thành nhập báo cáo và 5 API được yêu cầu; chưa hoàn tất C15 vì 3 Web Blocked và 12 API ban đầu Not Run. Raw tool transcript chưa export; evidence CLI thật được giữ.
+**Student review:** Review kết quả API và 5 bug nháp; ảnh Web chưa có cần bổ sung nếu thu thập. Không dùng API Pass thay thế kiểm UI ngay sau cập nhật của TC012.

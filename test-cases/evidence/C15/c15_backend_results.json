@@ -1,0 +1,289 @@
+{
+  "date": "2026-10-19",
+  "timezone": "Asia/Bangkok",
+  "tool": "Postman CLI 1.75.0",
+  "baseUrl": "http://localhost:3000",
+  "environment": "Existing running SUT; no backend restart, database reset or original product edits. Own fixture products created and deleted via API.",
+  "counts": {
+    "requests": 28,
+    "assertions": 34,
+    "failedAssertions": 4,
+    "testCases": 5,
+    "pass": 1,
+    "fail": 4,
+    "cliExitCode": 1
+  },
+  "results": [
+    {
+      "tc": "TC-C15-029",
+      "status": "Fail",
+      "before": {
+        "tc": "TC-C15-029",
+        "phase": "before",
+        "catalogCount": 14,
+        "catalogIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ]
+      },
+      "requestResponse": {
+        "tc": "TC-C15-029",
+        "phase": "action",
+        "method": "POST",
+        "targetId": 18,
+        "sent": {
+          "name": "",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": "1"
+        },
+        "status": 200,
+        "body": {
+          "message": "Product created",
+          "id": 18
+        }
+      },
+      "after": {
+        "tc": "TC-C15-029",
+        "phase": "after",
+        "catalogCount": 15,
+        "target": {
+          "id": 18,
+          "name": "",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        },
+        "newProducts": [
+          {
+            "id": 18,
+            "name": "",
+            "price": 100000,
+            "description": "C15 CLI supplementary test",
+            "imageUrl": "",
+            "category_id": 1
+          }
+        ]
+      }
+    },
+    {
+      "tc": "TC-C15-030",
+      "status": "Pass",
+      "before": {
+        "tc": "TC-C15-030",
+        "phase": "before",
+        "catalogCount": 15,
+        "target": {
+          "id": 19,
+          "name": "C15 CLI 1792397396158 030",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        }
+      },
+      "requestResponse": {
+        "tc": "TC-C15-030",
+        "phase": "action",
+        "method": "PUT",
+        "targetId": 19,
+        "sent": {
+          "name": "C15 CLI Updated 1792397396158",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": "1"
+        },
+        "status": 200,
+        "body": {
+          "message": "Product updated"
+        }
+      },
+      "after": {
+        "tc": "TC-C15-030",
+        "phase": "after",
+        "catalogCount": 15,
+        "target": {
+          "id": 19,
+          "name": "C15 CLI Updated 1792397396158",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        },
+        "newProducts": []
+      }
+    },
+    {
+      "tc": "TC-C15-031",
+      "status": "Fail",
+      "before": {
+        "tc": "TC-C15-031",
+        "phase": "before",
+        "catalogCount": 15,
+        "target": {
+          "id": 20,
+          "name": "C15 CLI 1792397396158 031",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        }
+      },
+      "requestResponse": {
+        "tc": "TC-C15-031",
+        "phase": "action",
+        "method": "PUT",
+        "targetId": 20,
+        "sent": {
+          "name": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": "1"
+        },
+        "status": 200,
+        "body": {
+          "message": "Product updated"
+        }
+      },
+      "after": {
+        "tc": "TC-C15-031",
+        "phase": "after",
+        "catalogCount": 15,
+        "target": {
+          "id": 20,
+          "name": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        },
+        "newProducts": []
+      }
+    },
+    {
+      "tc": "TC-C15-032",
+      "status": "Fail",
+      "before": {
+        "tc": "TC-C15-032",
+        "phase": "before",
+        "catalogCount": 15,
+        "target": {
+          "id": 21,
+          "name": "C15 CLI 1792397396158 032",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        }
+      },
+      "requestResponse": {
+        "tc": "TC-C15-032",
+        "phase": "action",
+        "method": "PUT",
+        "targetId": 21,
+        "sent": {
+          "name": "C15 CLI Updated 1792397396158",
+          "price": 0,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": "1"
+        },
+        "status": 200,
+        "body": {
+          "message": "Product updated"
+        }
+      },
+      "after": {
+        "tc": "TC-C15-032",
+        "phase": "after",
+        "catalogCount": 15,
+        "target": {
+          "id": 21,
+          "name": "C15 CLI Updated 1792397396158",
+          "price": 0,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        },
+        "newProducts": []
+      }
+    },
+    {
+      "tc": "TC-C15-033",
+      "status": "Fail",
+      "before": {
+        "tc": "TC-C15-033",
+        "phase": "before",
+        "catalogCount": 15,
+        "target": {
+          "id": 22,
+          "name": "C15 CLI 1792397396158 033",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        }
+      },
+      "requestResponse": {
+        "tc": "TC-C15-033",
+        "phase": "action",
+        "method": "PUT",
+        "targetId": 22,
+        "sent": {
+          "name": "",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": "1"
+        },
+        "status": 200,
+        "body": {
+          "message": "Product updated"
+        }
+      },
+      "after": {
+        "tc": "TC-C15-033",
+        "phase": "after",
+        "catalogCount": 15,
+        "target": {
+          "id": 22,
+          "name": "",
+          "price": 100000,
+          "description": "C15 CLI supplementary test",
+          "imageUrl": "",
+          "category_id": 1
+        },
+        "newProducts": []
+      }
+    }
+  ],
+  "cleanup": {
+    "finalCount": 14,
+    "baselineCount": 14,
+    "originalCatalogPreserved": true,
+    "ownedIds": [
+      18,
+      19,
+      20,
+      21,
+      22
+    ]
+  },
+  "provenance": "Console JSON extracted from postman-cli.log; wrapped lines rejoined. No additional test requests for extraction."
+}

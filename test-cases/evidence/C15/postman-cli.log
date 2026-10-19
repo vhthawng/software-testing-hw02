@@ -1,0 +1,321 @@
+﻿No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+C15 backend checks requested after Web results (029-033)
+
+Root SETUP Admin login
+
+  POST http://localhost:3000/api/login [200 OK, 640 B, 28 ms]
+  Pass  Admin login
+
+Root SETUP category
+
+  GET http://localhost:3000/api/categories [200 OK, 358 B, 6 ms]
+  Pass  Existing category
+  -
+  | 'C15_ENV {"category":{"id":1,"name":"Điện thoại"}}'
+  -
+
+Root SETUP baseline catalog
+
+  GET http://localhost:3000/api/products [200 OK, 2.76 KB, 4 ms]
+  Pass  Baseline catalog readable
+  -
+  | 'C15_ENV {"baselineCount":14,"baselineIds":[1,2,3,4,5,
+  | 6,7,8,9,10,11,12,13,14]}'
+  -
+
+Folder TC-C15-029
+Sub-folder TC-C15-029 SNAPSHOT before
+
+  GET http://localhost:3000/api/products [200 OK, 2.76 KB, 5 ms]
+  Pass  TC-C15-029 snapshot before
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-029","phase":"before","cat
+  | alogCount":14,"catalogIds":[1,2,3,4,5,6,7,8,9,10,11,12
+  | ,13,14]}'
+  -
+
+Sub-folder TC-C15-029 ACTION
+
+  POST http://localhost:3000/api/products [200 OK, 304 B, 17 ms]
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-029","phase":"action","met
+  | hod":"POST","targetId":18,"sent":{"name":"","price":10
+  | 0000,"description":"C15 CLI supplementary test","image
+  | Url":"","category_id":"1"},"status":200,"body":{"messa
+  | ge":"Product created","id":18}}'
+  -
+
+Sub-folder TC-C15-029 VERIFY after
+
+  GET http://localhost:3000/api/products [200 OK, 2.87 KB, 4 ms]
+  Pass  TC-C15-029 read after
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-029","phase":"after","cata
+  | logCount":15,"target":{"id":18,"name":"","price":10000
+  | 0,"description":"C15 CLI supplementary test","imageUrl
+  | ":"","category_id":1},"newProducts":[{"id":18,"name":"
+  | ","price":100000,"description":"C15 CLI supplementary 
+  | test","imageUrl":"","category_id":1}]}'
+  -
+  1. TC-C15-029: no invalid product created
+
+Sub-folder TC-C15-029 CLEANUP created product if any
+
+  DELETE http://localhost:3000/api/products/18 [200 OK, 296 B, 14 ms]
+  Pass  TC-C15-029 remove own invalid product
+
+Folder TC-C15-030
+Sub-folder TC-C15-030 SETUP target
+
+  POST http://localhost:3000/api/products [200 OK, 304 B, 14 ms]
+  Pass  TC-C15-030 create target
+
+Sub-folder TC-C15-030 SNAPSHOT before
+
+  GET http://localhost:3000/api/products [200 OK, 2.89 KB, 5 ms]
+  Pass  TC-C15-030 snapshot before
+  Pass  TC-C15-030 target fixture
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-030","phase":"before","cat
+  | alogCount":15,"target":{"id":19,"name":"C15 CLI 179239
+  | 7396158 030","price":100000,"description":"C15 CLI sup
+  | plementary test","imageUrl":"","category_id":1}}'
+  -
+
+Sub-folder TC-C15-030 ACTION
+
+  PUT http://localhost:3000/api/products/19 [200 OK, 296 B, 15 ms]
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-030","phase":"action","met
+  | hod":"PUT","targetId":19,"sent":{"name":"C15 CLI Updat
+  | ed 1792397396158","price":100000,"description":"C15 CL
+  | I supplementary test","imageUrl":"","category_id":"1"}
+  | ,"status":200,"body":{"message":"Product updated"}}'
+  -
+  Pass  TC-C15-030: valid update succeeds
+
+Sub-folder TC-C15-030 VERIFY after
+
+  GET http://localhost:3000/api/products [200 OK, 2.9 KB, 4 ms]
+  Pass  TC-C15-030 read after
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-030","phase":"after","cata
+  | logCount":15,"target":{"id":19,"name":"C15 CLI Updated
+  |  1792397396158","price":100000,"description":"C15 CLI 
+  | supplementary test","imageUrl":"","category_id":1},"ne
+  | wProducts":[]}'
+  -
+  Pass  TC-C15-030: target updated exactly
+  Pass  TC-C15-030: all other products unchanged
+
+Sub-folder TC-C15-030 CLEANUP target
+
+  DELETE http://localhost:3000/api/products/19 [200 OK, 296 B, 14 ms]
+  Pass  TC-C15-030 remove own target
+
+Folder TC-C15-031
+Sub-folder TC-C15-031 SETUP target
+
+  POST http://localhost:3000/api/products [200 OK, 304 B, 14 ms]
+  Pass  TC-C15-031 create target
+
+Sub-folder TC-C15-031 SNAPSHOT before
+
+  GET http://localhost:3000/api/products [200 OK, 2.89 KB, 7 ms]
+  Pass  TC-C15-031 snapshot before
+  Pass  TC-C15-031 target fixture
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-031","phase":"before","cat
+  | alogCount":15,"target":{"id":20,"name":"C15 CLI 179239
+  | 7396158 031","price":100000,"description":"C15 CLI sup
+  | plementary test","imageUrl":"","category_id":1}}'
+  -
+
+Sub-folder TC-C15-031 ACTION
+
+  PUT http://localhost:3000/api/products/20 [200 OK, 296 B, 14 ms]
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-031","phase":"action","met
+  | hod":"PUT","targetId":20,"sent":{"name":"AAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAA","price":100000,"descripti
+  | on":"C15 CLI supplementary test","imageUrl":"","catego
+  | ry_id":"1"},"status":200,"body":{"message":"Product up
+  | dated"}}'
+  -
+
+Sub-folder TC-C15-031 VERIFY after
+
+  GET http://localhost:3000/api/products [200 OK, 3.12 KB, 4 ms]
+  Pass  TC-C15-031 read after
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-031","phase":"after","cata
+  | logCount":15,"target":{"id":20,"name":"AAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  | AAAAAAAAAAAAAAAAAAAAAAAAA","price":100000,"description
+  | ":"C15 CLI supplementary test","imageUrl":"","category
+  | _id":1},"newProducts":[]}'
+  -
+  2. TC-C15-031: invalid update not persisted
+
+Sub-folder TC-C15-031 CLEANUP target
+
+  DELETE http://localhost:3000/api/products/20 [200 OK, 296 B, 14 ms]
+  Pass  TC-C15-031 remove own target
+
+Folder TC-C15-032
+Sub-folder TC-C15-032 SETUP target
+
+  POST http://localhost:3000/api/products [200 OK, 304 B, 14 ms]
+  Pass  TC-C15-032 create target
+
+Sub-folder TC-C15-032 SNAPSHOT before
+
+  GET http://localhost:3000/api/products [200 OK, 2.89 KB, 3 ms]
+  Pass  TC-C15-032 snapshot before
+  Pass  TC-C15-032 target fixture
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-032","phase":"before","cat
+  | alogCount":15,"target":{"id":21,"name":"C15 CLI 179239
+  | 7396158 032","price":100000,"description":"C15 CLI sup
+  | plementary test","imageUrl":"","category_id":1}}'
+  -
+
+Sub-folder TC-C15-032 ACTION
+
+  PUT http://localhost:3000/api/products/21 [200 OK, 296 B, 18 ms]
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-032","phase":"action","met
+  | hod":"PUT","targetId":21,"sent":{"name":"C15 CLI Updat
+  | ed 1792397396158","price":0,"description":"C15 CLI sup
+  | plementary test","imageUrl":"","category_id":"1"},"sta
+  | tus":200,"body":{"message":"Product updated"}}'
+  -
+
+Sub-folder TC-C15-032 VERIFY after
+
+  GET http://localhost:3000/api/products [200 OK, 2.89 KB, 4 ms]
+  Pass  TC-C15-032 read after
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-032","phase":"after","cata
+  | logCount":15,"target":{"id":21,"name":"C15 CLI Updated
+  |  1792397396158","price":0,"description":"C15 CLI suppl
+  | ementary test","imageUrl":"","category_id":1},"newProd
+  | ucts":[]}'
+  -
+  3. TC-C15-032: invalid update not persisted
+
+Sub-folder TC-C15-032 CLEANUP target
+
+  DELETE http://localhost:3000/api/products/21 [200 OK, 296 B, 13 ms]
+  Pass  TC-C15-032 remove own target
+
+Folder TC-C15-033
+Sub-folder TC-C15-033 SETUP target
+
+  POST http://localhost:3000/api/products [200 OK, 304 B, 13 ms]
+  Pass  TC-C15-033 create target
+
+Sub-folder TC-C15-033 SNAPSHOT before
+
+  GET http://localhost:3000/api/products [200 OK, 2.89 KB, 4 ms]
+  Pass  TC-C15-033 snapshot before
+  Pass  TC-C15-033 target fixture
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-033","phase":"before","cat
+  | alogCount":15,"target":{"id":22,"name":"C15 CLI 179239
+  | 7396158 033","price":100000,"description":"C15 CLI sup
+  | plementary test","imageUrl":"","category_id":1}}'
+  -
+
+Sub-folder TC-C15-033 ACTION
+
+  PUT http://localhost:3000/api/products/22 [200 OK, 296 B, 14 ms]
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-033","phase":"action","met
+  | hod":"PUT","targetId":22,"sent":{"name":"","price":100
+  | 000,"description":"C15 CLI supplementary test","imageU
+  | rl":"","category_id":"1"},"status":200,"body":{"messag
+  | e":"Product updated"}}'
+  -
+
+Sub-folder TC-C15-033 VERIFY after
+
+  GET http://localhost:3000/api/products [200 OK, 2.87 KB, 3 ms]
+  Pass  TC-C15-033 read after
+  -
+  | 'C15_EVIDENCE {"tc":"TC-C15-033","phase":"after","cata
+  | logCount":15,"target":{"id":22,"name":"","price":10000
+  | 0,"description":"C15 CLI supplementary test","imageUrl
+  | ":"","category_id":1},"newProducts":[]}'
+  -
+  4. TC-C15-033: invalid update not persisted
+
+Sub-folder TC-C15-033 CLEANUP target
+
+  DELETE http://localhost:3000/api/products/22 [200 OK, 296 B, 12 ms]
+  Pass  TC-C15-033 remove own target
+
+Root CLEANUP VERIFY original catalog preserved
+
+  GET http://localhost:3000/api/products [200 OK, 2.76 KB, 5 ms]
+  Pass  Original catalog restored after own fixture cleanup
+  -
+  | 'C15_ENV {"finalCount":14,"baselineCount":14,"original
+  | CatalogPreserved":true,"ownedIds":[18,19,20,21,22]}'
+  -
+
+--------------------------------------------------------------------
+|                         |           executed |            failed |
+--------------------------+--------------------+--------------------
+|              iterations |                  1 |                 0 |
+--------------------------+--------------------+--------------------
+|                requests |                 28 |                 0 |
+--------------------------+--------------------+--------------------
+|            test-scripts |                 28 |                 0 |
+--------------------------+--------------------+--------------------
+|      prerequest-scripts |                 29 |                 0 |
+--------------------------+--------------------+--------------------
+|              assertions |                 34 |                 4 |
+--------------------------------------------------------------------
+| total run duration: 2.6 s                                        |
+--------------------------------------------------------------------
+| total data received: 32.25 KB (approx)                           |
+--------------------------------------------------------------------
+| average response time: 10 ms [min: 3 ms, max: 28 ms, s.d.: 6 ms] |
+--------------------------------------------------------------------
+
+  #  failure         detail                                                                                           
+                                                                                                                      
+ 1.  AssertionError  TC-C15-029: no invalid product created                                                           
+                     expected [ { category_id: 1, …(5) }, …(14) ] to deeply equal [ { category_id: 1, …(5) }, …(13) ] 
+                     at assertion:1 in test-script                                                                    
+                     inside "TC-C15-029 / TC-C15-029 VERIFY after"                                                    
+                                                                                                                      
+ 2.  AssertionError  TC-C15-031: invalid update not persisted                                                         
+                     expected [ { category_id: 1, …(5) }, …(14) ] to deeply equal [ { category_id: 1, …(5) }, …(14) ] 
+                     at assertion:1 in test-script                                                                    
+                     inside "TC-C15-031 / TC-C15-031 VERIFY after"                                                    
+                                                                                                                      
+ 3.  AssertionError  TC-C15-032: invalid update not persisted                                                         
+                     expected [ { category_id: 1, …(5) }, …(14) ] to deeply equal [ { category_id: 1, …(5) }, …(14) ] 
+                     at assertion:1 in test-script                                                                    
+                     inside "TC-C15-032 / TC-C15-032 VERIFY after"                                                    
+                                                                                                                      
+ 4.  AssertionError  TC-C15-033: invalid update not persisted                                                         
+                     expected [ { category_id: 1, …(5) }, …(14) ] to deeply equal [ { category_id: 1, …(5) }, …(14) ] 
+                     at assertion:1 in test-script                                                                    
+                     inside "TC-C15-033 / TC-C15-033 VERIFY after"                                                    
+Postman credentials are required for publishing run details to Postman cloud.
+Please specify it by using the `postman login` command

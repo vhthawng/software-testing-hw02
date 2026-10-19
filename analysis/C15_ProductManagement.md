@@ -1,11 +1,11 @@
-﻿# Analysis: C15 — Quản lý sản phẩm Admin
+# Analysis: C15 — Quản lý sản phẩm Admin
 
 | | |
 |:---|:---|
 | **Tính năng / nền tảng** | FR-15 Product CRUD trên Web Admin; API bổ sung cho quyền ghi và dữ liệu danh mục không nhập được từ UI |
 | **Người thiết kế / ngày** | Codex hỗ trợ MSSV 23120355; tên sinh viên chưa cung cấp; tạo 2026-10-19, Asia/Bangkok |
 | **Test case chi tiết** | [C15_ProductManagement.md](../test-cases/C15_ProductManagement.md) |
-| **Trạng thái** | Draft; chưa thực thi, sinh viên chưa review |
+| **Trạng thái** | 33 TC: 9 Pass, 9 Fail, 3 Blocked, 12 Not Run; Web do người dùng báo cáo, 5 API bổ sung có CLI evidence; review tổng thể pending |
 
 ## 1. Phạm vi và nguồn
 
@@ -14,13 +14,13 @@
 | [README SUT](../eshop-sut/README.md) | v2.0, 2026-05-14; oracle | FR-15; FR-12, SEC-02/03 cho quyền Admin | Không có max giá hoặc precision tiền |
 | [API specification](../eshop-sut/api_specification.md) | Không ghi phiên bản | Products 3.1–3.3; Categories 3.4; login | Chưa có đầy đủ error/status/schema validation |
 | [Đề HW02](../2026.HW02.Domain%20Testing_En.md) | HW02-AI | Domain/BVA, AI audit, Git theo bước | Bài giảng chưa có trong workspace |
-| App.jsx Admin | Code hỗ trợ thao tác, không phải oracle | Tab Sản phẩm; form, Sửa, Xóa, đăng nhập | Chưa chạy UI/API C15 |
+| App.jsx Admin | Code hỗ trợ thao tác, không phải oracle | Tab Sản phẩm; form, Sửa, Xóa, đăng nhập | Web có báo cáo người dùng; API bổ sung đã chạy; AI chưa tự kiểm chứng UI |
 
 Trong phạm vi: Admin thêm/xem/sửa/xóa sản phẩm; tên bắt buộc và ≤255 ký tự; giá bắt buộc và >0; danh mục bắt buộc có trong danh sách; cập nhật chỉ tác động sản phẩm được chọn. API ghi phải có JWT hợp lệ và role admin theo FR-12.
 
 Ngoài phạm vi: import CSV FR-16, CRUD danh mục FR-14, Mobile, GUI toàn hệ thống, validation ảnh/mô tả chưa nêu; concurrency hoặc sản phẩm đã gắn vào đơn. Không lấy ràng buộc database/code làm yêu cầu.
 
-Domain/EP cho tên, giá, danh mục, xác thực/quyền; BVA cho chiều dài tên. Có các test sửa/xóa và kiểm tra dữ liệu khác giữ nguyên. Không nhân đôi toàn bộ validation Web thành API.
+Domain/EP cho tên, giá, danh mục, xác thực/quyền; BVA cho chiều dài tên. Có các test sửa/xóa và kiểm tra dữ liệu khác giữ nguyên. Không nhân đôi toàn bộ validation Web thành API. TC029–033 là bổ sung được người dùng yêu cầu để kiểm backend cho tên rỗng và sửa sản phẩm khi UI bị chặn; giữ riêng kết quả Web/API.
 
 ## 2. Input/context và quy tắc
 
@@ -58,7 +58,7 @@ O1–O5 là kết quả quan sát, không tạo output class giả.
 | G5 | Chưa nêu lỗi HTTP/message, dialog xác nhận xóa, hard/soft-delete | FR-15/API | Spec gap | Không ép câu lỗi/status hoặc yêu cầu dialog; kiểm invariant dữ liệu | Test âm, 016 |
 | G6 | Bài giảng chưa có | HW02 | Giới hạn phương pháp | Dùng BVA 2-point cho tên, cần sinh viên đối chiếu | 002–005 |
 
-Không tự dùng các policy chốt cho B08 làm yêu cầu C15. Các gap không chặn test có oracle rõ. Mọi status còn Not Run cho đến khi có execution thật.
+Không tự dùng các policy chốt cho B08 làm yêu cầu C15. Các gap không chặn test có oracle rõ. Status được cập nhật theo nguồn execution: Web do người dùng báo cáo; API bổ sung có log. Không chuyển test Web Blocked thành Pass/Fail theo API.
 
 ## 4. Domain Testing: phân vùng tương đương
 
@@ -132,6 +132,11 @@ Tên/giá/danh mục chuẩn nằm ở mục 2. Mỗi dòng là một TC duy nh�
 | TC-C15-026 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Không body. | C14 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | TC-C15-027 | FR-15 CRUD và FR-12: quyền Admin hợp lệ | Domain | JWT Admin hợp lệ; tạo tên C15 API Product, giá 100000; sửa tên C15 API Updated; dùng danh mục có thật. | C1, C4, C8, C11 | — | Hợp lệ | Admin thực hiện thành công thêm/xem/sửa/xóa; dữ liệu lưu đúng, chỉ sản phẩm thử bị tác động. Đây là đường đối chứng để các test từ chối không Pass do API hoàn toàn không hoạt động. |
 | TC-C15-028 | FR-12: phân hệ Admin chỉ dành cho admin | Domain | Email/mật khẩu của tài khoản role=user hợp lệ; không sửa role trong token. | C14 | — | Không hợp lệ | Không vào được màn hình/chức năng quản lý sản phẩm Admin. Không ép câu thông báo cụ thể. |
+| TC-C15-029 | FR-15; backend bổ sung theo yêu cầu người dùng | Domain + BVA | POST /api/products; JWT Admin hợp lệ; name="", price=100000, description="C15 CLI supplementary test", imageUrl="", category_id lấy từ GET /api/categories. | C2, C4, C8, C11 | B1 off, 0 ký tự | Không hợp lệ | Không tạo sản phẩm tên rỗng; danh sách products lưu không đổi. |
+| TC-C15-030 | FR-15; backend bổ sung theo yêu cầu người dùng | Functional | PUT /api/products/<ID sản phẩm thử mới>; JWT Admin; đổi name thành C15 CLI Updated kèm mã lần chạy, giữ giá 100000, mô tả/ảnh/danh mục như trước. | C1, C4, C8, C11 | — | Hợp lệ | Sửa thành công đúng sản phẩm; mọi sản phẩm khác giữ nguyên dữ liệu. Không kết luận về nút Sửa hoặc hiển thị Web. |
+| TC-C15-031 | FR-15; backend bổ sung theo yêu cầu người dùng | Domain + BVA | PUT /api/products/<ID sản phẩm thử>; JWT Admin; name="A".repeat(256), price=100000, mô tả/ảnh/danh mục giữ nguyên. | C3, C11 | B2 off, 256 ký tự | Không hợp lệ | Không lưu tên 256; dữ liệu trước test giữ nguyên. |
+| TC-C15-032 | FR-15; backend bổ sung theo yêu cầu người dùng | Domain | PUT /api/products/<ID sản phẩm thử>; JWT Admin; chỉ đổi price=0; giữ tên, description, imageUrl và category_id. | C6, C11 | — | Không hợp lệ | Không lưu giá 0; sản phẩm đích và mọi ID khác giữ nguyên dữ liệu trước test. |
+| TC-C15-033 | FR-15; backend bổ sung theo yêu cầu người dùng | Domain + BVA | PUT /api/products/<ID sản phẩm thử>; JWT Admin; name="", price=100000, các field khác giữ nguyên. | C2, C11 | B1 off, 0 ký tự | Không hợp lệ | Không lưu tên rỗng; dữ liệu trước test giữ nguyên. |
 
 ## 7. Truy vết và độ phủ
 
@@ -169,21 +174,31 @@ Các ID test trong bảng dưới có prefix TC-C15-. Trạng thái Đã thiết
 
 | Chỉ số | Số lượng |
 |:---|:---|
-| Tổng test duy nhất | 28 |
-| Chỉ Domain | 22 |
+| Tổng test duy nhất | 33 |
+| Chỉ Domain | 23 |
 | Chỉ BVA | 0 |
-| Cả Domain/BVA | 4 |
-| Chỉ kỹ thuật chức năng bổ sung | 2 |
-| Hợp lệ / Không hợp lệ | 8 / 20 |
-| Đã thực thi / Pass / Fail / Not Run | 0 / 0 / 0 / 28 |
+| Cả Domain/BVA | 7 |
+| Chỉ kỹ thuật chức năng bổ sung | 3 |
+| Hợp lệ / Không hợp lệ | 9 / 24 |
+| Đã hoàn thành (Pass + Fail) / Pass / Fail | 18 / 9 / 9 |
+| Blocked / Not Run | 3 / 12 |
 
-28=22+0+4+2. Mức giảm tổ hợp không định lượng vì tập tên/giá không có tổng số hữu hạn được đặc tả; không khẳng định bộ tối thiểu toàn cục.
+33=23+0+7+3. Đã thử 21 TC: 18 hoàn thành Pass/Fail và 3 Blocked; 12 API ban đầu vẫn Not Run. Mức giảm tổ hợp không định lượng vì tập tên/giá không có tổng số hữu hạn được đặc tả; không khẳng định bộ tối thiểu toàn cục.
+
+**Kết quả và phần bổ sung:** Web TC002 Pass tại FE; API TC029 Fail chứng minh backend không chặn cùng giá trị rỗng. TC012 Web Fail do không mở được sửa; TC013–015 Web Blocked; TC030 API Pass chỉ chứng minh update dữ liệu đúng, không thay thế kiểm UI tức thời của TC012. TC031/032/033 Fail vì backend lưu tên 256/giá 0/tên rỗng. Bằng chứng: [CLI summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md).
+
+| Truy vết bổ sung | TC IDs | Trạng thái | Lý do |
+|:---|:---|:---|:---|
+| FR-15 tên bắt buộc; C2, B1 off | 029, 033 | Đã thiết kế và chạy API | Tạo/sửa tên rỗng, khác nền tảng Web002/015 |
+| FR-15 tên ≤255; C3, B2 off | 031 | Đã thiết kế và chạy API | PUT gửi đủ 256 trực tiếp |
+| FR-15 giá >0; C6 | 032 | Đã thiết kế và chạy API | PUT giá 0 |
+| FR-15 sửa chỉ đúng đích; C1/C4/C8/C11 | 030 | Đã thiết kế và chạy API | Tất cả ID khác giữ nguyên |
 
 ## 8. Giới hạn và kỹ thuật bổ sung
 
 Chưa kiểm tất cả tổ hợp nhiều lỗi, mọi validation backend qua API, cập nhật đồng thời, price precision, tên Unicode/whitespace hoặc xóa sản phẩm đã gắn đơn/giỏ. Chưa có test sửa danh mục thành ID không tồn tại; TC017 hiện chỉ kiểm tạo mới. Nếu cần mở rộng, ghi test bổ sung theo mục tiêu và giữ oracle từ spec, không tự thêm policy.
 
-GET sản phẩm là API công khai trong contract; không tự yêu cầu JWT Admin cho GET /api/products chỉ vì nó được UI Admin gọi. Các request ghi phải kiểm đủ cả JWT và role trên từng method. Kết quả đọc code chưa phải runtime bug; chưa tạo bug report C15 hoặc evidence giả.
+GET sản phẩm là API công khai trong contract; không tự yêu cầu JWT Admin cho GET /api/products chỉ vì nó được UI Admin gọi. Các request ghi phải kiểm đủ cả JWT và role trên từng method. Có 5 bug C15 nháp từ Web người dùng báo cáo và CLI runtime. Không kết luận lỗi nút Sửa từ code tĩnh; TC012 dựa trên báo cáo người dùng.
 
 ## 9. Review và thay đổi
 
@@ -192,3 +207,5 @@ GET sản phẩm là API công khai trong contract; không tự yêu cầu JWT A
 | v0.1 | 2026-10-19 | Scope, input/context, oracle và spec gaps | Đọc FR-15/FR-12 và API | Toàn bộ | Sinh viên chưa review |
 | v0.2 | 2026-10-19 | 14 lớp và 28 card ban đầu | Single Fault, CRUD và phân quyền từng method | 001–028 | AI thiết kế; sinh viên chưa review |
 | v0.3 | 2026-10-19 | BVA tên 0/1/255/256, matrix/trace và giới hạn precision giá | Không tự đặt bước tiền nhỏ nhất hoặc ID biên danh mục | 002–005, 007–009 | AI kiểm tra nhất quán; chưa thực thi |
+
+| v0.4 | 2026-10-19 | Nhập 16 Web theo báo cáo; thêm và chạy API029–033 | Người dùng yêu cầu kiểm BE khi FE chặn tên rỗng hoặc không mở được sửa | 001–009, 011–016, 028–033 | 9 Pass, 9 Fail, 3 Blocked, 12 Not Run; cần review kết quả cuối |
