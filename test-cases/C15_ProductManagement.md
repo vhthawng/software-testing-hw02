@@ -33,6 +33,8 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 
 ## 1. Tổng hợp
 
+28 test: 22 chỉ Domain, 4 thuộc cả Domain/BVA và 2 kiểm tra chức năng. 28 Not Run.
+
 | TC ID | Nội dung | Dữ liệu chính | Kết quả mong đợi | Status |
 |:---|:---|:---|:---|:---|
 | TC-C15-001 | Web thêm và xem sản phẩm hợp lệ | Tên C15 Test Product; giá 100000; danh mục chọn từ danh sách. | Tạo một sản phẩm mới đúng dữ liệu; đọc lại được sau refresh. | Not Run |

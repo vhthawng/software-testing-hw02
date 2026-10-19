@@ -6,7 +6,7 @@ MSSV: 23120355. Chỉ tạo Markdown trong workspace; chưa tạo thư mục n�
 |---|---|---|---|---|---|
 | A04 | FR-04, SEC-02, SEC-06; bản spec-first đã cập nhật | 8 test chỉ Domain | 4 test thuộc cả Domain/BVA, 0 chỉ BVA | 13 đã chạy: 7 Pass, 6 Fail; 0 Not Run | AI self-review hoàn tất; sinh viên đã cung cấp actual/evidence, review cuối pending |
 | B08 | FR-08, SEC-02; giỏ trống/mismatch đã chốt | 8 chỉ Domain + 2 Functional | 2 Domain/BVA: B1 số dòng 0/1 | 4 Pass, 7 Fail, 1 Blocked; 0 Not Run | 5 bug nháp; TC005 vướng FR-07; G2 còn mở |
-| C15 | Chưa bắt đầu | Chưa làm | Chưa làm | Chưa chạy | Chưa review |
+| C15 | FR-15; FR-12, SEC-02/03 cho quyền ghi | 22 chỉ Domain + 2 Functional | 4 Domain/BVA; tên 0/1/255/256 | 0 đã chạy; 28 Not Run | AI kiểm tra ID/card/link; sinh viên chưa review |
 | D Mobile Register | Chưa bắt đầu | Chưa làm | Chưa làm | Chưa chạy | Chưa review |
 
 Artifact: [A04 analysis](analysis/A04_Profile.md). Commit A04 hoàn tất: `581b52b`; skill/workflow cập nhật: `92bd123`. Test case: [A04](test-cases/A04_Profile.md). Review record: [A04_04_spec_review](audit/A04_04_spec_review.md). Bug drafts: [bug-reports/bugs.md](bug-reports/bugs.md). Evidence: [A04 evidence](test-cases/evidence/A04/). Conversation audit: [conversation_log](audit/conversation_log.md).
@@ -30,3 +30,14 @@ Sinh viên cần đối chiếu bài giảng, review phân loại TC-A04-002/004
 - Review mới: D1 yêu cầu giỏ trống reject/báo lỗi/không tạo đơn; D2 yêu cầu total mismatch reject/báo lỗi/không tạo đơn. Đây là yêu cầu bổ sung người dùng xác nhận, không nguyên văn FR-08; max không bổ sung.
 
 - API execution: [summary](test-cases/evidence/B08/b08_api_execution_summary.md), [collection](test-cases/evidence/B08/b08_api_postman_collection.json), [bug drafts](bug-reports/bugs.md). Backend nguyên mã chạy trên database tạm riêng; database workspace được bảo toàn. Web đã cập nhật theo báo cáo của người dùng; TC005 Blocked.
+
+## C15 — Quản lý sản phẩm Admin
+
+- [Analysis](analysis/C15_ProductManagement.md): yêu cầu, input/context, postconditions, 14 lớp, BVA, 28-row matrix và truy vết.
+- [Test cases](test-cases/C15_ProductManagement.md): 28 test, gồm 16 Web và 12 API. Dữ liệu/steps viết cụ thể, mã phân tích chỉ để ở trường truy vết.
+- 22 chỉ Domain, 4 Domain+BVA và 2 Functional; 28 Not Run, chưa có runtime evidence hay bug C15 được tái hiện.
+- Commit scope/yêu cầu: 02231a1; commit Domain/cards ban đầu: 657bf69. Dùng lịch sử Git giữ output ban đầu, không tạo nhiều bản sao audit.
+- BVA tên dùng ASCII: 0/1 và 255/256. Giá 0 phải reject; giá 1 là đại diện dương, chưa tự coi là đơn vị nhỏ nhất vì spec chưa nêu precision.
+- Quyền ghi API kiểm POST/PUT/DELETE, mỗi method có JWT thiếu/sai/token user thường; Admin hợp lệ có đường đối chứng CRUD riêng. Sửa sản phẩm kiểm cả UI ngay sau lưu và backend/refresh cho tất cả ID khác.
+- Đã kiểm 28 ID khớp matrix/summary/card, 13 trường/card, 14 lớp, link hợp lệ, thống kê kỹ thuật khớp. Đây là kiểm tra tài liệu, không phải chạy SUT.
+- Việc kế tiếp: sinh viên review; chuẩn bị danh mục/sản phẩm thử đúng card; chạy Web hoặc giao chạy các API bằng CLI. Không đổi trạng thái khi chưa có kết quả thật.

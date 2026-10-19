@@ -83,3 +83,112 @@ Chia tên theo bắt buộc/max, giá theo bắt buộc và dấu, danh mục th
 
 Single Fault: test tên/giá/danh mục giữ những field còn lại chuẩn và Admin hợp lệ. Test quyền giữ body chuẩn và ID tồn tại. Test hợp lệ có thể đồng thời kiểm nhiều trường; test sửa đối chứng kiểm toàn bộ ID khác vì FR-15 nói các sản phẩm khác giữ nguyên. Không coi response/snapshot là biến đầu vào.
 
+## 5. Boundary Value Analysis
+
+Tên bắt buộc suy ra chiều dài tối thiểu 1; max 255 explicit trong FR-15. Dùng ASCII A để cách đếm byte/code point/UTF-16 không làm thay đổi các điểm đang kiểm. Độ mịn chiều dài là 1 ký tự. Chọn 2-point cho mỗi biên: một điểm on và một điểm off đổi kết quả hợp lệ, chờ đối chiếu thuật ngữ bài giảng.
+
+| Boundary ID | Class liên quan | Quy tắc / nguồn | Đóng/mở | Độ mịn | On-point | Off-point | Expected | TC |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| B1 | C1, C2 | name không rỗng: L≥1; FR-15 | Đóng | 1 ký tự | A, L=1 | Chuỗi rỗng, L=0 | On chấp nhận; off không lưu tên rỗng | 003 on, 002 off |
+| B2 | C1, C3 | L≤255; FR-15 | Đóng | 1 ký tự | A lặp 255 | A lặp 256 | On lưu đủ 255; off không lưu tên 256 | 004 on, 005 off |
+
+**Giá:** mốc 0 là biên mở của price>0; TC007 kiểm đúng mốc 0 phải bị từ chối, TC008 kiểm đại diện dương 1, TC009 kiểm đại diện âm -1. Vì spec chưa nêu độ mịn/precision, không gọi 1 là giá dương gần 0 nhất, không coi tập giá chỉ là số nguyên và chưa tuyên bố bộ này phủ BVA giá 2/3-point đầy đủ. Các test giá vẫn có oracle rõ theo dấu của số, nhãn Domain. BVA tên B1/B2 đã có on/off đầy đủ trong phạm vi UI.
+
+**Biên bị chặn tại UI:** nếu ô tên chỉ nhận 255 ký tự, TC005 kiểm được việc ngăn nhập vượt max. Ghi actual form/request thật; không tính là coverage backend nhận 256. TC013 khi sửa cũng ghi rõ đường chặn nếu có. Không tự thêm API duplicate mọi validation; độ phủ backend tên dài là thiếu sót đã biết nếu UI chặn.
+
+Danh mục và role là tập giá trị rời rạc không thứ tự, không có min/max số từ ID danh mục. Không coi ID nhỏ nhất/lớn nhất là biên nghiệp vụ.
+
+## 6. Test Matrix
+
+Tên/giá/danh mục chuẩn nằm ở mục 2. Mỗi dòng là một TC duy nhất; dữ liệu trong card ghi đầy đủ bằng lời dễ chạy. Test âm chỉ đổi field/quyền nêu ở dòng đó, giữ các field khác hợp lệ.
+
+| TC ID | Requirement / nguồn | Technique | Dữ liệu / context | Class IDs | Boundary / điểm | Validity | Expected |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| TC-C15-001 | FR-15: Admin thêm/xem sản phẩm | Domain | Tên C15 Test Product; giá 100000; danh mục chọn từ danh sách. | C1, C4, C8, C11 | — | Hợp lệ | Tạo một sản phẩm mới đúng dữ liệu; đọc lại được sau refresh. |
+| TC-C15-002 | FR-15: tên bắt buộc | Domain + BVA | Tên để trống; giá 100000; danh mục có thật. | C2 | B1 off, 0 ký tự | Không hợp lệ | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. |
+| TC-C15-003 | FR-15: tên bắt buộc, tối đa 255 ký tự | Domain + BVA | Tên A (1 ký tự ASCII); giá 100000; danh mục có thật. | C1 | B1 on, 1 ký tự | Hợp lệ | Tạo sản phẩm thành công; tên lưu đúng A, không mất ký tự. |
+| TC-C15-004 | FR-15: tối đa 255 ký tự | Domain + BVA | Tên là A lặp đúng 255 lần; giá 100000; danh mục có thật. | C1 | B2 on, 255 ký tự | Hợp lệ | Sản phẩm được tạo; tên lưu đủ 255 ký tự, bằng chính chuỗi đã gửi. |
+| TC-C15-005 | FR-15: tối đa 255 ký tự | Domain + BVA | Tên là A lặp đúng 256 lần; giá 100000; danh mục có thật. | C3 | B2 off, 256 ký tự | Không hợp lệ | Không lưu tên dài 256. Nếu UI chặn hoặc cắt nhập ở 255, ghi rõ input thực tế và tên lưu ≤255; không kết luận backend đã được test với 256 nếu request không gửi đủ 256. |
+| TC-C15-006 | FR-15: giá bắt buộc | Domain | Tên C15 Test Product; giá để trống; danh mục có thật. | C5 | — | Không hợp lệ | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. |
+| TC-C15-007 | FR-15: giá phải >0 | Domain | Tên C15 Test Product; giá 0; danh mục có thật. | C6 | Mốc giá 0; chưa gán đủ BVA giá | Không hợp lệ | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. |
+| TC-C15-008 | FR-15: giá phải >0 | Domain | Tên C15 Test Product; giá 1; danh mục có thật. Giá 1 là đại diện dương, không khẳng định là giá nhỏ nhất hệ thống. | C4 | — | Hợp lệ | Tạo sản phẩm với giá lưu bằng 1; tên và danh mục đúng dữ liệu gửi. |
+| TC-C15-009 | FR-15: giá phải >0 | Domain | Tên C15 Test Product; giá -1; danh mục có thật. | C7 | — | Không hợp lệ | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. |
+| TC-C15-010 | FR-15: danh mục bắt buộc | Domain | POST /api/products; JWT Admin hợp lệ; body chuẩn nhưng bỏ field category_id hoàn toàn. | C9, C11 | — | Không hợp lệ | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. |
+| TC-C15-011 | FR-15: danh mục thuộc danh sách hiện có | Domain | Tên C15 Test Product; giá 100000; chọn danh mục có thật khác lựa chọn mặc định. | C8 | — | Hợp lệ | Sản phẩm lưu đúng ID danh mục đã chọn, không tự đổi về danh mục mặc định. |
+| TC-C15-012 | FR-15: chỉ sản phẩm được sửa thay đổi | Functional | Đổi tên sản phẩm đích từ C15 Original thành C15 Updated; giữ giá 100000 và danh mục. | C1, C4, C8, C11 | — | Hợp lệ | Chỉ sản phẩm đích có tên mới; giá/danh mục giữ nguyên. Mọi sản phẩm khác giữ đúng tên và dữ liệu cả trên UI ngay sau lưu lẫn sau refresh/backend. |
+| TC-C15-013 | FR-15: tên tối đa 255 ký tự khi sửa | Domain | Đổi name của sản phẩm đích thành "A".repeat(256); giữ giá/danh mục. | C3 | — | Không hợp lệ | Không lưu tên dài 256; nếu gửi đủ chuỗi thì không cập nhật dữ liệu vi phạm. Nếu UI giới hạn đầu vào 255, ghi rõ chỉ kiểm được chặn nhập, không khẳng định đã gửi 256 xuống API. |
+| TC-C15-014 | FR-15: giá >0 khi sửa | Domain | Giữ tên C15 Original; đổi giá 100000 thành 0; giữ danh mục. | C6 | — | Không hợp lệ | Không cập nhật giá thành 0; dữ liệu sản phẩm đích và sản phẩm khác giữ nguyên. |
+| TC-C15-015 | FR-15: tên bắt buộc khi sửa | Domain | Xóa hết tên; giữ giá 100000 và danh mục. | C2 | — | Không hợp lệ | Không lưu tên rỗng; sản phẩm đích giữ nguyên dữ liệu trước test. |
+| TC-C15-016 | FR-15: Admin xóa sản phẩm | Functional | Xóa duy nhất sản phẩm C15 Original theo ID đã ghi. | C11 | — | Hợp lệ | Sản phẩm bị xóa không còn trong danh sách; sản phẩm đối chứng và các ID khác vẫn giữ nguyên. Không bắt buộc phải xuất hiện dialog xác nhận. |
+| TC-C15-017 | FR-15: danh mục phải thuộc danh sách có sẵn | Domain | POST /api/products; token Admin; body chuẩn, category_id là số dương không nằm trong GET /api/categories. | C10, C11 | — | Không hợp lệ | Không tạo sản phẩm tham chiếu danh mục không tồn tại; không ép status/message cụ thể. |
+| TC-C15-018 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | POST /api/products; không gửi Authorization. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | C12 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-019 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | POST /api/products; Authorization: Bearer invalid.c15.token. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | C13 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-020 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | POST /api/products; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | C14 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-021 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | PUT /api/products/<ID sản phẩm thử>; không gửi Authorization. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | C12 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-022 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | PUT /api/products/<ID sản phẩm thử>; Authorization: Bearer invalid.c15.token. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | C13 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-023 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | PUT /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | C14 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-024 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | DELETE /api/products/<ID sản phẩm thử>; không gửi Authorization. Không body. | C12 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-025 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer invalid.c15.token. Không body. | C13 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-026 | FR-12, SEC-02/03: API ghi sản phẩm chỉ cho JWT Admin hợp lệ | Domain | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Không body. | C14 | — | Không hợp lệ | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
+| TC-C15-027 | FR-15 CRUD và FR-12: quyền Admin hợp lệ | Domain | JWT Admin hợp lệ; tạo tên C15 API Product, giá 100000; sửa tên C15 API Updated; dùng danh mục có thật. | C1, C4, C8, C11 | — | Hợp lệ | Admin thực hiện thành công thêm/xem/sửa/xóa; dữ liệu lưu đúng, chỉ sản phẩm thử bị tác động. Đây là đường đối chứng để các test từ chối không Pass do API hoàn toàn không hoạt động. |
+| TC-C15-028 | FR-12: phân hệ Admin chỉ dành cho admin | Domain | Email/mật khẩu của tài khoản role=user hợp lệ; không sửa role trong token. | C14 | — | Không hợp lệ | Không vào được màn hình/chức năng quản lý sản phẩm Admin. Không ép câu thông báo cụ thể. |
+
+## 7. Truy vết và độ phủ
+
+Các ID test trong bảng dưới có prefix TC-C15-. Trạng thái Đã thiết kế không đồng nghĩa đã chạy hay Pass.
+
+| Requirement / Class / Boundary point | TC IDs | Trạng thái | Lý do |
+|:---|:---|:---|:---|
+| FR-15 thêm/xem | 001, 027 | Đã thiết kế | Web lưu/đọc lại; API đối chứng hợp lệ |
+| FR-15 tên bắt buộc/max | 002–005, 013, 015 | Đã thiết kế | Create biên 0/1/255/256, edit vi phạm |
+| FR-15 giá bắt buộc/dương | 006–009, 014 | Đã thiết kế | Trống, 0, dương, âm; edit giá 0 |
+| FR-15 danh mục bắt buộc/có sẵn | 010, 011, 017 | Đã thiết kế | Thiếu field, chọn danh mục thật, ID không tồn tại |
+| FR-15 sửa chỉ đúng đối tượng | 012, 027 | Đã thiết kế | So toàn bộ ID khác trên UI/backend |
+| FR-15 xóa | 016, 027 | Đã thiết kế | Xóa sản phẩm thử riêng |
+| FR-12 API POST có quyền Admin | 018–020, 027 | Đã thiết kế | JWT thiếu/sai/user và đối chứng Admin |
+| FR-12 API PUT có quyền Admin | 021–023, 027 | Đã thiết kế | JWT thiếu/sai/user và đối chứng Admin |
+| FR-12 API DELETE có quyền Admin | 024–026, 027 | Đã thiết kế | JWT thiếu/sai/user và đối chứng Admin |
+| FR-12 Web Admin | 028; thao tác Admin 001 | Đã thiết kế | Chặn user thường, Admin thao tác được |
+| C1 | 001, 003, 004, 012, 027 | Đã thiết kế | Có đại diện trong card |
+| C2 | 002, 015 | Đã thiết kế | Có đại diện trong card |
+| C3 | 005, 013 | Đã thiết kế | Có đại diện trong card |
+| C4 | 001, 008, 012, 027 | Đã thiết kế | Có đại diện trong card |
+| C5 | 006 | Đã thiết kế | Có đại diện trong card |
+| C6 | 007, 014 | Đã thiết kế | Có đại diện trong card |
+| C7 | 009 | Đã thiết kế | Có đại diện trong card |
+| C8 | 001, 011, 012, 027 | Đã thiết kế | Có đại diện trong card |
+| C9 | 010 | Đã thiết kế | Có đại diện trong card |
+| C10 | 017 | Đã thiết kế | Có đại diện trong card |
+| C11 | 001, 010, 012, 016, 017, 027 | Đã thiết kế | Có đại diện trong card |
+| C12 | 018, 021, 024 | Đã thiết kế | Có đại diện trong card |
+| C13 | 019, 022, 025 | Đã thiết kế | Có đại diện trong card |
+| C14 | 020, 023, 026, 028 | Đã thiết kế | Có đại diện trong card |
+| B1 on / off | 003 / 002 | Đã thiết kế | L=1 / 0 |
+| B2 on / off | 004 / 005 | Đã thiết kế | L=255 / 256; ghi giới hạn UI nếu input bị chặn |
+| BVA giá đủ on/off gần nhất | — | Chưa xác định | Precision/độ mịn G2 chưa có |
+
+| Chỉ số | Số lượng |
+|:---|:---|
+| Tổng test duy nhất | 28 |
+| Chỉ Domain | 22 |
+| Chỉ BVA | 0 |
+| Cả Domain/BVA | 4 |
+| Chỉ kỹ thuật chức năng bổ sung | 2 |
+| Hợp lệ / Không hợp lệ | 8 / 20 |
+| Đã thực thi / Pass / Fail / Not Run | 0 / 0 / 0 / 28 |
+
+28=22+0+4+2. Mức giảm tổ hợp không định lượng vì tập tên/giá không có tổng số hữu hạn được đặc tả; không khẳng định bộ tối thiểu toàn cục.
+
+## 8. Giới hạn và kỹ thuật bổ sung
+
+Chưa kiểm tất cả tổ hợp nhiều lỗi, mọi validation backend qua API, cập nhật đồng thời, price precision, tên Unicode/whitespace hoặc xóa sản phẩm đã gắn đơn/giỏ. Chưa có test sửa danh mục thành ID không tồn tại; TC017 hiện chỉ kiểm tạo mới. Nếu cần mở rộng, ghi test bổ sung theo mục tiêu và giữ oracle từ spec, không tự thêm policy.
+
+GET sản phẩm là API công khai trong contract; không tự yêu cầu JWT Admin cho GET /api/products chỉ vì nó được UI Admin gọi. Các request ghi phải kiểm đủ cả JWT và role trên từng method. Kết quả đọc code chưa phải runtime bug; chưa tạo bug report C15 hoặc evidence giả.
+
+## 9. Review và thay đổi
+
+| Phiên bản | Ngày | Thay đổi | Lý do | TC ảnh hưởng | Review |
+|:---|:---|:---|:---|:---|:---|
+| v0.1 | 2026-10-19 | Scope, input/context, oracle và spec gaps | Đọc FR-15/FR-12 và API | Toàn bộ | Sinh viên chưa review |
+| v0.2 | 2026-10-19 | 14 lớp và 28 card ban đầu | Single Fault, CRUD và phân quyền từng method | 001–028 | AI thiết kế; sinh viên chưa review |
+| v0.3 | 2026-10-19 | BVA tên 0/1/255/256, matrix/trace và giới hạn precision giá | Không tự đặt bước tiền nhỏ nhất hoặc ID biên danh mục | 002–005, 007–009 | AI kiểm tra nhất quán; chưa thực thi |

@@ -108,3 +108,15 @@ Người dùng phản hồi test case khó hiểu vì quá nhiều mã R1/F1 và
 - **Evidence Web có thật:** ảnh TC003, TC004, TC011 trong test-cases/evidence/B08/. TC001/002/005 chỉ có báo cáo người dùng, chưa có ảnh tương ứng.
 - **Bug drafts:** thêm BUG-B08-004 (Web không xóa giỏ), BUG-B08-005 (sửa tổng UI); bổ sung đường Web vào BUG-B08-003 (giỏ trống). Giữ riêng lỗi Web/API không xóa giỏ vì chưa có kết luận nguyên nhân chung. Tổng 5 bug B08 nháp; chưa đăng Issue.
 - **AI review:** thiết kế TC005 dựa vào khả năng chỉnh số lượng theo FR-07 nhưng runtime không hỗ trợ, khiến đường chạy bị chặn. Cần phân biệt quan sát tổng đúng qua đường khác với việc đã hoàn thành các bước test ban đầu. Kết luận/ảnh do người dùng cung cấp chưa đồng nghĩa AI đã tự kiểm chứng UI.
+
+## C15 — Thiết kế Domain và BVA ban đầu
+
+- **Prompt nguyên văn:** “Tiếp đến với feature C15 đi.”
+- **Ngày/công cụ:** 2026-10-19, Asia/Bangkok; Codex; model/version không xác nhận. Skills: work-flow, domain-testing.
+- **Nguồn:** FR-15, FR-12, SEC-02/03 trong EShop README; API Products/Categories; đề HW02. Đọc App.jsx Admin chỉ để chọn bước thao tác, chưa thực thi.
+- **Output:** [analysis](analysis/C15_ProductManagement.md) và [test cases](test-cases/C15_ProductManagement.md). Commit 02231a1 giữ scope/input/oracle/gaps ban đầu; 657bf69 giữ bước Domain và card ban đầu. Git giữ bản bất biến thay vì tạo thêm nhiều file snapshot.
+- **Thiết kế:** 14 lớp; 28 TC (16 Web, 12 API). 22 chỉ Domain, 4 cả Domain/BVA, 2 Functional. BVA tên 0/1/255/256; giá >0 có 0/1/-1 làm dữ liệu rõ oracle nhưng không gọi 1 là mức giá nhỏ nhất. Không tự thêm max giá/rounding/Unicode/whitespace/validation ảnh.
+- **Scope API:** thiếu danh mục và ID danh mục không tồn tại để kiểm ràng buộc không biểu diễn được trong dropdown; 9 test quyền theo method POST/PUT/DELETE × JWT thiếu/sai/user; một test Admin hợp lệ CRUD làm đối chứng. Không nhân đôi toàn bộ form Web sang API.
+- **Review AI:** đã kiểm 28 ID khớp matrix/summary/card, 13 trường/card, 28 Not Run, 14 classes và link local. Card dùng giá trị/tên rõ, không lặp mã viết tắt như phản hồi B08. Nếu UI chặn tên 256, ghi rõ input thực tế, không tuyên bố backend nhận 256.
+- **Giới hạn:** precision tiền/bài giảng chưa có; chưa kiểm mọi validation backend hay danh mục invalid khi sửa; các thiếu sót được ghi trong analysis. Chưa có bug C15 runtime, chưa có evidence, chưa có phản hồi review sinh viên để tự gán verdict hoặc AI gap thực tế.
+- **Verdict sinh viên:** Pending. Không tự ghi VALID hoặc ký xác nhận thay sinh viên. Chi tiết hội thoại tại [conversation log](audit/conversation_log.md).

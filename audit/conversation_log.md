@@ -343,3 +343,22 @@ Historical entries before this log: [conversation_before_current.md](conversatio
 **Assistant response summary:** Đã cập nhật kết quả Web; TC005 Blocked cho đường gốc, tổng tiền đúng qua đường thêm sản phẩm được ghi riêng. Tổng 4 Pass/7 Fail/1 Blocked; 5 bug B08 nháp.
 **Verdict:** Cập nhật theo báo cáo người dùng; chưa tuyên bố mọi test hoàn thành vì TC005 Blocked; chưa có Issue/screenshot cho mọi bug. Raw tool transcript chưa export.
 **Student review:** Review cách phân loại TC005; nếu muốn kiểm tra đường thêm sản phẩm thay thế, cần mô tả lại case/re-run có dữ liệu cụ thể, không biến quan sát hiện tại thành Pass của steps chưa chạy được.
+
+## Entry 017 — Bắt đầu feature C15 Quản lý sản phẩm
+
+**Date/time:** 2026-10-19, Asia/Bangkok; exact time unavailable.
+**Tool/model:** Codex; model/version not confirmed.
+**Skills:** work-flow, domain-testing (template, boundary-rules).
+
+**Prompt (user, verbatim):**
+
+> Tiếp đến với feature C15 đi.
+
+**Assistant output record:** Đọc skills, FR-15/FR-12/SEC-02/03, API Products/Categories, đề HW02 phần commit và App.jsx Admin để hiểu thao tác. Tạo analysis/C15_ProductManagement.md theo input/context và oracle riêng, spec gaps, 14 lớp, BVA tên 0/1/255/256 với độ mịn 1 ASCII ký tự. Không đặt max giá hoặc precision: test giá trống/0/1/-1 có oracle từ bắt buộc/>0 nhưng không gọi 1 là giá nhỏ nhất. Tạo test-cases/C15_ProductManagement.md với 28 card: 16 Web và 12 API; 22 Domain-only, 4 Domain+BVA, 2 Functional; mỗi card có dữ liệu rõ, không lạm dụng mã R/F trong steps. CRUD Web có test sửa đối chiếu tất cả ID khác cả UI ngay sau lưu và sau refresh/API. API kiểm danh mục thiếu/không tồn tại, mỗi POST/PUT/DELETE có ba ca JWT thiếu/sai/user, cùng đường Admin CRUD hợp lệ làm đối chứng. Card mô tả giới hạn nếu UI không cho nhập đủ 256, không gọi đó là backend đã nhận input 256. Không chạy SUT, không tạo bug/evidence giả. Cập nhật progress/AI Audit, dùng Git giữ bản output ban đầu.
+
+**Immutable outputs:** 02231a1 (yêu cầu/scope/input/oracle/gaps); 657bf69 (Domain/classes/cards ban đầu). Bước hoàn thiện BVA/matrix/trace/audit được lưu trong commit tiếp theo; không bịa hash chưa có.
+**Artifacts:** [analysis C15](../analysis/C15_ProductManagement.md), [test cases C15](../test-cases/C15_ProductManagement.md), [progress](../WORK_PROGRESS.md), [AI Audit](../AI_Audit_Report.md).
+**Verification:** 28 ID khớp matrix/summary/card; mỗi card 13 trường; 28 Not Run; 22/4/2 kỹ thuật khớp; 14 lớp; link local hợp lệ. Đây là kiểm tra tài liệu, không phải execution.
+**Assistant response summary:** Đã thiết kế C15 Domain/BVA với 28 test dễ đọc; chưa thực thi. BVA tên có căn cứ, G2 precision giá và các thiếu sót khác được ghi rõ.
+**Verdict:** Thiết kế có artifact và self-review; sinh viên chưa review, chưa thực thi, bài giảng chưa đối chiếu. Raw tool transcript chưa export; output thật được giữ qua file và Git.
+**Student review:** Kiểm scope/quy ước BVA, chuẩn bị category/product ID thật, rồi chạy Web và API theo card; không dùng đọc code để đánh Pass/Fail.
