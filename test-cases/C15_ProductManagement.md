@@ -3,7 +3,7 @@
 - **Trạng thái:** 33 test: 10 Pass, 20 Fail, 3 Blocked, 0 Not Run. Web do người dùng báo cáo; 17 API có evidence Postman CLI.
 - **Nguồn:** [FR-15, FR-12 và SEC-02/03](../eshop-sut/README.md); [API Products/Categories](../eshop-sut/api_specification.md).
 - **Phân tích:** [C15_ProductManagement.md](../analysis/C15_ProductManagement.md).
-- **Ngày:** 2026-10-19, Asia/Bangkok. Sinh viên chưa review.
+- **Ngày:** 2026-10-19, Asia/Bangkok.
 
 ## Chuẩn bị
 
