@@ -1,12 +1,10 @@
-﻿# B08 — Kết quả thực thi API bằng Postman CLI
+# B08 — Kết quả thực thi API bằng Postman CLI
 
 - **Ngày:** 2026-10-18, Asia/Bangkok.
 - **Công cụ:** Postman CLI 1.75.0; chạy collection local, không cần đăng nhập Postman Cloud.
 - **Môi trường:** http://localhost:3000; bản sao nguyên mã `server.js` và `database.js`, database riêng trong thư mục tạm. Không khởi động backend gốc vì startup có thao tác xóa/tạo lại bảng.
 - **Dữ liệu:** sản phẩm thử ID 6, giá catalog 100000 ₫; số lượng 2; tổng đúng 200000 ₫. Mỗi TC có user mới và giỏ riêng. TC012 có giỏ trống, tổng 0.
-- **Collection:** [b08_api_postman_collection.json](b08_api_postman_collection.json).
 - **Log gốc:** [postman-cli.log](postman-cli.log). Không bật verbose; không ghi response login/JWT vào log.
-- **Response và snapshot dạng JSON:** [b08_api_results.json](b08_api_results.json), trích từ console JSON trong log, ghép lại các dòng bị CLI ngắt.
 
 ## Kết quả
 
@@ -28,16 +26,13 @@ TC009/010 vi phạm FR-08 về backend tự tính tiền, đồng thời vi ph�
 - 6 test case đã thực thi: **2 Pass, 4 Fail**. Số assertion thất bại không phải số test case thất bại.
 - 6 test Web (001–005, 011) chưa chạy; không dùng API thay thế kết quả UI.
 
-## Tái chạy và giới hạn
+## Nguồn và giới hạn
 
-Chạy collection trên backend thử nghiệm đã sẵn sàng:
+Log CLI giữ console response/snapshot của lần chạy. Collection/JSON trích xuất cũ có trong Git tại commit `23b6586`. Không chạy lại hoặc thay đổi status khi dọn evidence.
 
-~~~powershell
-postman.cmd collection run test-cases/evidence/B08/b08_api_postman_collection.json
-~~~
+Source hashes của bản sao đã chạy:
 
-Collection tự tạo một sản phẩm thử qua API Admin và user riêng cho từng TC; giá sản phẩm được đọc lại từ catalog trước khi test. Không reset database dùng chung. Nếu test setup không đạt, collection dừng và không coi các TC còn lại đã được thực thi. Lần chạy này mọi setup đều đạt.
+- server.js (SHA-256): `E2263811A1690A63A7DBB4446C3FD33FB87F50D073D9F8CDFAB7083A52F5E8ED`
+- database.js (SHA-256): `50012F35C2CF0776DD837482D76ADF701F0EE40CDCB9D80143278FCCDE034717`
 
-Các field id sản phẩm được API cart trả về dạng chuỗi; assertion chuyển thành số để so sánh ID, không thay đổi oracle tiền hay lỗi nghiệp vụ. Source hashes được lưu trong JSON results để xác nhận bản sao chạy đúng mã nguồn. Không có thay đổi SUT để làm test Pass.
-
-Dữ liệu thử nghiệm nằm trong database tạm riêng; backend thử nghiệm được dừng sau khi thu thập evidence. Database workspace không bị reset hoặc ghi bởi lần chạy này. Chưa có screenshot hoặc GitHub Issue cho các bug API, mới có CLI log/JSON và bug Markdown nháp.
+Database thử nghiệm riêng; backend thử nghiệm được dừng sau khi thu evidence. Database workspace không bị reset hoặc ghi bởi lần chạy này. Status Web cập nhật sau lượt API được lưu trong test case; đoạn Web chưa chạy bên trên chỉ mô tả thời điểm chạy API. Chưa có screenshot/GitHub Issue cho các bug API.

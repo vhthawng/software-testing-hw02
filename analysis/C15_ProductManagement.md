@@ -185,7 +185,7 @@ Các ID test trong bảng dưới có prefix TC-C15-. Trạng thái Đã thiết
 
 33=23+0+7+3. Đã thử 33 TC: 30 hoàn thành Pass/Fail và 3 Web Blocked; 17 API đã chạy (2 Pass, 15 Fail). Mức giảm tổ hợp không định lượng vì tập tên/giá không có tổng số hữu hạn được đặc tả; không khẳng định bộ tối thiểu toàn cục.
 
-**Kết quả và phần bổ sung:** Web TC002 Pass tại FE; API TC029 Fail chứng minh backend không chặn cùng giá trị rỗng. TC012 Web Fail do không mở được sửa; TC013–015 Web Blocked; TC030 API Pass chỉ chứng minh update dữ liệu đúng, không thay thế kiểm UI tức thời của TC012. TC031/032/033 Fail vì backend lưu tên 256/giá 0/tên rỗng. Bằng chứng: [CLI summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md).
+**Kết quả và phần bổ sung:** Web TC002 Pass tại FE; API TC029 Fail chứng minh backend không chặn cùng giá trị rỗng. TC012 Web Fail do không mở được sửa; TC013–015 Web Blocked; TC030 API Pass chỉ chứng minh update dữ liệu đúng, không thay thế kiểm UI tức thời của TC012. TC031/032/033 Fail vì backend lưu tên 256/giá 0/tên rỗng. Bằng chứng: [Kết quả CLI](../test-cases/evidence/C15/c15_api_execution_summary.md).
 
 | Truy vết bổ sung | TC IDs | Trạng thái | Lý do |
 |:---|:---|:---|:---|

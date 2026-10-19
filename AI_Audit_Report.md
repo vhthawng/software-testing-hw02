@@ -1,4 +1,4 @@
-﻿# AI Audit Report — HW02 (đang làm)
+# AI Audit Report — HW02 (đang làm)
 
 “I use AI tools for the following tasks,”: phân tích FR-04, thiết kế Domain/BVA và ghi tài liệu. Công cụ: Codex trong phiên chat hiện tại; model/version không xác nhận. MSSV 23120355; họ tên/lớp chưa cung cấp.
 
@@ -50,7 +50,7 @@ Các lượt làm bài mới được ghi append-only trong [conversation_log.md
 ## A04 API execution
 
 - **Prompt:** Người dùng yêu cầu dùng Postman CLI để chạy từ TC-A04-010 trở đi và đặt evidence dưới `test-cases/evidence/`.
-- **Công cụ:** Postman CLI v1.75.0; collection [a04_api_postman_collection.json](test-cases/evidence/A04/a04_api_postman_collection.json); SUT local backend.
+- **Công cụ:** Postman CLI v1.75.0; collection [Kết quả CLI](test-cases/evidence/A04/a04_api_execution_summary.md); SUT local backend.
 - **Output thực tế:** [a04_api_execution_summary.md](test-cases/evidence/A04/a04_api_execution_summary.md) và [postman-cli.log](test-cases/evidence/A04/postman-cli.log). Log đã redacted token.
 - **Verdict:** TC-A04-010 Pass, TC-A04-011 Pass, TC-A04-012 Fail, TC-A04-013 Pass. BUG-A04-001 được ghi nháp tại [bug-reports/bugs.md](bug-reports/bugs.md), chưa đăng GitHub Issue.
 - **Caveat:** Postman CLI không cho dùng `--output` khi chưa đăng nhập Postman Cloud; CLI reporter tích hợp được dùng và lưu đầy đủ. Sinh viên cần review actual/evidence trước khi nộp.
@@ -95,7 +95,7 @@ Người dùng phản hồi test case khó hiểu vì quá nhiều mã R1/F1 và
 - **Collection:** tự tạo sản phẩm giá 100000 qua API Admin, đọc catalog xác minh, mỗi TC có user/giỏ mới và snapshot orders trước/sau. Setup assertion có fail-fast để tránh kết quả sai do fixture không đạt. Không dùng kết quả SUT làm oracle tổng tiền.
 - **Kết quả:** TC006 Pass (401, không đơn), TC007 Pass (403, không đơn); TC008 Fail (đơn đúng 200000 nhưng giỏ không xóa); TC009/010 Fail (lưu 199999/200001 thay vì từ chối); TC012 Fail (giỏ trống tạo đơn 0).
 - **Số liệu thật:** 57 requests, 67 assertions, 10 assertions failed; exit code 1. Tính theo test case: 2 Pass, 4 Fail, còn 6 Web Not Run. Không nhầm 10 assertions failed thành 10 TC fail.
-- **Artifacts:** [summary](test-cases/evidence/B08/b08_api_execution_summary.md), [CLI log](test-cases/evidence/B08/postman-cli.log), [response/snapshot JSON](test-cases/evidence/B08/b08_api_results.json), [collection](test-cases/evidence/B08/b08_api_postman_collection.json); cập nhật [test cases](test-cases/B08_Checkout.md), analysis và progress.
+- **Artifacts:** [summary](test-cases/evidence/B08/b08_api_execution_summary.md), [CLI log](test-cases/evidence/B08/postman-cli.log); cập nhật [test cases](test-cases/B08_Checkout.md), analysis và progress.
 - **Bug drafts:** BUG-B08-001 giỏ không xóa; BUG-B08-002 client total được tin và lưu sai; BUG-B08-003 giỏ trống tạo đơn. Xem [bugs.md](bug-reports/bugs.md). Chưa có screenshot/GitHub Issue; không tự đăng ngoài workspace.
 - **Verdict:** execution có evidence; sinh viên chưa review kết quả cuối. TC012 đánh theo quyết định bổ sung được xác nhận, phân biệt với FR-08 gốc. Chưa chạy Web, chưa suy ra kết quả UI.
 
@@ -128,7 +128,7 @@ Người dùng phản hồi test case khó hiểu vì quá nhiều mã R1/F1 và
 - **Bổ sung có ủy quyền rõ:** người dùng yêu cầu dùng Postman CLI kiểm lại BE cho TC002 và TC012–015. Thêm ID riêng TC029–033 thay vì đổi nền tảng hoặc ghi đè kết quả Web. Không tự chạy 12 API cũ chưa được yêu cầu trong lượt này.
 - **Kết quả CLI:** TC029 Fail (POST tạo tên rỗng), TC030 Pass (PUT sửa hợp lệ, mọi ID khác giữ nguyên), TC031 Fail (PUT tên 256), TC032 Fail (PUT giá 0), TC033 Fail (PUT tên rỗng). 28 requests, 34 assertions, 4 assertion failures, exit 1.
 - **Fixture/cleanup:** backend đang chạy có dữ liệu Web của người dùng; không restart/reset DB. Chỉ tạo 5 sản phẩm thử riêng ID 18–22 và xóa sau evidence. Assertion cuối Pass: 14 sản phẩm ban đầu khớp toàn bộ dữ liệu theo ID. Log không bật verbose, không ghi token thật.
-- **Artifacts:** [collection](test-cases/evidence/C15/c15_backend_recheck_collection.json), [CLI log](test-cases/evidence/C15/postman-cli.log), [JSON results](test-cases/evidence/C15/c15_backend_results.json), [summary](test-cases/evidence/C15/c15_backend_recheck_summary.md), [test cases](test-cases/C15_ProductManagement.md), [analysis](analysis/C15_ProductManagement.md).
+- **Artifacts:** [Kết quả CLI](test-cases/evidence/C15/c15_api_execution_summary.md), [CLI log](test-cases/evidence/C15/postman-cli.log), [test cases](test-cases/C15_ProductManagement.md), [analysis](analysis/C15_ProductManagement.md).
 - **Tổng mới:** 33 TC: 23 chỉ Domain, 7 Domain+BVA, 3 Functional; 9 Pass, 9 Fail, 3 Blocked, 12 Not Run. Completed=Pass+Fail=18; attempted=21 gồm 3 Blocked.
 - **Bug drafts:** 5 C15 bugs: tên >255; giá trống; giá không dương; nút Sửa Web không hoạt động (nguồn người dùng); backend tên rỗng. Chưa có ảnh C15 trong workspace hoặc GitHub Issue. Chi tiết tại [bugs.md](bug-reports/bugs.md).
 - **Review/gap:** UI required có thể che lỗi backend, nên thêm kiểm trực tiếp API khi người dùng yêu cầu. UI không mở được sửa là giới hạn execution; không kết luận API không sửa được. TC030 không kiểm hiển thị Web ngay sau sửa nên phần đó vẫn chưa phủ runtime.
@@ -137,9 +137,15 @@ Người dùng phản hồi test case khó hiểu vì quá nhiều mã R1/F1 và
 
 - **Ngày/công cụ:** 2026-10-19, Asia/Bangkok; Codex; Postman CLI 1.75.0. Skills: work-flow, domain-testing.
 - **Yêu cầu:** sửa status CLI thành Pass/Fail có căn cứ, kiểm A04/B08. Không đổi Not Run thành kết quả giả: 12 API C15 ban đầu chưa chạy được thực thi trong lượt này.
-- **C15:** TC010, TC017–027 chạy trên backend đang hoạt động; TC027 Pass, 11 còn lại Fail. 60 requests, 77 assertions, 20 failures, exit 1; kiểm chứng bằng GET dữ liệu lưu. Danh mục thiếu/không tồn tại vẫn được lưu; POST/PUT/DELETE không token, token sai và token user đều có hiệu lực. Thêm BUG-C15-006/007. [Evidence mới](test-cases/evidence/C15/c15_remaining_api_summary.md).
+- **C15:** TC010, TC017–027 chạy trên backend đang hoạt động; TC027 Pass, 11 còn lại Fail. 60 requests, 77 assertions, 20 failures, exit 1; kiểm chứng bằng GET dữ liệu lưu. Danh mục thiếu/không tồn tại vẫn được lưu; POST/PUT/DELETE không token, token sai và token user đều có hiệu lực. Thêm BUG-C15-006/007. [Kết quả CLI](test-cases/evidence/C15/c15_api_execution_summary.md).
 - **Cleanup:** chỉ thao tác fixture ID 23–34; không restart/reset DB; 14 sản phẩm gốc được bảo toàn toàn bộ dữ liệu theo kiểm tra cuối. Không ghi JWT thật.
 - **A04:** 4 API khớp evidence cũ; TC002/004 là Web test âm đã từ chối đúng expected, sửa nhãn Fail ban đầu thành Pass dựa trên báo cáo người dùng, không chạy lại. AI trước đó đã giữ nhãn Fail dù nhận thấy actual phù hợp; đây là sai sót phân loại, nay đã sửa. Tổng 9 Pass, 4 Fail.
 - **B08:** 6 API khớp JSON evidence, giữ 4 Pass, 7 Fail, 1 Blocked. Không chạy lại hoặc đổi TC005 Web Blocked.
 - **Tổng C15:** 10 Pass, 20 Fail, 3 Web Blocked, 0 Not Run. Tất cả 17 API có status thực thi (2 Pass, 15 Fail). Đã đối chiếu 58 ID với matrix/summary/card, status evidence và link local; không có mismatch.
 - **Giới hạn:** chưa có review cuối của sinh viên hoặc screenshot/Issue mới; không coi API thay thế UI. Lịch sử kết quả cũ giữ nguyên trong audit, trạng thái hiện tại ở test case/progress. [Conversation Entry 020](audit/conversation_log.md).
+
+## Tinh gọn evidence theo yêu cầu người dùng
+
+2026-10-19; skill work-flow. Evidence giảm từ 26 xuống 17 file: giữ 11 ảnh, 3 CLI log và 3 summary (mỗi feature một log/summary). Bỏ 4 collection và 3 JSON trích lại từ log; C15 gộp hai summary/hai log thành một summary/một log. Nội dung từng log C15 được đối chiếu với Git 23b6586 và còn nguyên, chỉ thêm phân cách lượt chạy. Metadata source hash B08 được chuyển từ JSON sang summary trước khi bỏ file. Cập nhật link ở tài liệu đang dùng, bỏ link backend stdout/stderr A04 vốn đã thiếu. Không thực thi lại, không đổi status, không sửa SUT hay ảnh.
+
+Bản cũ xem tại commit `23b6586`. Audit hội thoại là append-only: những link cũ trỏ tới file đã bỏ được giữ như lịch sử và cần tra phiên bản Git này. [Conversation Entry 021](audit/conversation_log.md).

@@ -453,3 +453,20 @@ Historical entries before this log: [conversation_before_current.md](conversatio
 
 **Verdict:** Status CLI đều có Pass/Fail dựa trên execution evidence; tổng A04 9 Pass/4 Fail, B08 4 Pass/7 Fail/1 Blocked, C15 10 Pass/20 Fail/3 Blocked. Không có API Not Run.
 **Student review:** Review status sửa theo oracle và hai bug mới; 4 Web Blocked chưa được kiểm hoàn tất. Chưa có ảnh hoặc Issue mới.
+
+## Entry 021 — Tinh gọn thư mục evidence
+
+**Date/time:** 2026-10-19, Asia/Bangkok; không có thời điểm chính xác từng message.
+**Tool/model:** Codex; model/version không xác nhận.
+**Skill:** work-flow.
+**Capture:** INCOMPLETE — prompt nguyên văn; diễn giải output và thao tác bên dưới là tóm tắt, không phải export raw tool transcript.
+
+**Prompt (user, verbatim; không gồm metadata IDE):**
+
+> hãy loại bỏ các phần không cần thiết trong evidence đi, chỉ giữ lại những gì cần thiết, hiện tại đang nhiều file quá rồi
+
+**Assistant output record (summary):** Rà 26 file evidence A04/B08/C15 và liên kết. Giữ 11 ảnh, log CLI gốc và summary cho mỗi feature. Bỏ 4 collection và 3 JSON trích từ log vì không cần giữ như evidence trùng; tất cả có trong commit 23b6586 trước dọn. Gộp hai C15 summary vào c15_api_execution_summary.md và hai CLI log vào postman-cli.log, thêm phân cách lượt 1/2; kiểm nội dung mỗi log nguồn còn nguyên so với Git. Chuyển source hashes B08 từ JSON sang summary. Xóa link backend stdout/stderr A04 vốn không có file. Cập nhật link tài liệu hiện hành; audit hội thoại cũ giữ append-only, link tới file đã bỏ cần xem Git 23b6586. Không chạy lại hoặc thay đổi kết quả. Còn 17 file (11 ảnh + 3 log + 3 summary). Kiểm link hiện hành/status/log preservation đạt.
+
+**Artifacts:** [A04 summary](../test-cases/evidence/A04/a04_api_execution_summary.md), [B08 summary](../test-cases/evidence/B08/b08_api_execution_summary.md), [C15 summary](../test-cases/evidence/C15/c15_api_execution_summary.md), [C15 log gộp](../test-cases/evidence/C15/postman-cli.log), test cases, bug report, analysis C15, progress và AI Audit được cập nhật link.
+**Verdict:** Hoàn thành dọn evidence được giao; số lượng 26 → 17, status không đổi.
+**Student review:** File chạy lại collection nằm trong lịch sử Git; các thiếu sót ảnh/Issue đã ghi trước vẫn giữ nguyên.

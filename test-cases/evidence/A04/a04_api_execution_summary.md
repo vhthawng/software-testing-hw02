@@ -1,11 +1,9 @@
-﻿# A04 API execution summary — TC-A04-010 đến TC-A04-013
+# A04 API execution summary — TC-A04-010 đến TC-A04-013
 
 - **Công cụ:** Postman CLI v1.75.0
-- **Collection:** [a04_api_postman_collection.json](a04_api_postman_collection.json)
 - **SUT:** `eshop-sut/backend`, `http://localhost:3000`
 - **Ngày chạy:** 2026-10-18 (Asia/Bangkok)
 - **Log CLI:** [postman-cli.log](postman-cli.log) — response token đã được redacted.
-- **Backend log:** [backend.stdout.log](backend.stdout.log), [backend.stderr.log](backend.stderr.log)
 
 ## Kết quả theo test case
 
@@ -27,3 +25,5 @@
 
 Collection dùng tài khoản seed của SUT để chạy local. Token trong CLI log đã được thay bằng `<REDACTED>` trước khi lưu evidence.
 
+
+Collection cũ có trong Git tại commit `23b6586`; thư mục evidence chỉ giữ summary, log CLI và ảnh. Backend stdout/stderr không còn trong workspace, không dùng làm evidence.

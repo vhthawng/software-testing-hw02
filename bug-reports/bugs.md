@@ -65,7 +65,7 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Expected | Tạo đơn đúng 200000; giỏ API rỗng sau thành công |
 | Actual | HTTP 200, tạo đơn ID 1 đúng 200000; GET /api/cart vẫn trả sản phẩm giá 100000 × 2 |
 | Ảnh hưởng | Giỏ cũ còn sau checkout, người dùng có thể nhầm chưa đặt hoặc đặt lại các sản phẩm đó |
-| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [JSON snapshot](../test-cases/evidence/B08/b08_api_results.json), [summary](../test-cases/evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [Kết quả CLI](../test-cases/evidence/B08/b08_api_execution_summary.md) |
 | Screenshot / Issue | Chưa có screenshot, chưa đăng GitHub Issue |
 | Cleanup | Dữ liệu nằm trong database tạm; dừng backend thử nghiệm sau khi lưu evidence |
 
@@ -82,7 +82,7 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Expected | Mismatch bị từ chối, có lỗi, không tạo đơn; backend không lưu tiền giả mạo |
 | Actual | Cả hai trả HTTP 200 với Checkout successful. TC009 tạo đơn ID 2 lưu 199999; TC010 tạo đơn ID 3 lưu 200001; cả hai khác tổng giỏ 200000 |
 | Ảnh hưởng | Tính toàn vẹn tiền đơn hàng bị vi phạm; client có thể làm số tiền lưu thấp hoặc cao hơn tổng giỏ |
-| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [JSON snapshot](../test-cases/evidence/B08/b08_api_results.json), [summary](../test-cases/evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [Kết quả CLI](../test-cases/evidence/B08/b08_api_execution_summary.md) |
 | Screenshot / Issue | Chưa có screenshot, chưa đăng GitHub Issue |
 | Cleanup | Tài khoản/đơn nằm trong database tạm; dừng backend thử nghiệm sau khi lưu evidence |
 
@@ -99,7 +99,7 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Expected | Từ chối request, có lỗi và không tạo đơn |
 | Actual | HTTP 200 với Checkout successful, tạo đơn ID 4 có total_amount=0 |
 | Ảnh hưởng | Phát sinh đơn không có sản phẩm và tổng tiền 0 trái policy đã chốt |
-| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [JSON snapshot](../test-cases/evidence/B08/b08_api_results.json), [summary](../test-cases/evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [CLI log](../test-cases/evidence/B08/postman-cli.log), [Kết quả CLI](../test-cases/evidence/B08/b08_api_execution_summary.md) |
 | Screenshot / Issue | Có ảnh Web [TC-B08-011.png](../test-cases/evidence/B08/TC-B08-011.png); chưa có screenshot API, chưa đăng GitHub Issue |
 | Cleanup | Đơn thử nằm trong database tạm; dừng backend thử nghiệm sau khi lưu evidence |
 
@@ -152,7 +152,7 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Steps | 1. Tạo sản phẩm thử riêng có tên hợp lệ.<br>2. PUT /api/products/<ID thử> bằng JWT Admin, full body chuẩn chỉ đổi name thành A lặp 256.<br>3. GET /api/products đọc lại name và đếm độ dài. |
 | Expected | Không lưu tên dài 256; dữ liệu hợp lệ trước đó giữ nguyên |
 | Actual | Web TC005: người dùng báo sản phẩm được tạo với tên đủ 256. CLI TC031: HTTP 200, ID 20 lưu đủ 256 ký tự |
-| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [JSON](../test-cases/evidence/C15/c15_backend_results.json), [summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md); Web có báo cáo người dùng, chưa có ảnh C15 trong workspace |
+| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [Kết quả CLI](../test-cases/evidence/C15/c15_api_execution_summary.md); Web có báo cáo người dùng, chưa có ảnh C15 trong workspace |
 | Ảnh hưởng | Dữ liệu sản phẩm vi phạm giới hạn tên; cả tạo Web và cập nhật API có đường lưu sai |
 | Cleanup / Issue | Sản phẩm CLI đã dọn, catalog cuối khớp baseline; chưa có screenshot/GitHub Issue |
 
@@ -183,7 +183,7 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Steps | 1. PUT /api/products/<ID thử> bằng JWT Admin và full body chuẩn, price=0.<br>2. GET /api/products đọc lại giá.<br>3. Đường Web: tạo mới với giá 0 hoặc âm theo TC007/009. |
 | Expected | Không tạo/sửa sản phẩm thành giá 0 hoặc âm |
 | Actual | Người dùng báo tạo được giá 0 và giá âm trên Web. CLI TC032 trả HTTP 200, ID 21 lưu price=0 |
-| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [JSON](../test-cases/evidence/C15/c15_backend_results.json); chưa có ảnh Web C15 trong workspace |
+| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [Kết quả CLI](../test-cases/evidence/C15/c15_api_execution_summary.md); chưa có ảnh Web C15 trong workspace |
 | Ảnh hưởng | Giá sản phẩm vi phạm miền dương |
 | Cleanup / Issue | Dọn đúng sản phẩm CLI; catalog ban đầu bảo toàn; chưa có screenshot/GitHub Issue |
 
@@ -200,7 +200,7 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Expected | Mở/chọn đúng sản phẩm để Admin nhập thay đổi và lưu |
 | Actual | Người dùng báo bấm Sửa không trigger event/thao tác mong đợi, không test tiếp được cập nhật trên UI |
 | Đối chiếu backend | TC030 API sửa hợp lệ Pass, mọi ID khác không đổi; điều này không bác bỏ lỗi UI và không xác nhận hiển thị Web ngay sau lưu |
-| Evidence | Báo cáo người dùng tại [conversation log](../audit/conversation_log.md), Entry 019; [API đối chiếu](../test-cases/evidence/C15/c15_backend_recheck_summary.md). Chưa có screenshot/video nút Sửa |
+| Evidence | Báo cáo người dùng tại [conversation log](../audit/conversation_log.md), Entry 019; [Kết quả CLI](../test-cases/evidence/C15/c15_api_execution_summary.md). Chưa có screenshot/video nút Sửa |
 | Ảnh hưởng | Chặn đường sửa Web và các test validation khi sửa |
 | Screenshot / Issue | Chưa có ảnh, chưa đăng GitHub Issue; không suy ra nguyên nhân code từ báo cáo UI |
 
@@ -216,7 +216,7 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Steps | 1. Snapshot products trước test.<br>2. POST /api/products với full body có name="".<br>3. GET list kiểm sản phẩm mới.<br>4. Với sản phẩm thử riêng có tên hợp lệ, PUT full body chỉ đổi name="".<br>5. GET list kiểm name. |
 | Expected | Không tạo hoặc lưu tên rỗng; dữ liệu trước thao tác giữ nguyên |
 | Actual | POST trả 200 tạo ID 18 có name=""; PUT trả 200, ID 22 lưu name="" |
-| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [JSON](../test-cases/evidence/C15/c15_backend_results.json), [summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md) |
+| Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [Kết quả CLI](../test-cases/evidence/C15/c15_api_execution_summary.md) |
 | Ảnh hưởng | Có thể bỏ qua validation FE bằng API, lưu sản phẩm thiếu tên |
 | Cleanup / Issue | Đã xóa các fixture CLI, so sánh cuối khớp catalog gốc; chưa có screenshot/GitHub Issue |
 
@@ -231,7 +231,7 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Preconditions / Data / Steps | Đăng nhập Admin; GET categories xác nhận 1/2/3 có thật và 4 không có. POST body chuẩn lần lượt bỏ category_id và đặt category_id=4; GET products kiểm dữ liệu lưu. |
 | Expected | Từ chối và không ghi dữ liệu vi phạm; không ép mã HTTP/câu lỗi cụ thể |
 | Actual | Cả hai HTTP 200; ID 23 lưu category_id=null; ID 24 lưu category_id=4. |
-| Evidence | [Summary](../test-cases/evidence/C15/c15_remaining_api_summary.md), [CLI log](../test-cases/evidence/C15/c15_remaining_api_cli.log), [JSON](../test-cases/evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](../test-cases/evidence/C15/c15_api_execution_summary.md), [CLI log](../test-cases/evidence/C15/postman-cli.log) |
 | Ảnh hưởng | Lưu sản phẩm thiếu hoặc sai liên kết danh mục. |
 | Cleanup / Screenshot / Issue | Đã dọn fixture riêng; catalog 14 sản phẩm gốc giữ nguyên toàn bộ dữ liệu; chưa có screenshot hoặc GitHub Issue |
 
@@ -246,6 +246,6 @@ Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail th
 | Preconditions / Data / Steps | Gọi POST/PUT/DELETE products với từng trường hợp không Authorization, token sai, JWT role=user hợp lệ. Mỗi lần dùng sản phẩm thử riêng; GET trước/sau kiểm dữ liệu. |
 | Expected | Từ chối và không ghi dữ liệu vi phạm; không ép mã HTTP/câu lỗi cụ thể |
 | Actual | Cả 9 thao tác trả HTTP 200 và có hiệu lực: POST tạo ID 25–27; PUT đổi tên ID 28–30; DELETE xóa ID 31–33. TC027 Admin CRUD Pass làm đối chứng. |
-| Evidence | [Summary](../test-cases/evidence/C15/c15_remaining_api_summary.md), [CLI log](../test-cases/evidence/C15/c15_remaining_api_cli.log), [JSON](../test-cases/evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](../test-cases/evidence/C15/c15_api_execution_summary.md), [CLI log](../test-cases/evidence/C15/postman-cli.log) |
 | Ảnh hưởng | Người không có quyền có thể thay đổi catalog sản phẩm. |
 | Cleanup / Screenshot / Issue | Đã dọn fixture riêng; catalog 14 sản phẩm gốc giữ nguyên toàn bộ dữ liệu; chưa có screenshot hoặc GitHub Issue |

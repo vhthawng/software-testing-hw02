@@ -31,9 +31,9 @@ Tên biên dùng ASCII A; có thể sinh bằng Console JavaScript với "A".rep
 
 Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lưu không đổi thì Pass. Không bắt buộc câu lỗi hay mã HTTP cụ thể. Nếu môi trường/fixture không chuẩn bị được thì Blocked, không giả actual. Cleanup chỉ sản phẩm test; không reset database dùng chung. Evidence khi có đặt trong test-cases/evidence/C15/.
 
-**Lượt backend bổ sung 2026-10-19:** TC029–033 được thêm vì bạn yêu cầu gọi API trực tiếp để kiểm lại trường hợp FE chặn hoặc nút Sửa không hoạt động. Giữ nguyên ID/nền tảng/steps TC001–028. [Kết quả CLI](evidence/C15/c15_backend_recheck_summary.md).
+**Lượt backend bổ sung 2026-10-19:** TC029–033 được thêm vì bạn yêu cầu gọi API trực tiếp để kiểm lại trường hợp FE chặn hoặc nút Sửa không hoạt động. Giữ nguyên ID/nền tảng/steps TC001–028. [Kết quả CLI](evidence/C15/c15_api_execution_summary.md).
 
-**Lượt API còn lại 2026-10-19:** Đã chạy TC010, TC017–027: 1 Pass, 11 Fail. [Evidence](evidence/C15/c15_remaining_api_summary.md). Không còn API Not Run; giữ nguyên kết quả Web.
+**Lượt API còn lại 2026-10-19:** Đã chạy TC010, TC017–027: 1 Pass, 11 Fail. [Kết quả CLI](evidence/C15/c15_api_execution_summary.md). Không còn API Not Run; giữ nguyên kết quả Web.
 
 ## 1. Tổng hợp
 
@@ -253,7 +253,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. |
 | Actual Result | Postman CLI 2026-10-19: POST, categoryMissing, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm có category_id=null. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-006](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -379,7 +379,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Không tạo sản phẩm tham chiếu danh mục không tồn tại; không ép status/message cụ thể. |
 | Actual Result | Postman CLI 2026-10-19: POST, categoryInvalid, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm có category_id=4 dù GET categories chỉ có 1, 2, 3. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-006](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -397,7 +397,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: POST, không gửi Authorization, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm ID 25. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -415,7 +415,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: POST, token sai, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm ID 26. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -433,7 +433,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: POST, JWT hợp lệ của role=user, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm ID 27. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -451,7 +451,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: PUT, không gửi Authorization, HTTP 200; GET kiểm chứng ID 28 lưu tên C15 Unauthorized Update. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -469,7 +469,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: PUT, token sai, HTTP 200; GET kiểm chứng ID 29 lưu tên C15 Unauthorized Update. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -487,7 +487,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: PUT, JWT hợp lệ của role=user, HTTP 200; GET kiểm chứng ID 30 lưu tên C15 Unauthorized Update. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -505,7 +505,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: DELETE, không gửi Authorization, HTTP 200; GET kiểm chứng ID 31 đã bị xóa, GET không còn sản phẩm đích. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -523,7 +523,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: DELETE, token sai, HTTP 200; GET kiểm chứng ID 32 đã bị xóa, GET không còn sản phẩm đích. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -541,7 +541,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
 | Actual Result | Postman CLI 2026-10-19: DELETE, JWT hợp lệ của role=user, HTTP 200; GET kiểm chứng ID 33 đã bị xóa, GET không còn sản phẩm đích. Vi phạm expected từ chối và không ghi dữ liệu. |
 | Status | Fail |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -559,7 +559,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Admin thực hiện thành công thêm/xem/sửa/xóa; dữ liệu lưu đúng, chỉ sản phẩm thử bị tác động. Đây là đường đối chứng để các test từ chối không Pass do API hoàn toàn không hoạt động. |
 | Actual Result | Postman CLI 2026-10-19: JWT Admin hợp lệ tạo ID 34, đọc lại đúng dữ liệu; PUT đổi tên đúng sản phẩm, các sản phẩm khác giữ nguyên; DELETE thành công và GET không còn ID 34. Catalog trở về đúng baseline. |
 | Status | Pass |
-| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Evidence | [Kết quả CLI](evidence/C15/c15_api_execution_summary.md), [CLI log](evidence/C15/postman-cli.log) |
 | Bug ID / Issue URL | — |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
@@ -595,7 +595,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Không tạo sản phẩm tên rỗng; danh sách products lưu không đổi. |
 | Actual Result | Postman CLI: HTTP 200, tạo sản phẩm ID 18 và GET list trả name="". Backend không chặn tên rỗng, dù FE của TC002 đã chặn. |
 | Status | Fail |
-| Evidence | [CLI log](evidence/C15/postman-cli.log); [JSON results](evidence/C15/c15_backend_results.json); [summary](evidence/C15/c15_backend_recheck_summary.md) |
+| Evidence | [CLI log](evidence/C15/postman-cli.log); [Kết quả CLI](evidence/C15/c15_api_execution_summary.md) |
 | Bug ID / Issue URL | [BUG-C15-005](../bug-reports/bugs.md) |
 | Cleanup | Sản phẩm test ID 18–22 đã được xóa; assertion cuối xác nhận catalog khớp baseline 14 sản phẩm. Không restart server hoặc reset DB. |
 
@@ -613,7 +613,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Sửa thành công đúng sản phẩm; mọi sản phẩm khác giữ nguyên dữ liệu. Không kết luận về nút Sửa hoặc hiển thị Web. |
 | Actual Result | Postman CLI: HTTP 200, ID 19 đổi đúng tên; kiểm target và mọi sản phẩm khác đều Pass. Nút Sửa Web của TC012 vẫn Fail theo báo cáo. |
 | Status | Pass |
-| Evidence | [CLI log](evidence/C15/postman-cli.log); [JSON results](evidence/C15/c15_backend_results.json); [summary](evidence/C15/c15_backend_recheck_summary.md) |
+| Evidence | [CLI log](evidence/C15/postman-cli.log); [Kết quả CLI](evidence/C15/c15_api_execution_summary.md) |
 | Bug ID / Issue URL | — |
 | Cleanup | Sản phẩm test ID 18–22 đã được xóa; assertion cuối xác nhận catalog khớp baseline 14 sản phẩm. Không restart server hoặc reset DB. |
 
@@ -631,7 +631,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Không lưu tên 256; dữ liệu trước test giữ nguyên. |
 | Actual Result | Postman CLI: HTTP 200; ID 20 được lưu tên A lặp đủ 256 ký tự. Web TC013 vẫn Blocked, đây là execution API riêng. |
 | Status | Fail |
-| Evidence | [CLI log](evidence/C15/postman-cli.log); [JSON results](evidence/C15/c15_backend_results.json); [summary](evidence/C15/c15_backend_recheck_summary.md) |
+| Evidence | [CLI log](evidence/C15/postman-cli.log); [Kết quả CLI](evidence/C15/c15_api_execution_summary.md) |
 | Bug ID / Issue URL | [BUG-C15-001](../bug-reports/bugs.md) |
 | Cleanup | Sản phẩm test ID 18–22 đã được xóa; assertion cuối xác nhận catalog khớp baseline 14 sản phẩm. Không restart server hoặc reset DB. |
 
@@ -649,7 +649,7 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Không lưu giá 0; sản phẩm đích và mọi ID khác giữ nguyên dữ liệu trước test. |
 | Actual Result | Postman CLI: HTTP 200; ID 21 lưu price=0. Web TC014 vẫn Blocked, API kiểm riêng đã Fail. |
 | Status | Fail |
-| Evidence | [CLI log](evidence/C15/postman-cli.log); [JSON results](evidence/C15/c15_backend_results.json); [summary](evidence/C15/c15_backend_recheck_summary.md) |
+| Evidence | [CLI log](evidence/C15/postman-cli.log); [Kết quả CLI](evidence/C15/c15_api_execution_summary.md) |
 | Bug ID / Issue URL | [BUG-C15-003](../bug-reports/bugs.md) |
 | Cleanup | Sản phẩm test ID 18–22 đã được xóa; assertion cuối xác nhận catalog khớp baseline 14 sản phẩm. Không restart server hoặc reset DB. |
 
@@ -667,6 +667,6 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Expected Result | Không lưu tên rỗng; dữ liệu trước test giữ nguyên. |
 | Actual Result | Postman CLI: HTTP 200; ID 22 lưu name="". Web TC015 vẫn Blocked, API kiểm riêng đã Fail. |
 | Status | Fail |
-| Evidence | [CLI log](evidence/C15/postman-cli.log); [JSON results](evidence/C15/c15_backend_results.json); [summary](evidence/C15/c15_backend_recheck_summary.md) |
+| Evidence | [CLI log](evidence/C15/postman-cli.log); [Kết quả CLI](evidence/C15/c15_api_execution_summary.md) |
 | Bug ID / Issue URL | [BUG-C15-005](../bug-reports/bugs.md) |
 | Cleanup | Sản phẩm test ID 18–22 đã được xóa; assertion cuối xác nhận catalog khớp baseline 14 sản phẩm. Không restart server hoặc reset DB. |

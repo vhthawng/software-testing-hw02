@@ -29,7 +29,7 @@ TC-A04-002/004 đã được phân loại Pass theo actual từ chối đúng ex
 
 - Review mới: D1 yêu cầu giỏ trống reject/báo lỗi/không tạo đơn; D2 yêu cầu total mismatch reject/báo lỗi/không tạo đơn. Đây là yêu cầu bổ sung người dùng xác nhận, không nguyên văn FR-08; max không bổ sung.
 
-- API execution: [summary](test-cases/evidence/B08/b08_api_execution_summary.md), [collection](test-cases/evidence/B08/b08_api_postman_collection.json), [bug drafts](bug-reports/bugs.md). Backend nguyên mã chạy trên database tạm riêng; database workspace được bảo toàn. Web đã cập nhật theo báo cáo của người dùng; TC005 Blocked.
+- API execution: [summary](test-cases/evidence/B08/b08_api_execution_summary.md), [bug drafts](bug-reports/bugs.md). Backend nguyên mã chạy trên database tạm riêng; database workspace được bảo toàn. Web đã cập nhật theo báo cáo của người dùng; TC005 Blocked.
 
 ## C15 — Quản lý sản phẩm Admin
 
@@ -42,8 +42,12 @@ TC-A04-002/004 đã được phân loại Pass theo actual từ chối đúng ex
 - Đã kiểm 33 ID khớp matrix/summary/card, 13 trường/card, thống kê khớp; Web do người dùng báo cáo, API bổ sung có CLI log/JSON.
 - Việc kế tiếp: sinh viên review 7 bug nháp, bổ sung ảnh Web và kiểm lại 3 test Web Blocked khi có thể sửa trên UI. 17 API đã có kết quả CLI.
 
-- [C15 backend recheck](test-cases/evidence/C15/c15_backend_recheck_summary.md): 28 requests, 34 assertions, 4 failed; dữ liệu catalog ban đầu giữ nguyên sau cleanup.
+- [Kết quả CLI](test-cases/evidence/C15/c15_api_execution_summary.md): 28 requests, 34 assertions, 4 failed; dữ liệu catalog ban đầu giữ nguyên sau cleanup.
 
 ## Rà status CLI 2026-10-19
 
-A04: 4 API khớp evidence; sửa 2 Web test âm TC002/004 thành Pass, tổng 9 Pass/4 Fail. B08: 6 API khớp evidence, giữ 4 Pass/7 Fail/1 Blocked. C15: chạy 12 API còn lại, 1 Pass/11 Fail; cộng 5 API trước thành 17 API đã chạy (2 Pass/15 Fail). Tổng C15 10 Pass/20 Fail/3 Web Blocked/0 Not Run; 7 bug nháp. [Evidence mới](test-cases/evidence/C15/c15_remaining_api_summary.md). Các đoạn kết quả lượt trước bên trên là lịch sử; trạng thái hiện tại theo bảng đầu file và mục này.
+A04: 4 API khớp evidence; sửa 2 Web test âm TC002/004 thành Pass, tổng 9 Pass/4 Fail. B08: 6 API khớp evidence, giữ 4 Pass/7 Fail/1 Blocked. C15: chạy 12 API còn lại, 1 Pass/11 Fail; cộng 5 API trước thành 17 API đã chạy (2 Pass/15 Fail). Tổng C15 10 Pass/20 Fail/3 Web Blocked/0 Not Run; 7 bug nháp. [Kết quả CLI](test-cases/evidence/C15/c15_api_execution_summary.md). Các đoạn kết quả lượt trước bên trên là lịch sử; trạng thái hiện tại theo bảng đầu file và mục này.
+
+## Tinh gọn evidence 2026-10-19
+
+Giữ ảnh Web, một summary và một log CLI mỗi feature. C15 gộp hai lượt vào `c15_api_execution_summary.md` và `postman-cli.log`, không chạy lại. Bỏ collection và JSON trích từ log khỏi evidence; bản đầy đủ trước dọn ở commit `23b6586`. Audit hội thoại cũ giữ nguyên; các link lịch sử tới file đã bỏ cần tra phiên bản này. Status không đổi.

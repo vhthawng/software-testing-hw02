@@ -161,7 +161,7 @@ Rà soát 2026-10-19: cả 6 status API khớp evidence CLI (2 Pass, 4 Fail). T�
 | Expected Result | Request bị từ chối, không tạo đơn cho tài khoản thử nghiệm. Không bắt buộc mã HTTP hay câu lỗi cụ thể. |
 | Actual Result | Postman CLI: HTTP 401, {"error":"Unauthorized"}. Không có đơn mới sau request; giỏ vẫn còn sản phẩm ban đầu. |
 | Status | Pass |
-| Evidence | [Log CLI](evidence/B08/postman-cli.log); [response/snapshot JSON](evidence/B08/b08_api_results.json); [summary](evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [Log CLI](evidence/B08/postman-cli.log); [Kết quả CLI](evidence/B08/b08_api_execution_summary.md) |
 | Bug ID / Issue URL | — |
 | Cleanup | User/giỏ/đơn thử nghiệm nằm trong database tạm riêng; backend thử nghiệm được dừng sau khi lưu evidence. Không reset database workspace. |
 
@@ -179,7 +179,7 @@ Rà soát 2026-10-19: cả 6 status API khớp evidence CLI (2 Pass, 4 Fail). T�
 | Expected Result | Request bị từ chối, không tạo đơn cho tài khoản thử nghiệm. Không bắt buộc mã HTTP hay câu lỗi cụ thể. |
 | Actual Result | Postman CLI: HTTP 403, {"error":"Forbidden"}. Không có đơn mới sau request; giỏ vẫn còn sản phẩm ban đầu. |
 | Status | Pass |
-| Evidence | [Log CLI](evidence/B08/postman-cli.log); [response/snapshot JSON](evidence/B08/b08_api_results.json); [summary](evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [Log CLI](evidence/B08/postman-cli.log); [Kết quả CLI](evidence/B08/b08_api_execution_summary.md) |
 | Bug ID / Issue URL | — |
 | Cleanup | User/giỏ/đơn thử nghiệm nằm trong database tạm riêng; backend thử nghiệm được dừng sau khi lưu evidence. Không reset database workspace. |
 
@@ -197,7 +197,7 @@ Rà soát 2026-10-19: cả 6 status API khớp evidence CLI (2 Pass, 4 Fail). T�
 | Expected Result | Thanh toán thành công; đơn mới có total_amount=200000; giỏ API rỗng. |
 | Actual Result | Postman CLI: HTTP 200, tạo đơn ID 1 với total_amount=200000. GET /api/cart sau thành công vẫn còn sản phẩm giá 100000 × 2; không đạt yêu cầu xóa giỏ. |
 | Status | Fail |
-| Evidence | [Log CLI](evidence/B08/postman-cli.log); [response/snapshot JSON](evidence/B08/b08_api_results.json); [summary](evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [Log CLI](evidence/B08/postman-cli.log); [Kết quả CLI](evidence/B08/b08_api_execution_summary.md) |
 | Bug ID / Issue URL | [BUG-B08-001](../bug-reports/bugs.md) |
 | Cleanup | User/giỏ/đơn thử nghiệm nằm trong database tạm riêng; backend thử nghiệm được dừng sau khi lưu evidence. Không reset database workspace. |
 
@@ -215,7 +215,7 @@ Rà soát 2026-10-19: cả 6 status API khớp evidence CLI (2 Pass, 4 Fail). T�
 | Expected Result | Backend từ chối request, báo lỗi và không tạo đơn. Tự sửa thành 200000 rồi tạo đơn cũng là Fail theo quyết định đã chốt. |
 | Actual Result | Postman CLI: HTTP 200, message Checkout successful; tạo đơn ID 2 với total_amount=199999 dù tổng giỏ là 200000. Không từ chối và không báo lỗi. |
 | Status | Fail |
-| Evidence | [Log CLI](evidence/B08/postman-cli.log); [response/snapshot JSON](evidence/B08/b08_api_results.json); [summary](evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [Log CLI](evidence/B08/postman-cli.log); [Kết quả CLI](evidence/B08/b08_api_execution_summary.md) |
 | Bug ID / Issue URL | [BUG-B08-002](../bug-reports/bugs.md) |
 | Cleanup | User/giỏ/đơn thử nghiệm nằm trong database tạm riêng; backend thử nghiệm được dừng sau khi lưu evidence. Không reset database workspace. |
 
@@ -233,7 +233,7 @@ Rà soát 2026-10-19: cả 6 status API khớp evidence CLI (2 Pass, 4 Fail). T�
 | Expected Result | Backend từ chối request, báo lỗi và không tạo đơn. Tự sửa thành 200000 rồi tạo đơn cũng là Fail theo quyết định đã chốt. |
 | Actual Result | Postman CLI: HTTP 200, message Checkout successful; tạo đơn ID 3 với total_amount=200001 dù tổng giỏ là 200000. Không từ chối và không báo lỗi. |
 | Status | Fail |
-| Evidence | [Log CLI](evidence/B08/postman-cli.log); [response/snapshot JSON](evidence/B08/b08_api_results.json); [summary](evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [Log CLI](evidence/B08/postman-cli.log); [Kết quả CLI](evidence/B08/b08_api_execution_summary.md) |
 | Bug ID / Issue URL | [BUG-B08-002](../bug-reports/bugs.md) |
 | Cleanup | User/giỏ/đơn thử nghiệm nằm trong database tạm riêng; backend thử nghiệm được dừng sau khi lưu evidence. Không reset database workspace. |
 
@@ -269,7 +269,7 @@ Rà soát 2026-10-19: cả 6 status API khớp evidence CLI (2 Pass, 4 Fail). T�
 | Expected Result | Backend từ chối request, báo lỗi và không tạo đơn. |
 | Actual Result | Postman CLI: GET /api/cart trước test trả []; checkout trả HTTP 200, message Checkout successful; tạo đơn ID 4 với total_amount=0. Không từ chối giỏ trống. |
 | Status | Fail |
-| Evidence | [Log CLI](evidence/B08/postman-cli.log); [response/snapshot JSON](evidence/B08/b08_api_results.json); [summary](evidence/B08/b08_api_execution_summary.md) |
+| Evidence | [Log CLI](evidence/B08/postman-cli.log); [Kết quả CLI](evidence/B08/b08_api_execution_summary.md) |
 | Bug ID / Issue URL | [BUG-B08-003](../bug-reports/bugs.md) |
 | Cleanup | User/giỏ/đơn thử nghiệm nằm trong database tạm riêng; backend thử nghiệm được dừng sau khi lưu evidence. Không reset database workspace. |
 

@@ -1,4 +1,33 @@
-# C15 — API còn lại
+# C15 — Kết quả thực thi API
+
+17 API: **2 Pass, 15 Fail**, qua hai lượt chạy ngày 2026-10-19. [Log CLI đầy đủ](postman-cli.log) giữ nguyên nội dung từng lượt, ngăn bằng tiêu đề LƯỢT 1/LƯỢT 2. Không chạy lại khi gộp.
+
+## Lượt 1 — Kiểm backend sau kết quả Web
+
+- **Ngày:** 2026-10-19, Asia/Bangkok; Postman CLI 1.75.0.
+- **Môi trường:** backend đang chạy ở http://localhost:3000. Không restart hoặc reset database; tạo sản phẩm thử riêng qua API, sau đó xóa đúng các ID thử.
+- **Phạm vi:** 5 test API bổ sung TC029–033 theo yêu cầu người dùng; không thay thế status Web TC002/012–015 và không chạy 12 API cũ khác.
+
+| Test API mới | Liên quan Web | Status | Actual |
+|:---|:---|:---|:---|
+| TC-C15-029 | TC002 | Fail | POST tên rỗng trả 200; sản phẩm mới có name="" được lưu |
+| TC-C15-030 | TC012 | Pass | PUT tên hợp lệ trả 200, đổi đúng sản phẩm; mọi sản phẩm khác giữ nguyên |
+| TC-C15-031 | TC013 | Fail | PUT tên A lặp 256 trả 200; lưu đủ 256 ký tự |
+| TC-C15-032 | TC014 | Fail | PUT giá 0 trả 200; giá 0 được lưu |
+| TC-C15-033 | TC015 | Fail | PUT tên rỗng trả 200; name="" được lưu |
+
+**TC002 Web Pass không có nghĩa backend có validation:** trình duyệt chặn trường tên rỗng; TC029 gọi thẳng API đã chứng minh backend vẫn lưu tên rỗng. **TC030 API Pass không chữa lỗi nút Sửa:** không xác minh được hiển thị/interaction của UI qua Postman, nên TC012 vẫn Fail, TC013–015 vẫn Blocked trên Web.
+
+## Số liệu và cleanup
+
+- 28 requests, 34 assertions, 4 assertion failures; exit code 1 do test nghiệp vụ Fail.
+- Setup và cleanup assertions đều đạt; không có transport failure/script error.
+- 5 sản phẩm thử (ID 18–22) đã được xóa. GET /api/products cuối có 14 sản phẩm, so sánh toàn bộ field theo ID khớp baseline trước chạy.
+- Không ghi token/session thật vào evidence; không bật verbose hoặc log response login.
+- Response/snapshot before/action/after nằm trong console JSON của log gốc.
+
+
+## Lượt 2 — 12 API còn lại
 
 Ngày 2026-10-19 (Asia/Bangkok); Postman CLI 1.75.0; backend đang chạy tại localhost:3000. Không restart/reset database.
 
@@ -21,4 +50,9 @@ Ngày 2026-10-19 (Asia/Bangkok); Postman CLI 1.75.0; backend đang chạy tại 
 
 Danh mục thật: 1, 2, 3; kiểm ID 4 không tồn tại trước TC017. Đã xác nhận login Admin và user thường đúng role trước kiểm quyền. Chỉ thao tác sản phẩm fixture riêng; dọn ID 23–34. Catalog cuối khớp toàn bộ 14 sản phẩm baseline theo ID và các trường dữ liệu; không sửa sản phẩm gốc.
 
-[Collection](c15_remaining_api_collection.json) · [CLI log](c15_remaining_api_cli.log) · [JSON trích từ log](c15_remaining_api_results.json). Không ghi JWT thật. API Pass không thay thế các Web TC013–015 Blocked.
+API Pass không thay thế các Web TC013–015 Blocked.
+
+
+## Bản lưu phục vụ chạy lại
+
+Collection và JSON trích từ log đã bỏ khỏi evidence để giảm file trùng. Có thể xem/khôi phục bản cũ bằng Git tại commit `23b6586`; tên file gốc được ghi trong lịch sử audit.
