@@ -1,4 +1,4 @@
-﻿# Analysis: A04 — Quản lý hồ sơ cá nhân
+# Analysis: A04 — Quản lý hồ sơ cá nhân
 
 | | |
 |:---|:---|
@@ -162,7 +162,7 @@ Các test âm chỉ thay một điều kiện sai; các trường còn lại gi�
 | Thuộc cả hai | 4 |
 | Kỹ thuật bổ sung-only | 1 |
 | Hợp lệ / Không hợp lệ hoặc negative action | 5 / 8 |
-| Đã thực thi / Pass / Fail | 13 / 7 / 6 |
+| Đã thực thi / Pass / Fail | 13 / 9 / 4 |
 | Not Run | 0 |
 
 Kiểm tra: N = 8 + 0 + 4 + 1 = 13. Mức giảm chưa định lượng vì miền name/address và trạng thái UI chưa có tập giá trị hữu hạn được đặc tả.
@@ -178,8 +178,7 @@ EP/BVA kiểm tra miền và ngưỡng, nhưng không chứng minh toàn bộ t�
 | Phiên bản | Ngày | Thay đổi | Lý do | TC bị ảnh hưởng | Trạng thái review |
 |:---|:---|:---|:---|:---|:---|
 | v0.1 | 2026-10-18 | Bản phân tích cũ có output V8/V9 trong bảng biến, class id/user_id, và nhân đôi Web/API | Bản nháp ban đầu chưa áp dụng đầy đủ guardrail spec-first | Toàn bộ | Đã nhận diện trong AI self-review; sinh viên chưa review |
-| v0.2 | 2026-10-18 | Tách input/context khỏi observable output; loại output class C22–C28; bỏ id/user_id; gom non-digit; giữ API chỉ cho security/ownership; giảm còn 13 TC | Áp dụng domain-testing skill đã chỉnh và dùng spec/API contract làm nguồn | TC-A04-001–013 | AI self-review; sinh viên chưa review
-
+| v0.2 | 2026-10-18 | Tách input/context khỏi observable output; loại output class C22–C28; bỏ id/user_id; gom non-digit; giữ API chỉ cho security/ownership; giảm còn 13 TC | Áp dụng domain-testing skill đã chỉnh và dùng spec/API contract làm nguồn | TC-A04-001–013 | AI self-review; sinh viên chưa review |
 | v0.3 | 2026-10-18 | Chạy TC-A04-010–013 bằng Postman CLI; ghi nhận 3 Pass, 1 Fail và BUG-A04-001; cập nhật traceability thực thi/evidence | Có kết quả API thực tế; SEC-06 không đạt với role injection | TC-A04-010–013 | AI cập nhật; sinh viên chưa review |
-
 | v0.4 | 2026-10-18 | Ghi nhận actual Web TC-A04-001–009, chuyển ảnh vào evidence/A04 và thêm BUG-A04-002/003 | Kết quả thực thi do sinh viên cung cấp; TC-A04-002/004 được báo Fail dù hành vi quan sát phù hợp expected invalid class, cần review phân loại | TC-A04-001–009 | AI cập nhật từ báo cáo sinh viên; review tổng thể pending |
+| v0.5 | 2026-10-19 | TC002/004 đổi Fail thành Pass theo actual từ chối input sai; kiểm 4 CLI khớp evidence | Rà status theo expected, không chạy lại Web | 002, 004 | Tổng 9 Pass, 4 Fail; sinh viên chưa review cuối |

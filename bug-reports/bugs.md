@@ -2,7 +2,7 @@
 
 ## Classification note
 
-The execution report marks TC-A04-002 (L=9) and TC-A04-004 (L=12) as **Fail**. Their observed rejection and absence of an update request match the current FR-04 expected result for invalid phone lengths, so no product bug is assigned to those two cases until the student confirms the intended status classification.
+Rà soát 2026-10-19: TC-A04-002 (L=9) và TC-A04-004 (L=12) đổi từ Fail theo nhãn báo cáo ban đầu sang **Pass**, vì quan sát từ chối và không gửi request cập nhật phù hợp expected FR-04. Không gán bug cho hai test âm này; lịch sử báo cáo ban đầu giữ trong audit.
 
 ## BUG-A04-001 — `/api/users/me` cho phép client tự đổi `role`
 
@@ -219,3 +219,33 @@ The execution report marks TC-A04-002 (L=9) and TC-A04-004 (L=12) as **Fail**. T
 | Evidence | [CLI log](../test-cases/evidence/C15/postman-cli.log), [JSON](../test-cases/evidence/C15/c15_backend_results.json), [summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md) |
 | Ảnh hưởng | Có thể bỏ qua validation FE bằng API, lưu sản phẩm thiếu tên |
 | Cleanup / Issue | Đã xóa các fixture CLI, so sánh cuối khớp catalog gốc; chưa có screenshot/GitHub Issue |
+
+## BUG-C15-006 — Backend cho tạo sản phẩm thiếu danh mục hoặc tham chiếu danh mục không tồn tại
+
+| Trường | Nội dung |
+|---|---|
+| Trạng thái | Đã tái hiện Postman CLI; bug nháp, chưa đăng Issue |
+| Requirement | FR-15: danh mục bắt buộc và phải hợp lệ |
+| Test cases | TC-C15-010, TC-C15-017 |
+| Môi trường | 2026-10-19; localhost:3000; Postman CLI 1.75.0 |
+| Preconditions / Data / Steps | Đăng nhập Admin; GET categories xác nhận 1/2/3 có thật và 4 không có. POST body chuẩn lần lượt bỏ category_id và đặt category_id=4; GET products kiểm dữ liệu lưu. |
+| Expected | Từ chối và không ghi dữ liệu vi phạm; không ép mã HTTP/câu lỗi cụ thể |
+| Actual | Cả hai HTTP 200; ID 23 lưu category_id=null; ID 24 lưu category_id=4. |
+| Evidence | [Summary](../test-cases/evidence/C15/c15_remaining_api_summary.md), [CLI log](../test-cases/evidence/C15/c15_remaining_api_cli.log), [JSON](../test-cases/evidence/C15/c15_remaining_api_results.json) |
+| Ảnh hưởng | Lưu sản phẩm thiếu hoặc sai liên kết danh mục. |
+| Cleanup / Screenshot / Issue | Đã dọn fixture riêng; catalog 14 sản phẩm gốc giữ nguyên toàn bộ dữ liệu; chưa có screenshot hoặc GitHub Issue |
+
+## BUG-C15-007 — API cho thêm, sửa, xóa sản phẩm khi không có quyền Admin
+
+| Trường | Nội dung |
+|---|---|
+| Trạng thái | Đã tái hiện Postman CLI; bug nháp, chưa đăng Issue |
+| Requirement | FR-12, SEC-02/03: chỉ Admin hợp lệ được ghi sản phẩm |
+| Test cases | TC-C15-018–026 |
+| Môi trường | 2026-10-19; localhost:3000; Postman CLI 1.75.0 |
+| Preconditions / Data / Steps | Gọi POST/PUT/DELETE products với từng trường hợp không Authorization, token sai, JWT role=user hợp lệ. Mỗi lần dùng sản phẩm thử riêng; GET trước/sau kiểm dữ liệu. |
+| Expected | Từ chối và không ghi dữ liệu vi phạm; không ép mã HTTP/câu lỗi cụ thể |
+| Actual | Cả 9 thao tác trả HTTP 200 và có hiệu lực: POST tạo ID 25–27; PUT đổi tên ID 28–30; DELETE xóa ID 31–33. TC027 Admin CRUD Pass làm đối chứng. |
+| Evidence | [Summary](../test-cases/evidence/C15/c15_remaining_api_summary.md), [CLI log](../test-cases/evidence/C15/c15_remaining_api_cli.log), [JSON](../test-cases/evidence/C15/c15_remaining_api_results.json) |
+| Ảnh hưởng | Người không có quyền có thể thay đổi catalog sản phẩm. |
+| Cleanup / Screenshot / Issue | Đã dọn fixture riêng; catalog 14 sản phẩm gốc giữ nguyên toàn bộ dữ liệu; chưa có screenshot hoặc GitHub Issue |

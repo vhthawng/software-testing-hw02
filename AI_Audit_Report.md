@@ -132,3 +132,14 @@ Người dùng phản hồi test case khó hiểu vì quá nhiều mã R1/F1 và
 - **Tổng mới:** 33 TC: 23 chỉ Domain, 7 Domain+BVA, 3 Functional; 9 Pass, 9 Fail, 3 Blocked, 12 Not Run. Completed=Pass+Fail=18; attempted=21 gồm 3 Blocked.
 - **Bug drafts:** 5 C15 bugs: tên >255; giá trống; giá không dương; nút Sửa Web không hoạt động (nguồn người dùng); backend tên rỗng. Chưa có ảnh C15 trong workspace hoặc GitHub Issue. Chi tiết tại [bugs.md](bug-reports/bugs.md).
 - **Review/gap:** UI required có thể che lỗi backend, nên thêm kiểm trực tiếp API khi người dùng yêu cầu. UI không mở được sửa là giới hạn execution; không kết luận API không sửa được. TC030 không kiểm hiển thị Web ngay sau sửa nên phần đó vẫn chưa phủ runtime.
+
+## A04 / B08 / C15 — Đối chiếu status CLI và thực thi phần C15 còn thiếu
+
+- **Ngày/công cụ:** 2026-10-19, Asia/Bangkok; Codex; Postman CLI 1.75.0. Skills: work-flow, domain-testing.
+- **Yêu cầu:** sửa status CLI thành Pass/Fail có căn cứ, kiểm A04/B08. Không đổi Not Run thành kết quả giả: 12 API C15 ban đầu chưa chạy được thực thi trong lượt này.
+- **C15:** TC010, TC017–027 chạy trên backend đang hoạt động; TC027 Pass, 11 còn lại Fail. 60 requests, 77 assertions, 20 failures, exit 1; kiểm chứng bằng GET dữ liệu lưu. Danh mục thiếu/không tồn tại vẫn được lưu; POST/PUT/DELETE không token, token sai và token user đều có hiệu lực. Thêm BUG-C15-006/007. [Evidence mới](test-cases/evidence/C15/c15_remaining_api_summary.md).
+- **Cleanup:** chỉ thao tác fixture ID 23–34; không restart/reset DB; 14 sản phẩm gốc được bảo toàn toàn bộ dữ liệu theo kiểm tra cuối. Không ghi JWT thật.
+- **A04:** 4 API khớp evidence cũ; TC002/004 là Web test âm đã từ chối đúng expected, sửa nhãn Fail ban đầu thành Pass dựa trên báo cáo người dùng, không chạy lại. AI trước đó đã giữ nhãn Fail dù nhận thấy actual phù hợp; đây là sai sót phân loại, nay đã sửa. Tổng 9 Pass, 4 Fail.
+- **B08:** 6 API khớp JSON evidence, giữ 4 Pass, 7 Fail, 1 Blocked. Không chạy lại hoặc đổi TC005 Web Blocked.
+- **Tổng C15:** 10 Pass, 20 Fail, 3 Web Blocked, 0 Not Run. Tất cả 17 API có status thực thi (2 Pass, 15 Fail). Đã đối chiếu 58 ID với matrix/summary/card, status evidence và link local; không có mismatch.
+- **Giới hạn:** chưa có review cuối của sinh viên hoặc screenshot/Issue mới; không coi API thay thế UI. Lịch sử kết quả cũ giữ nguyên trong audit, trạng thái hiện tại ở test case/progress. [Conversation Entry 020](audit/conversation_log.md).

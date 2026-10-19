@@ -435,3 +435,21 @@ Historical entries before this log: [conversation_before_current.md](conversatio
 **Assistant response summary:** 5 kiểm backend: 1 Pass, 4 Fail. Web có status riêng; TC002 FE Pass nhưng backend tên rỗng Fail, TC012 UI Fail nhưng API update hợp lệ Pass. Tổng 33 TC: 9 Pass, 9 Fail, 3 Blocked, 12 Not Run.
 **Verdict:** Hoàn thành nhập báo cáo và 5 API được yêu cầu; chưa hoàn tất C15 vì 3 Web Blocked và 12 API ban đầu Not Run. Raw tool transcript chưa export; evidence CLI thật được giữ.
 **Student review:** Review kết quả API và 5 bug nháp; ảnh Web chưa có cần bổ sung nếu thu thập. Không dùng API Pass thay thế kiểm UI ngay sau cập nhật của TC012.
+
+## Entry 020 — Rà status CLI A04/B08/C15
+
+**Date/time:** 2026-10-19, Asia/Bangkok; thời điểm chính xác của từng message không có trong transcript lưu.
+**Tool/model:** Codex; model/version không xác nhận; Postman CLI 1.75.0.
+**Skills:** work-flow, domain-testing.
+**Capture:** INCOMPLETE — prompt tác vụ được lưu nguyên văn bên dưới; output trung gian/tool transcript chỉ lưu tóm tắt, không có export raw toàn lượt. Không tái tạo transcript thiếu.
+
+**Prompt (user, verbatim; không gồm metadata IDE):**
+
+> sao các tests case chạy bằng cli đều để status là not run --> điều chỉnh lại pass hoặc fail, và kiểm tra cho [A04_Profile.md](test-cases/A04_Profile.md) VÀ [B08_Checkout.md](test-cases/B08_Checkout.md)
+
+**Assistant output record (summary):** Áp dụng workflow/domain-testing. Phát hiện 5 API C15 bổ sung đã có Pass/Fail; 12 API ban đầu còn Not Run vì chưa chạy. Chạy đủ TC010, TC017–027 bằng Postman CLI, không sửa source SUT: 1 Pass/11 Fail; 60 requests/77 assertions/20 failed, exit 1. Login xác nhận Admin/user đúng role; danh mục thật 1/2/3 và ID4 không tồn tại. Quan sát HTTP200 kèm GET chứng minh lưu category null/không tồn tại, và 9 đường ghi không có quyền vẫn có hiệu lực. TC027 Admin CRUD Pass. Dọn fixture ID23–34; 14 sản phẩm gốc khớp toàn bộ dữ liệu sau cleanup. Thêm hai bug nháp C15-006/007. Rà A04 API010–013 và B08 API006/007/008/009/010/012 khớp evidence cũ, không chạy lại. Sửa A04 Web002/004 từ Fail thành Pass do actual từ chối input sai phù hợp expected; không thay đổi nguồn quan sát người dùng. C15 Web013–015 và B08 Web005 giữ Blocked. Cập nhật bảng tổng hợp/card, analysis, progress, bugs và AI audit. Kiểm 58 ID matrix/card/summary, các status JSON/CLI và link local không lệch.
+
+**Artifacts:** [A04](../test-cases/A04_Profile.md), [B08](../test-cases/B08_Checkout.md), [C15](../test-cases/C15_ProductManagement.md), [C15 summary](../test-cases/evidence/C15/c15_remaining_api_summary.md), [collection](../test-cases/evidence/C15/c15_remaining_api_collection.json), [CLI log](../test-cases/evidence/C15/c15_remaining_api_cli.log), [JSON](../test-cases/evidence/C15/c15_remaining_api_results.json), [A04 analysis](../analysis/A04_Profile.md), [C15 analysis](../analysis/C15_ProductManagement.md), [bugs](../bug-reports/bugs.md), [progress](../WORK_PROGRESS.md), [AI Audit](../AI_Audit_Report.md).
+
+**Verdict:** Status CLI đều có Pass/Fail dựa trên execution evidence; tổng A04 9 Pass/4 Fail, B08 4 Pass/7 Fail/1 Blocked, C15 10 Pass/20 Fail/3 Blocked. Không có API Not Run.
+**Student review:** Review status sửa theo oracle và hai bug mới; 4 Web Blocked chưa được kiểm hoàn tất. Chưa có ảnh hoặc Issue mới.

@@ -34,6 +34,8 @@ Hai quy tắc bổ sung đã được bạn xác nhận: **giỏ trống phải 
 
 **Kết quả Web 2026-10-18:** cập nhật theo báo cáo thực thi của bạn. Ảnh hiện có: TC003, TC004, TC011. TC005 ghi Blocked cho bước đổi số lượng trong giỏ; quan sát tổng tiền đúng qua cách thêm sản phẩm được giữ riêng trong Actual Result.
 
+Rà soát 2026-10-19: cả 6 status API khớp evidence CLI (2 Pass, 4 Fail). Tổng giữ 4 Pass, 7 Fail, 1 Blocked; TC005 Web vẫn Blocked, không thay bằng kết quả đường thao tác khác. Không chạy lại trong lượt rà này.
+
 ## 1. Tổng hợp
 
 12 test: 8 chỉ Domain Testing, 2 thuộc cả Domain Testing và BVA, 2 kiểm tra chức năng. Kết quả hiện tại: 4 Pass, 7 Fail, 1 Blocked, 0 Not Run. Đã hoàn thành 11 test (Pass + Fail); TC005 đã thử nhưng bị chặn tại bước đổi số lượng trong giỏ.

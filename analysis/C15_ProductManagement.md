@@ -5,7 +5,7 @@
 | **Tính năng / nền tảng** | FR-15 Product CRUD trên Web Admin; API bổ sung cho quyền ghi và dữ liệu danh mục không nhập được từ UI |
 | **Người thiết kế / ngày** | Codex hỗ trợ MSSV 23120355; tên sinh viên chưa cung cấp; tạo 2026-10-19, Asia/Bangkok |
 | **Test case chi tiết** | [C15_ProductManagement.md](../test-cases/C15_ProductManagement.md) |
-| **Trạng thái** | 33 TC: 9 Pass, 9 Fail, 3 Blocked, 12 Not Run; Web do người dùng báo cáo, 5 API bổ sung có CLI evidence; review tổng thể pending |
+| **Trạng thái** | 33 TC: 10 Pass, 20 Fail, 3 Blocked, 0 Not Run; Web do người dùng báo cáo, 17 API có CLI evidence; review tổng thể pending |
 
 ## 1. Phạm vi và nguồn
 
@@ -180,10 +180,10 @@ Các ID test trong bảng dưới có prefix TC-C15-. Trạng thái Đã thiết
 | Cả Domain/BVA | 7 |
 | Chỉ kỹ thuật chức năng bổ sung | 3 |
 | Hợp lệ / Không hợp lệ | 9 / 24 |
-| Đã hoàn thành (Pass + Fail) / Pass / Fail | 18 / 9 / 9 |
-| Blocked / Not Run | 3 / 12 |
+| Đã hoàn thành (Pass + Fail) / Pass / Fail | 30 / 10 / 20 |
+| Blocked / Not Run | 3 / 0 |
 
-33=23+0+7+3. Đã thử 21 TC: 18 hoàn thành Pass/Fail và 3 Blocked; 12 API ban đầu vẫn Not Run. Mức giảm tổ hợp không định lượng vì tập tên/giá không có tổng số hữu hạn được đặc tả; không khẳng định bộ tối thiểu toàn cục.
+33=23+0+7+3. Đã thử 33 TC: 30 hoàn thành Pass/Fail và 3 Web Blocked; 17 API đã chạy (2 Pass, 15 Fail). Mức giảm tổ hợp không định lượng vì tập tên/giá không có tổng số hữu hạn được đặc tả; không khẳng định bộ tối thiểu toàn cục.
 
 **Kết quả và phần bổ sung:** Web TC002 Pass tại FE; API TC029 Fail chứng minh backend không chặn cùng giá trị rỗng. TC012 Web Fail do không mở được sửa; TC013–015 Web Blocked; TC030 API Pass chỉ chứng minh update dữ liệu đúng, không thay thế kiểm UI tức thời của TC012. TC031/032/033 Fail vì backend lưu tên 256/giá 0/tên rỗng. Bằng chứng: [CLI summary](../test-cases/evidence/C15/c15_backend_recheck_summary.md).
 
@@ -207,5 +207,5 @@ GET sản phẩm là API công khai trong contract; không tự yêu cầu JWT A
 | v0.1 | 2026-10-19 | Scope, input/context, oracle và spec gaps | Đọc FR-15/FR-12 và API | Toàn bộ | Sinh viên chưa review |
 | v0.2 | 2026-10-19 | 14 lớp và 28 card ban đầu | Single Fault, CRUD và phân quyền từng method | 001–028 | AI thiết kế; sinh viên chưa review |
 | v0.3 | 2026-10-19 | BVA tên 0/1/255/256, matrix/trace và giới hạn precision giá | Không tự đặt bước tiền nhỏ nhất hoặc ID biên danh mục | 002–005, 007–009 | AI kiểm tra nhất quán; chưa thực thi |
-
 | v0.4 | 2026-10-19 | Nhập 16 Web theo báo cáo; thêm và chạy API029–033 | Người dùng yêu cầu kiểm BE khi FE chặn tên rỗng hoặc không mở được sửa | 001–009, 011–016, 028–033 | 9 Pass, 9 Fail, 3 Blocked, 12 Not Run; cần review kết quả cuối |
+| v0.5 | 2026-10-19 | Chạy 12 API còn lại, đối chiếu status với evidence | Người dùng yêu cầu rà status CLI | 010, 017–027 | 10 Pass, 20 Fail, 3 Blocked, 0 Not Run; sinh viên chưa review |

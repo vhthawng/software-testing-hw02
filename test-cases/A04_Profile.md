@@ -1,10 +1,10 @@
-﻿# Test Cases: A04 — Hồ sơ cá nhân Web
+# Test Cases: A04 — Hồ sơ cá nhân Web
 
-- **Trạng thái thiết kế:** Draft; 13 test đã thực thi (7 Pass, 6 Fail); sinh viên đã cung cấp actual/evidence Web và API, review tổng thể còn pending.
+- **Trạng thái thiết kế:** Draft; 13 test đã thực thi (9 Pass, 4 Fail); sinh viên đã cung cấp actual/evidence Web và API, review tổng thể còn pending.
 - **Nguồn yêu cầu:** [FR-04, SEC-02, SEC-06](../eshop-sut/README.md).
 - **API contract:** [Users 2.1–2.2](../eshop-sut/api_specification.md).
 - **Phân tích:** [analysis/A04_Profile.md](../analysis/A04_Profile.md).
-- **Tạo/cập nhật:** 2026-10-18 (Asia/Bangkok).
+- **Tạo/cập nhật:** tạo 2026-10-18; rà status 2026-10-19 (Asia/Bangkok).
 
 ## Chuẩn bị và quy ước
 
@@ -14,20 +14,19 @@ Các test Web dùng thao tác trên giao diện rồi refresh hoặc đọc lạ
 
 ## 1. Tổng hợp
 
-Tổng cộng 13 test duy nhất: 8 chỉ Domain, 1 kỹ thuật chức năng, 4 thuộc cả Domain và BVA, 0 chỉ BVA. Đã thực thi 13 test: 7 Pass, 6 Fail.
+Tổng cộng 13 test duy nhất: 8 chỉ Domain, 1 kỹ thuật chức năng, 4 thuộc cả Domain và BVA, 0 chỉ BVA. Đã thực thi 13 test: 9 Pass, 4 Fail.
 
 | TC ID | Title | Requirement | Technique | Dữ liệu chính | Expected | Status | Bug |
 |:---|:---|:---|:---|:---|:---|:---|:---|
 | TC-A04-001 | Phone hợp lệ tại biên dưới trên Web | FR-04 | Cả hai | 0912345678, L=10 | Lưu và đọc lại đúng phone. | Fail | BUG-A04-002 |
-| TC-A04-002 | Phone dưới biên dưới trên Web | FR-04 | Cả hai | 091234567, L=9 | Không commit phone. | Fail | — |
+| TC-A04-002 | Phone dưới biên dưới trên Web | FR-04 | Cả hai | 091234567, L=9 | Không commit phone. | Pass | — |
 | TC-A04-003 | Phone hợp lệ tại biên trên trên Web | FR-04 | Cả hai | 09123456789, L=11 | Lưu và đọc lại đúng phone. | Fail | BUG-A04-002 |
-| TC-A04-004 | Phone trên biên trên trên Web | FR-04 | Cả hai | 091234567890, L=12 | Không commit phone. | Fail | — |
+| TC-A04-004 | Phone trên biên trên trên Web | FR-04 | Cả hai | 091234567890, L=12 | Không commit phone. | Pass | — |
 | TC-A04-005 | Phone không bắt đầu bằng 0 | FR-04 | Domain | 1912345678 | Không commit phone. | Fail | BUG-A04-003 |
 | TC-A04-006 | Phone chứa non-digit | FR-04 | Domain | 09123456a1 | Không commit phone. | Pass | — |
 | TC-A04-007 | Cập nhật họ tên | FR-04 | Domain | Nguyễn Thị Bình | Lưu đúng name, trường khác giữ nguyên. | Pass | — |
 | TC-A04-008 | Cập nhật địa chỉ giao hàng | FR-04 | Domain | 45 Nguyễn Huệ, Quận 1, TP.HCM | Lưu đúng address, name/phone giữ nguyên. | Pass | — |
 | TC-A04-009 | Email không sửa được qua UI | FR-04 | Functional | Thử nhập email mới | Email lưu giữ nguyên. | Pass | — |
-
 | TC-A04-010 | API thiếu JWT | SEC-02 | Domain | PUT /api/users/me không Authorization | Không cập nhật. | Pass | — |
 | TC-A04-011 | API JWT không hợp lệ | SEC-02 | Domain | Bearer invalid.a04.token | Không cập nhật. | Pass | — |
 | TC-A04-012 | API không cho client đổi role | SEC-06 | Domain | Thêm role=admin | Role lưu không thành admin. | Fail | BUG-A04-001 |
@@ -65,8 +64,8 @@ Tổng cộng 13 test duy nhất: 8 chỉ Domain, 1 kỹ thuật chức năng, 4
 | Test data | phone = 091234567 (9 digits); name/address nominal. |
 | Steps | 1. Nhập phone 091234567.<br>2. Nhấn cập nhật.<br>3. Refresh hoặc GET hồ sơ U.<br>4. Ghi phản hồi và dữ liệu lưu. |
 | Expected Result | Giá trị 9 digits không được commit; phone lưu vẫn là giá trị snapshot trước test. Message/status cụ thể không được spec quy định. |
-| Actual Result | UI hiển thị dialog "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."; không có request cập nhật xuống API. Status Fail theo báo cáo thực thi; hành vi từ chối phù hợp expected FR-04 cho L=9, cần rà soát lại cách gán trạng thái. |
-| Status | Fail |
+| Actual Result | UI hiển thị dialog "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."; không có request cập nhật xuống API. Rà soát 2026-10-19: phân loại Pass vì input không hợp lệ đã bị từ chối đúng expected, dựa trên quan sát người dùng; không thực thi lại. |
+| Status | Pass |
 | Evidence | [TC-A04-002.png](evidence/A04/TC-A04-002.png) |
 | Bug ID / Issue URL | — |
 | Cleanup | Khôi phục snapshot U. |
@@ -101,8 +100,8 @@ Tổng cộng 13 test duy nhất: 8 chỉ Domain, 1 kỹ thuật chức năng, 4
 | Test data | phone = 091234567890 (12 digits); name/address nominal. |
 | Steps | 1. Nhập phone 091234567890.<br>2. Nhấn cập nhật.<br>3. Refresh hoặc GET hồ sơ U.<br>4. Ghi phản hồi và dữ liệu lưu. |
 | Expected Result | Giá trị 12 digits không được commit; phone lưu vẫn là snapshot trước test. |
-| Actual Result | UI hiển thị dialog "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."; không có request cập nhật xuống API. Status Fail theo báo cáo thực thi; hành vi từ chối phù hợp expected FR-04 cho L=12, cần rà soát lại cách gán trạng thái. |
-| Status | Fail |
+| Actual Result | UI hiển thị dialog "Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."; không có request cập nhật xuống API. Rà soát 2026-10-19: phân loại Pass vì input không hợp lệ đã bị từ chối đúng expected, dựa trên quan sát người dùng; không thực thi lại. |
+| Status | Pass |
 | Evidence | — (chưa có file ảnh TC-A04-004.png) |
 | Bug ID / Issue URL | — |
 | Cleanup | Khôi phục snapshot U. |

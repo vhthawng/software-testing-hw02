@@ -1,6 +1,6 @@
 # Test Cases: C15 — Quản lý sản phẩm Admin
 
-- **Trạng thái:** 33 test: 9 Pass, 9 Fail, 3 Blocked, 12 Not Run. Web do người dùng báo cáo; 5 API bổ sung có evidence Postman CLI.
+- **Trạng thái:** 33 test: 10 Pass, 20 Fail, 3 Blocked, 0 Not Run. Web do người dùng báo cáo; 17 API có evidence Postman CLI.
 - **Nguồn:** [FR-15, FR-12 và SEC-02/03](../eshop-sut/README.md); [API Products/Categories](../eshop-sut/api_specification.md).
 - **Phân tích:** [C15_ProductManagement.md](../analysis/C15_ProductManagement.md).
 - **Ngày:** 2026-10-19, Asia/Bangkok. Sinh viên chưa review.
@@ -33,9 +33,11 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 
 **Lượt backend bổ sung 2026-10-19:** TC029–033 được thêm vì bạn yêu cầu gọi API trực tiếp để kiểm lại trường hợp FE chặn hoặc nút Sửa không hoạt động. Giữ nguyên ID/nền tảng/steps TC001–028. [Kết quả CLI](evidence/C15/c15_backend_recheck_summary.md).
 
+**Lượt API còn lại 2026-10-19:** Đã chạy TC010, TC017–027: 1 Pass, 11 Fail. [Evidence](evidence/C15/c15_remaining_api_summary.md). Không còn API Not Run; giữ nguyên kết quả Web.
+
 ## 1. Tổng hợp
 
-33 test: 23 chỉ Domain, 7 thuộc cả Domain/BVA, 3 kiểm tra chức năng. Kết quả: 9 Pass, 9 Fail, 3 Blocked, 12 Not Run. Đã hoàn thành 18 test (Pass + Fail), 3 Web bị chặn và 12 API cũ chưa chạy.
+33 test: 23 chỉ Domain, 7 thuộc cả Domain/BVA, 3 kiểm tra chức năng. Kết quả: 10 Pass, 20 Fail, 3 Blocked, 0 Not Run. Đã hoàn thành 30 test (Pass + Fail); 3 Web bị chặn vì nút Sửa không hoạt động.
 
 | TC ID | Nội dung | Dữ liệu chính | Kết quả mong đợi | Status |
 |:---|:---|:---|:---|:---|
@@ -48,24 +50,24 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | TC-C15-007 | Web từ chối giá bằng 0 | Tên C15 Test Product; giá 0; danh mục có thật. | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. | Fail |
 | TC-C15-008 | Web chấp nhận giá dương 1 | Tên C15 Test Product; giá 1; danh mục có thật. Giá 1 là đại diện dương, không khẳng định là giá nhỏ nhất hệ thống. | Tạo sản phẩm với giá lưu bằng 1; tên và danh mục đúng dữ liệu gửi. | Pass |
 | TC-C15-009 | Web từ chối giá âm | Tên C15 Test Product; giá -1; danh mục có thật. | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. | Fail |
-| TC-C15-010 | API từ chối tạo sản phẩm thiếu danh mục | POST /api/products; JWT Admin hợp lệ; body chuẩn nhưng bỏ field category_id hoàn toàn. | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. | Not Run |
+| TC-C15-010 | API từ chối tạo sản phẩm thiếu danh mục | POST /api/products; JWT Admin hợp lệ; body chuẩn nhưng bỏ field category_id hoàn toàn. | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. | Fail |
 | TC-C15-011 | Web lưu đúng danh mục được chọn | Tên C15 Test Product; giá 100000; chọn danh mục có thật khác lựa chọn mặc định. | Sản phẩm lưu đúng ID danh mục đã chọn, không tự đổi về danh mục mặc định. | Pass |
 | TC-C15-012 | Web sửa đúng sản phẩm, giữ nguyên các sản phẩm khác | Đổi tên sản phẩm đích từ C15 Original thành C15 Updated; giữ giá 100000 và danh mục. | Chỉ sản phẩm đích có tên mới; giá/danh mục giữ nguyên. Mọi sản phẩm khác giữ đúng tên và dữ liệu cả trên UI ngay sau lưu lẫn sau refresh/backend. | Fail |
 | TC-C15-013 | Web không cập nhật tên vượt 255 ký tự | Đổi name của sản phẩm đích thành "A".repeat(256); giữ giá/danh mục. | Không lưu tên dài 256; nếu gửi đủ chuỗi thì không cập nhật dữ liệu vi phạm. Nếu UI giới hạn đầu vào 255, ghi rõ chỉ kiểm được chặn nhập, không khẳng định đã gửi 256 xuống API. | Blocked |
 | TC-C15-014 | Web từ chối cập nhật giá bằng 0 | Giữ tên C15 Original; đổi giá 100000 thành 0; giữ danh mục. | Không cập nhật giá thành 0; dữ liệu sản phẩm đích và sản phẩm khác giữ nguyên. | Blocked |
 | TC-C15-015 | Web từ chối cập nhật tên thành rỗng | Xóa hết tên; giữ giá 100000 và danh mục. | Không lưu tên rỗng; sản phẩm đích giữ nguyên dữ liệu trước test. | Blocked |
 | TC-C15-016 | Web xóa sản phẩm thử, giữ sản phẩm khác | Xóa duy nhất sản phẩm C15 Original theo ID đã ghi. | Sản phẩm bị xóa không còn trong danh sách; sản phẩm đối chứng và các ID khác vẫn giữ nguyên. Không bắt buộc phải xuất hiện dialog xác nhận. | Pass |
-| TC-C15-017 | API từ chối danh mục không tồn tại | POST /api/products; token Admin; body chuẩn, category_id là số dương không nằm trong GET /api/categories. | Không tạo sản phẩm tham chiếu danh mục không tồn tại; không ép status/message cụ thể. | Not Run |
-| TC-C15-018 | API chặn thêm sản phẩm khi thiếu token | POST /api/products; không gửi Authorization. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-019 | API chặn thêm sản phẩm khi token sai | POST /api/products; Authorization: Bearer invalid.c15.token. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-020 | API chặn thêm sản phẩm khi token của user thường | POST /api/products; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-021 | API chặn sửa sản phẩm khi thiếu token | PUT /api/products/<ID sản phẩm thử>; không gửi Authorization. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-022 | API chặn sửa sản phẩm khi token sai | PUT /api/products/<ID sản phẩm thử>; Authorization: Bearer invalid.c15.token. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-023 | API chặn sửa sản phẩm khi token của user thường | PUT /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-024 | API chặn xóa sản phẩm khi thiếu token | DELETE /api/products/<ID sản phẩm thử>; không gửi Authorization. Không body. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-025 | API chặn xóa sản phẩm khi token sai | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer invalid.c15.token. Không body. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-026 | API chặn xóa sản phẩm khi token của user thường | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Không body. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Not Run |
-| TC-C15-027 | API Admin hợp lệ thêm, xem, sửa và xóa được sản phẩm | JWT Admin hợp lệ; tạo tên C15 API Product, giá 100000; sửa tên C15 API Updated; dùng danh mục có thật. | Admin thực hiện thành công thêm/xem/sửa/xóa; dữ liệu lưu đúng, chỉ sản phẩm thử bị tác động. Đây là đường đối chứng để các test từ chối không Pass do API hoàn toàn không hoạt động. | Not Run |
+| TC-C15-017 | API từ chối danh mục không tồn tại | POST /api/products; token Admin; body chuẩn, category_id là số dương không nằm trong GET /api/categories. | Không tạo sản phẩm tham chiếu danh mục không tồn tại; không ép status/message cụ thể. | Fail |
+| TC-C15-018 | API chặn thêm sản phẩm khi thiếu token | POST /api/products; không gửi Authorization. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-019 | API chặn thêm sản phẩm khi token sai | POST /api/products; Authorization: Bearer invalid.c15.token. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-020 | API chặn thêm sản phẩm khi token của user thường | POST /api/products; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-021 | API chặn sửa sản phẩm khi thiếu token | PUT /api/products/<ID sản phẩm thử>; không gửi Authorization. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-022 | API chặn sửa sản phẩm khi token sai | PUT /api/products/<ID sản phẩm thử>; Authorization: Bearer invalid.c15.token. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-023 | API chặn sửa sản phẩm khi token của user thường | PUT /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-024 | API chặn xóa sản phẩm khi thiếu token | DELETE /api/products/<ID sản phẩm thử>; không gửi Authorization. Không body. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-025 | API chặn xóa sản phẩm khi token sai | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer invalid.c15.token. Không body. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-026 | API chặn xóa sản phẩm khi token của user thường | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Không body. | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. | Fail |
+| TC-C15-027 | API Admin hợp lệ thêm, xem, sửa và xóa được sản phẩm | JWT Admin hợp lệ; tạo tên C15 API Product, giá 100000; sửa tên C15 API Updated; dùng danh mục có thật. | Admin thực hiện thành công thêm/xem/sửa/xóa; dữ liệu lưu đúng, chỉ sản phẩm thử bị tác động. Đây là đường đối chứng để các test từ chối không Pass do API hoàn toàn không hoạt động. | Pass |
 | TC-C15-028 | Web Admin không cho user thường vào quản lý sản phẩm | Email/mật khẩu của tài khoản role=user hợp lệ; không sửa role trong token. | Không vào được màn hình/chức năng quản lý sản phẩm Admin. Không ép câu thông báo cụ thể. | Pass |
 | TC-C15-029 | API từ chối tạo sản phẩm tên rỗng | POST /api/products; JWT Admin hợp lệ; name="", price=100000, description="C15 CLI supplementary test", imageUrl="", category_id lấy từ GET /api/categories. | Không tạo sản phẩm tên rỗng; danh sách products lưu không đổi. | Fail |
 | TC-C15-030 | API sửa tên hợp lệ, giữ mọi sản phẩm khác | PUT /api/products/<ID sản phẩm thử mới>; JWT Admin; đổi name thành C15 CLI Updated kèm mã lần chạy, giữ giá 100000, mô tả/ảnh/danh mục như trước. | Sửa thành công đúng sản phẩm; mọi sản phẩm khác giữ nguyên dữ liệu. Không kết luận về nút Sửa hoặc hiển thị Web. | Pass |
@@ -249,10 +251,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | POST /api/products; JWT Admin hợp lệ; body chuẩn nhưng bỏ field category_id hoàn toàn. |
 | Steps | 1. Gửi POST /api/products bằng token Admin với body không có category_id.<br>2. Ghi response.<br>3. GET /api/products so sánh với trước test. |
 | Expected Result | Không tạo sản phẩm với dữ liệu vi phạm; danh sách lưu giữ nguyên. Không ép HTTP status hoặc câu lỗi cụ thể. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: POST, categoryMissing, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm có category_id=null. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-006](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-011 — Web lưu đúng danh mục được chọn
@@ -375,10 +377,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | POST /api/products; token Admin; body chuẩn, category_id là số dương không nằm trong GET /api/categories. |
 | Steps | 1. Gửi POST với tên/giá hợp lệ và category_id không tồn tại.<br>2. Đọc response và GET /api/products sau test. |
 | Expected Result | Không tạo sản phẩm tham chiếu danh mục không tồn tại; không ép status/message cụ thể. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: POST, categoryInvalid, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm có category_id=4 dù GET categories chỉ có 1, 2, 3. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-006](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-018 — API chặn thêm sản phẩm khi thiếu token
@@ -393,10 +395,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | POST /api/products; không gửi Authorization. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi POST /api/products với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: POST, không gửi Authorization, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm ID 25. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-019 — API chặn thêm sản phẩm khi token sai
@@ -411,10 +413,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | POST /api/products; Authorization: Bearer invalid.c15.token. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi POST /api/products với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: POST, token sai, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm ID 26. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-020 — API chặn thêm sản phẩm khi token của user thường
@@ -429,10 +431,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | POST /api/products; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Body chuẩn: name=C15 Unauthorized Create; giá 100000; danh mục có thật. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi POST /api/products với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: POST, JWT hợp lệ của role=user, HTTP 200; GET kiểm chứng vẫn tạo sản phẩm ID 27. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-021 — API chặn sửa sản phẩm khi thiếu token
@@ -447,10 +449,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | PUT /api/products/<ID sản phẩm thử>; không gửi Authorization. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi PUT /api/products/<ID sản phẩm thử> với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: PUT, không gửi Authorization, HTTP 200; GET kiểm chứng ID 28 lưu tên C15 Unauthorized Update. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-022 — API chặn sửa sản phẩm khi token sai
@@ -465,10 +467,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | PUT /api/products/<ID sản phẩm thử>; Authorization: Bearer invalid.c15.token. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi PUT /api/products/<ID sản phẩm thử> với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: PUT, token sai, HTTP 200; GET kiểm chứng ID 29 lưu tên C15 Unauthorized Update. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-023 — API chặn sửa sản phẩm khi token của user thường
@@ -483,10 +485,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | PUT /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Body chuẩn, name=C15 Unauthorized Update; giá 100000; danh mục có thật. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi PUT /api/products/<ID sản phẩm thử> với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: PUT, JWT hợp lệ của role=user, HTTP 200; GET kiểm chứng ID 30 lưu tên C15 Unauthorized Update. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-024 — API chặn xóa sản phẩm khi thiếu token
@@ -501,10 +503,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | DELETE /api/products/<ID sản phẩm thử>; không gửi Authorization. Không body. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi DELETE /api/products/<ID sản phẩm thử> với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: DELETE, không gửi Authorization, HTTP 200; GET kiểm chứng ID 31 đã bị xóa, GET không còn sản phẩm đích. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-025 — API chặn xóa sản phẩm khi token sai
@@ -519,10 +521,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer invalid.c15.token. Không body. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi DELETE /api/products/<ID sản phẩm thử> với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: DELETE, token sai, HTTP 200; GET kiểm chứng ID 32 đã bị xóa, GET không còn sản phẩm đích. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-026 — API chặn xóa sản phẩm khi token của user thường
@@ -537,10 +539,10 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | DELETE /api/products/<ID sản phẩm thử>; Authorization: Bearer <token hợp lệ của tài khoản role=user>. Không body. |
 | Steps | 1. Ghi danh sách products trước test.<br>2. Gửi DELETE /api/products/<ID sản phẩm thử> với xác thực mô tả ở dữ liệu.<br>3. Ghi response.<br>4. GET /api/products, so sánh toàn bộ dữ liệu theo ID với trước test. |
 | Expected Result | Request bị từ chối; không có sản phẩm mới nếu POST, sản phẩm đích không đổi nếu PUT, không bị xóa nếu DELETE. Mọi sản phẩm khác giữ nguyên; không ép HTTP status/message. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
-| Bug ID / Issue URL | — |
+| Actual Result | Postman CLI 2026-10-19: DELETE, JWT hợp lệ của role=user, HTTP 200; GET kiểm chứng ID 33 đã bị xóa, GET không còn sản phẩm đích. Vi phạm expected từ chối và không ghi dữ liệu. |
+| Status | Fail |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
+| Bug ID / Issue URL | [BUG-C15-007](../bug-reports/bugs.md) |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 
 ### TC-C15-027 — API Admin hợp lệ thêm, xem, sửa và xóa được sản phẩm
@@ -555,9 +557,9 @@ Test âm: nếu UI từ chối dữ liệu không hợp lệ và dữ liệu lư
 | Test data | JWT Admin hợp lệ; tạo tên C15 API Product, giá 100000; sửa tên C15 API Updated; dùng danh mục có thật. |
 | Steps | 1. POST /api/products với body chuẩn, ghi ID mới từ response hoặc chênh lệch danh sách.<br>2. GET /api/products kiểm đúng sản phẩm mới.<br>3. PUT /api/products/<ID mới> với full body chuẩn, đổi tên C15 API Updated.<br>4. GET list kiểm tên mới và các ID khác không đổi.<br>5. DELETE /api/products/<ID mới> bằng cùng token Admin.<br>6. GET list xác minh sản phẩm thử không còn, các ID khác vẫn nguyên. |
 | Expected Result | Admin thực hiện thành công thêm/xem/sửa/xóa; dữ liệu lưu đúng, chỉ sản phẩm thử bị tác động. Đây là đường đối chứng để các test từ chối không Pass do API hoàn toàn không hoạt động. |
-| Actual Result | Chưa thực thi |
-| Status | Not Run |
-| Evidence | — |
+| Actual Result | Postman CLI 2026-10-19: JWT Admin hợp lệ tạo ID 34, đọc lại đúng dữ liệu; PUT đổi tên đúng sản phẩm, các sản phẩm khác giữ nguyên; DELETE thành công và GET không còn ID 34. Catalog trở về đúng baseline. |
+| Status | Pass |
+| Evidence | [CLI summary](evidence/C15/c15_remaining_api_summary.md), [log](evidence/C15/c15_remaining_api_cli.log), [JSON](evidence/C15/c15_remaining_api_results.json) |
 | Bug ID / Issue URL | — |
 | Cleanup | Ghi ID sản phẩm test; khôi phục dữ liệu sản phẩm thử nếu cần hoặc xóa bằng quyền Admin. Không sửa/xóa đối tượng dùng chung; nếu thao tác sai làm ảnh hưởng sản phẩm khác thì lưu evidence trước khi phục hồi. |
 

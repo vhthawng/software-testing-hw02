@@ -1,0 +1,2221 @@
+{
+  "info": {
+    "name": "C15 remaining API tests 010 017-027",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Execute original pending API cases. Own products only, separate snapshot per case, cleanup and final verification. No Web status inferred from API."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "runId",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if(!pm.collectionVariables.get('runId'))pm.collectionVariables.set('runId',Date.now().toString());"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "SETUP Admin login",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/login",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@eshop.com\",\n  \"password\": \"Admin123!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+              "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+              "const b=pm.response.json();setup('Admin login',pm.response.code===200&&typeof b.token==='string'&&b.user.role==='admin');pm.collectionVariables.set('adminToken',b.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "SETUP User login",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/login",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test@eshop.com\",\n  \"password\": \"Test1234!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+              "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+              "const b=pm.response.json();setup('Ordinary user login',pm.response.code===200&&typeof b.token==='string'&&b.user.role==='user');pm.collectionVariables.set('userToken',b.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "SETUP Categories",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/categories",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+              "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+              "const rows=pm.response.json();setup('Categories readable',pm.response.code===200&&Array.isArray(rows)&&rows.length>0);pm.collectionVariables.set('categoryId',rows[0].id);const missing=Math.max(...rows.map(x=>Number(x.id)))+1;pm.collectionVariables.set('missingCategory',missing);console.log('C15_RUN '+JSON.stringify({categories:rows,missingCategory:missing}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "SETUP Catalog baseline",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/products",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+              "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+              "const rows=pm.response.json();setup('Catalog readable',pm.response.code===200&&Array.isArray(rows));pm.collectionVariables.set('baseline',JSON.stringify(norm(rows)));console.log('C15_RUN '+JSON.stringify({baselineCount:rows.length,baselineIds:rows.map(x=>x.id)}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-010",
+      "item": [
+        {
+          "name": "TC-C15-010 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-010 snapshot readable',pm.response.code===200&&Array.isArray(rows));pm.collectionVariables.set('c010before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-010',phase:'before',catalogCount:rows.length,catalogIds:rows.map(x=>x.id)}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-010 ACTION",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 Unauthorized Create\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('POST'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c010id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-010',phase:'action',method:'POST',authMode:'categoryMissing',targetId:pm.collectionVariables.get('c010id')||null,sent:JSON.parse(pm.variables.replaceIn(pm.request.body.raw)),status:pm.response.code,body:response}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-010 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-010 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c010before'));const id=Number(pm.collectionVariables.get('c010id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-010',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c010needsCleanup',!!p);pm.test('TC-C15-010: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-010 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c010id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c010needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-010 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-017",
+      "item": [
+        {
+          "name": "TC-C15-017 VERIFY missing category",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categories",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-017 category absent',pm.response.code===200&&Array.isArray(rows)&&!rows.some(x=>Number(x.id)===Number(pm.collectionVariables.get('missingCategory'))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-017 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-017 snapshot readable',pm.response.code===200&&Array.isArray(rows));pm.collectionVariables.set('c017before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-017',phase:'before',catalogCount:rows.length,catalogIds:rows.map(x=>x.id)}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-017 ACTION",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 Unauthorized Create\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{missingCategory}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('POST'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c017id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-017',phase:'action',method:'POST',authMode:'categoryInvalid',targetId:pm.collectionVariables.get('c017id')||null,sent:JSON.parse(pm.variables.replaceIn(pm.request.body.raw)),status:pm.response.code,body:response}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-017 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-017 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c017before'));const id=Number(pm.collectionVariables.get('c017id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-017',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c017needsCleanup',!!p);pm.test('TC-C15-017: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-017 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c017id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c017needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-017 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-018",
+      "item": [
+        {
+          "name": "TC-C15-018 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-018 snapshot readable',pm.response.code===200&&Array.isArray(rows));pm.collectionVariables.set('c018before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-018',phase:'before',catalogCount:rows.length,catalogIds:rows.map(x=>x.id)}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-018 ACTION",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 Unauthorized Create\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('POST'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c018id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-018',phase:'action',method:'POST',authMode:'noToken',targetId:pm.collectionVariables.get('c018id')||null,sent:JSON.parse(pm.variables.replaceIn(pm.request.body.raw)),status:pm.response.code,body:response}));pm.test('TC-C15-018: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-018 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-018 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c018before'));const id=Number(pm.collectionVariables.get('c018id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-018',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c018needsCleanup',!!p);pm.test('TC-C15-018: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-018 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c018id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c018needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-018 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-019",
+      "item": [
+        {
+          "name": "TC-C15-019 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-019 snapshot readable',pm.response.code===200&&Array.isArray(rows));pm.collectionVariables.set('c019before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-019',phase:'before',catalogCount:rows.length,catalogIds:rows.map(x=>x.id)}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-019 ACTION",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.c15.token"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 Unauthorized Create\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('POST'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c019id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-019',phase:'action',method:'POST',authMode:'invalidToken',targetId:pm.collectionVariables.get('c019id')||null,sent:JSON.parse(pm.variables.replaceIn(pm.request.body.raw)),status:pm.response.code,body:response}));pm.test('TC-C15-019: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-019 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-019 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c019before'));const id=Number(pm.collectionVariables.get('c019id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-019',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c019needsCleanup',!!p);pm.test('TC-C15-019: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-019 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c019id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c019needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-019 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-020",
+      "item": [
+        {
+          "name": "TC-C15-020 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-020 snapshot readable',pm.response.code===200&&Array.isArray(rows));pm.collectionVariables.set('c020before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-020',phase:'before',catalogCount:rows.length,catalogIds:rows.map(x=>x.id)}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-020 ACTION",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 Unauthorized Create\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('POST'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c020id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-020',phase:'action',method:'POST',authMode:'user',targetId:pm.collectionVariables.get('c020id')||null,sent:JSON.parse(pm.variables.replaceIn(pm.request.body.raw)),status:pm.response.code,body:response}));pm.test('TC-C15-020: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-020 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-020 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c020before'));const id=Number(pm.collectionVariables.get('c020id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-020',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c020needsCleanup',!!p);pm.test('TC-C15-020: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-020 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c020id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c020needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-020 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-021",
+      "item": [
+        {
+          "name": "TC-C15-021 SETUP target",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 CLI {{runId}} 021\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const b=pm.response.json();setup('TC-C15-021 fixture create',pm.response.code>=200&&pm.response.code<300&&Number.isInteger(b.id));pm.collectionVariables.set('c021id',b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-021 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-021 snapshot readable',pm.response.code===200&&Array.isArray(rows));const p=rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c021id')));setup('TC-C15-021 fixture verified',!!p&&p.name==='C15 CLI '+pm.collectionVariables.get('runId')+' 021'&&Number(p.price)===100000);pm.collectionVariables.set('c021before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-021',phase:'before',catalogCount:rows.length,target:rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c021id')))}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-021 ACTION",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/products/{{c021id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 Unauthorized Update\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('PUT'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c021id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-021',phase:'action',method:'PUT',authMode:'noToken',targetId:pm.collectionVariables.get('c021id')||null,sent:JSON.parse(pm.variables.replaceIn(pm.request.body.raw)),status:pm.response.code,body:response}));pm.test('TC-C15-021: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-021 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-021 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c021before'));const id=Number(pm.collectionVariables.get('c021id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-021',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c021needsCleanup',!!p);pm.test('TC-C15-021: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-021 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c021id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c021needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-021 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-022",
+      "item": [
+        {
+          "name": "TC-C15-022 SETUP target",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 CLI {{runId}} 022\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const b=pm.response.json();setup('TC-C15-022 fixture create',pm.response.code>=200&&pm.response.code<300&&Number.isInteger(b.id));pm.collectionVariables.set('c022id',b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-022 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-022 snapshot readable',pm.response.code===200&&Array.isArray(rows));const p=rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c022id')));setup('TC-C15-022 fixture verified',!!p&&p.name==='C15 CLI '+pm.collectionVariables.get('runId')+' 022'&&Number(p.price)===100000);pm.collectionVariables.set('c022before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-022',phase:'before',catalogCount:rows.length,target:rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c022id')))}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-022 ACTION",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/products/{{c022id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.c15.token"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 Unauthorized Update\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('PUT'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c022id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-022',phase:'action',method:'PUT',authMode:'invalidToken',targetId:pm.collectionVariables.get('c022id')||null,sent:JSON.parse(pm.variables.replaceIn(pm.request.body.raw)),status:pm.response.code,body:response}));pm.test('TC-C15-022: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-022 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-022 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c022before'));const id=Number(pm.collectionVariables.get('c022id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-022',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c022needsCleanup',!!p);pm.test('TC-C15-022: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-022 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c022id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c022needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-022 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-023",
+      "item": [
+        {
+          "name": "TC-C15-023 SETUP target",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 CLI {{runId}} 023\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const b=pm.response.json();setup('TC-C15-023 fixture create',pm.response.code>=200&&pm.response.code<300&&Number.isInteger(b.id));pm.collectionVariables.set('c023id',b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-023 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-023 snapshot readable',pm.response.code===200&&Array.isArray(rows));const p=rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c023id')));setup('TC-C15-023 fixture verified',!!p&&p.name==='C15 CLI '+pm.collectionVariables.get('runId')+' 023'&&Number(p.price)===100000);pm.collectionVariables.set('c023before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-023',phase:'before',catalogCount:rows.length,target:rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c023id')))}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-023 ACTION",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/products/{{c023id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 Unauthorized Update\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('PUT'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c023id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-023',phase:'action',method:'PUT',authMode:'user',targetId:pm.collectionVariables.get('c023id')||null,sent:JSON.parse(pm.variables.replaceIn(pm.request.body.raw)),status:pm.response.code,body:response}));pm.test('TC-C15-023: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-023 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-023 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c023before'));const id=Number(pm.collectionVariables.get('c023id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-023',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c023needsCleanup',!!p);pm.test('TC-C15-023: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-023 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c023id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c023needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-023 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-024",
+      "item": [
+        {
+          "name": "TC-C15-024 SETUP target",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 CLI {{runId}} 024\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const b=pm.response.json();setup('TC-C15-024 fixture create',pm.response.code>=200&&pm.response.code<300&&Number.isInteger(b.id));pm.collectionVariables.set('c024id',b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-024 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-024 snapshot readable',pm.response.code===200&&Array.isArray(rows));const p=rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c024id')));setup('TC-C15-024 fixture verified',!!p&&p.name==='C15 CLI '+pm.collectionVariables.get('runId')+' 024'&&Number(p.price)===100000);pm.collectionVariables.set('c024before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-024',phase:'before',catalogCount:rows.length,target:rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c024id')))}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-024 ACTION",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c024id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('DELETE'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c024id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-024',phase:'action',method:'DELETE',authMode:'noToken',targetId:pm.collectionVariables.get('c024id')||null,sent:null,status:pm.response.code,body:response}));pm.test('TC-C15-024: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-024 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-024 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c024before'));const id=Number(pm.collectionVariables.get('c024id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-024',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c024needsCleanup',!!p);pm.test('TC-C15-024: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-024 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c024id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c024needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-024 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-025",
+      "item": [
+        {
+          "name": "TC-C15-025 SETUP target",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 CLI {{runId}} 025\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const b=pm.response.json();setup('TC-C15-025 fixture create',pm.response.code>=200&&pm.response.code<300&&Number.isInteger(b.id));pm.collectionVariables.set('c025id',b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-025 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-025 snapshot readable',pm.response.code===200&&Array.isArray(rows));const p=rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c025id')));setup('TC-C15-025 fixture verified',!!p&&p.name==='C15 CLI '+pm.collectionVariables.get('runId')+' 025'&&Number(p.price)===100000);pm.collectionVariables.set('c025before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-025',phase:'before',catalogCount:rows.length,target:rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c025id')))}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-025 ACTION",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c025id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.c15.token"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('DELETE'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c025id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-025',phase:'action',method:'DELETE',authMode:'invalidToken',targetId:pm.collectionVariables.get('c025id')||null,sent:null,status:pm.response.code,body:response}));pm.test('TC-C15-025: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-025 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-025 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c025before'));const id=Number(pm.collectionVariables.get('c025id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-025',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c025needsCleanup',!!p);pm.test('TC-C15-025: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-025 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c025id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c025needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-025 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-026",
+      "item": [
+        {
+          "name": "TC-C15-026 SETUP target",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 CLI {{runId}} 026\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const b=pm.response.json();setup('TC-C15-026 fixture create',pm.response.code>=200&&pm.response.code<300&&Number.isInteger(b.id));pm.collectionVariables.set('c026id',b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-026 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-026 snapshot readable',pm.response.code===200&&Array.isArray(rows));const p=rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c026id')));setup('TC-C15-026 fixture verified',!!p&&p.name==='C15 CLI '+pm.collectionVariables.get('runId')+' 026'&&Number(p.price)===100000);pm.collectionVariables.set('c026before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-026',phase:'before',catalogCount:rows.length,target:rows.find(x=>Number(x.id)===Number(pm.collectionVariables.get('c026id')))}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-026 ACTION",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c026id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const response=pm.response.json();if('DELETE'==='POST'&&Number.isInteger(response.id))pm.collectionVariables.set('c026id',response.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-026',phase:'action',method:'DELETE',authMode:'user',targetId:pm.collectionVariables.get('c026id')||null,sent:null,status:pm.response.code,body:response}));pm.test('TC-C15-026: unauthorized write rejected',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(false);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-026 VERIFY after",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-026 read after',pm.response.code===200&&Array.isArray(rows));const before=JSON.parse(pm.collectionVariables.get('c026before'));const id=Number(pm.collectionVariables.get('c026id'));const p=rows.find(x=>Number(x.id)===id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-026',phase:'after',catalogCount:rows.length,target:p||null,newProducts:rows.filter(x=>!before.some(y=>y.id===x.id))}));pm.collectionVariables.set('c026needsCleanup',!!p);pm.test('TC-C15-026: no forbidden data change',function(){pm.expect(norm(rows)).to.deep.eql(before);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-026 CLEANUP own target",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c026id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get('c026needsCleanup'))pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-026 cleanup',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TC-C15-027",
+      "item": [
+        {
+          "name": "TC-C15-027 SNAPSHOT before",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-027 snapshot',pm.response.code===200&&Array.isArray(rows));pm.collectionVariables.set('c027before',JSON.stringify(norm(rows)));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-027',phase:'before',catalogCount:rows.length,catalogIds:rows.map(x=>x.id)}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-027 CREATE Admin",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 API Product {{runId}}\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const b=pm.response.json();setup('TC-C15-027 create Admin',pm.response.code>=200&&pm.response.code<300&&Number.isInteger(b.id));pm.collectionVariables.set('c027id',b.id);console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-027',phase:'create',status:pm.response.code,body:b}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-027 VERIFY create",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();const p=rows.find(x=>x.id===Number(pm.collectionVariables.get('c027id')));setup('TC-C15-027 product created correctly',pm.response.code===200&&!!p&&p.name==='C15 API Product '+pm.collectionVariables.get('runId')&&Number(p.price)===100000&&Number(p.category_id)===Number(pm.collectionVariables.get('categoryId')));pm.collectionVariables.set('c027created',JSON.stringify(p));console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-027',phase:'created',target:p}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-027 UPDATE Admin",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/products/{{c027id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"C15 API Updated {{runId}}\",\n  \"price\": 100000,\n  \"description\": \"C15 remaining API fixture\",\n  \"imageUrl\": \"\",\n  \"category_id\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-027 update succeeds',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-027',phase:'update',status:pm.response.code,body:pm.response.json()}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-027 VERIFY update",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();setup('TC-C15-027 updated list readable',pm.response.code===200&&Array.isArray(rows));const id=Number(pm.collectionVariables.get('c027id'));const p=rows.find(x=>x.id===id);const old=JSON.parse(pm.collectionVariables.get('c027created'));const expected={...old,name:'C15 API Updated '+pm.collectionVariables.get('runId')};pm.test('TC-C15-027 target updated exactly',function(){pm.expect(p).to.deep.eql(expected);});const before=JSON.parse(pm.collectionVariables.get('c027before'));pm.test('TC-C15-027 other products unchanged',function(){pm.expect(norm(rows.filter(x=>x.id!==id))).to.deep.eql(before);});console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-027',phase:'updated',target:p,otherProductsUnchanged:JSON.stringify(norm(rows.filter(x=>x.id!==id)))===JSON.stringify(before)}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-027 DELETE Admin",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/{{c027id}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "pm.test('TC-C15-027 delete succeeds',function(){pm.expect(pm.response.code>=200&&pm.response.code<300).to.eql(true);});console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-027',phase:'delete',status:pm.response.code,body:pm.response.json()}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-C15-027 VERIFY deleted",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+                  "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+                  "const rows=pm.response.json();const before=JSON.parse(pm.collectionVariables.get('c027before'));pm.test('TC-C15-027 deleted target and others preserved',function(){pm.expect(pm.response.code).to.eql(200);pm.expect(norm(rows)).to.deep.eql(before);});console.log('C15_EVIDENCE '+JSON.stringify({tc:'TC-C15-027',phase:'after',catalogCount:rows.length,target:rows.find(x=>x.id===Number(pm.collectionVariables.get('c027id')))||null,catalogRestored:JSON.stringify(norm(rows))===JSON.stringify(before)}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FINAL verify initial catalog preserved",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/products",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function setup(label,ok){pm.test(label,function(){pm.expect(ok).to.eql(true);});if(!ok){pm.execution.setNextRequest(null);throw Error('SETUP_BLOCKED '+label);}}",
+              "function norm(rows){return rows.map(p=>{const v={};Object.keys(p).sort().forEach(k=>v[k]=p[k]);return v;}).sort((a,b)=>Number(a.id)-Number(b.id));}",
+              "const rows=pm.response.json();const before=JSON.parse(pm.collectionVariables.get('baseline'));pm.test('All original products restored',function(){pm.expect(pm.response.code).to.eql(200);pm.expect(norm(rows)).to.deep.eql(before);});console.log('C15_RUN '+JSON.stringify({finalCount:rows.length,baselineCount:before.length,originalCatalogPreserved:JSON.stringify(norm(rows))===JSON.stringify(before)}));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
